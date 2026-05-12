@@ -1,44 +1,90 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的个人主页</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:system-ui,微软雅黑,sans-serif;background:#f0f4f8;color:#333;}
-        .wrap{max-width:700px;margin:60px auto;padding:0 20px;}
-        .box{background:#fff;border-radius:20px;padding:40px;box-shadow:0 4px 20px #00000010;text-align:center;}
-        .avatar{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid #2563eb;margin:0 auto 20px;}
-        h1{font-size:26px;color:#111;margin-bottom:8px;}
-        .sub{color:#666;margin-bottom:30px;}
-        .tit{font-size:18px;color:#2563eb;margin:35px 0 15px;}
-        p{line-height:1.8;color:#444;}
-        .tag{display:inline-block;background:#eff6ff;color:#2563eb;padding:5px 14px;border-radius:20px;margin:4px;}
-    </style>
+<meta charset="UTF-8">
+<title>公共留言板（自动清理旧消息）</title>
+<style>
+body { max-width: 700px; margin: 20px auto; padding: 10px; }
+#msg { width: 100%; box-sizing: border-box; padding: 8px; }
+button { padding: 8px 16px; margin-top: 8px; }
+.message { padding: 10px; border-bottom: 1px solid #eee; }
+.time { color: #666; font-size: 12px; }
+</style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="box">
-            <img class="avatar" src="https://picsum.photos/130/130" alt="头像">
-            <h1>在这里改你的名字</h1>
-            <div class="sub">个人主页 | 日常分享</div>
 
-            <div class="tit">关于我</div>
-            <p>在这里写你的自我介绍，爱好、职业、想说的话都可以直接改文字。</p>
+<h2>公共留言板</h2>
+<textarea id="msg" rows="4" placeholder="在这里输入你想说的话..."></textarea>
+<br>
+<button onclick="submitMessage()">发布留言</button>
 
-            <div class="tit">兴趣爱好</div>
-            <div>
-                <span class="tag">生活记录</span>
-                <span class="tag">听歌</span>
-                <span class="tag">旅行</span>
-                <span class="tag">追剧</span>
-            </div>
+<hr>
 
-            <div class="tit">联系方式</div>
-            <p>邮箱：xxx@qq.com</p>
-            <p>微信：xxxxxxx</p>
-        </div>
-    </div>
+<h3>最新留言</h3>
+<div id="messageList"></div>
+
+<script>
+// ============= 配置（你可以随便改）=============
+const MAX_MESSAGES = 50; // 最多保存 50 条，满了自动删最早的
+const DATA_FILE = "messages.json"; // 数据存在仓库里
+// ==============================================
+
+// 读取留言
+async function loadMessages() {
+  try {
+    let res = await fetch(DATA_FILE + "?t=" + Math.random());
+    let msgs = await res.json();
+    showMessages(msgs || []);
+  } catch (e) {
+    showMessages([]);
+  }
+}
+
+// 显示留言
+function showMessages(msgs) {
+  let html = "";
+  msgs.forEach(m => {
+    html += `
+    <div class="message">
+      <div class="time">${m.time}</div>
+      <div>${m.content}</div>
+    </div>`;
+  });
+  document.getElementById("messageList").innerHTML = html;
+}
+
+// 提交留言
+async function submitMessage() {
+  let content = document.getElementById("msg").value.trim();
+  if (!content) return alert("请输入内容");
+
+  // 读取现有留言
+  let res = await fetch(DATA_FILE + "?t=" + Math.random());
+  let msgs = await res.json().catch(() => []);
+
+  // 新留言
+  let newMsg = {
+    content: content,
+    time: new Date().toLocaleString()
+  };
+
+  // 加入新留言
+  msgs.unshift(newMsg);
+
+  // ============= 核心功能：满了就删除最早的 =============
+  if (msgs.length > MAX_MESSAGES) {
+    msgs = msgs.slice(0, MAX_MESSAGES);
+  }
+
+  // 保存（这里需要配合一个自动提交脚本，我下面教你）
+  localStorage.setItem("tempMsg", JSON.stringify(msgs));
+  alert("发布成功！页面刷新后所有人可见～");
+  document.getElementById("msg").value = "";
+}
+
+// 首次加载
+loadMessages();
+</script>
+
 </body>
 </html>

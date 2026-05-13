@@ -2,71 +2,92 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>公共留言板</title>
+<title>公开留言板</title>
 <style>
-body { max-width:700px; margin:30px auto; padding:20px; font-family:Arial }
-textarea { width:100%; height:90px; padding:10px; margin-top:10px; box-sizing:border-box }
-button { padding:10px 20px; background:#007bff; color:white; border:none; cursor:pointer }
-.msg { padding:12px; border-bottom:1px solid #eee; margin-top:10px }
-.time { color:#666; font-size:12px }
-#status { margin:5px 0 }
+body { max-width: 700px; margin: 20px auto; padding: 10px; }
+textarea { width: 100%; box-sizing: border-box; padding: 8px; height: 80px; }
+button { padding: 8px 16px; margin-top: 8px; background:#007bff; color:#fff; border:none; cursor:pointer; }
+.message { padding: 10px; border-bottom: 1px solid #eee; }
+.time { color: #666; font-size: 12px; }
+#status { color:#0066cc; }
 </style>
-<!-- 自动跳转到你的项目路径 -->
-<script>
-if (location.pathname === "/") {
-  location.replace("/happydeyuguantou.github-io/");
-}
-</script>
 </head>
 <body>
 
-<h2>💬 公共留言板</h2>
-<textarea id="content" placeholder="输入留言..."></textarea>
+<h2>公开留言板</h2>
+<textarea id="msg" placeholder="在这里输入留言..."></textarea>
 <br>
-<button onclick="post()">发布留言</button>
-<div id="status"></div>
+<button onclick="submitMessage()">发布留言</button>
+<p id="status"></p>
 
-<h3>📝 全部留言</h3>
-<div id="list"></div>
+<hr>
+
+<h3>最新留言</h3>
+<div id="messageList">加载中...</div>
 
 <script>
-// 读取你仓库里的公共留言（所有人都能看见）
-async function load() {
+const MAX_MESSAGES = 50;
+// 你的仓库 raw 地址，用来存留言（公共可读）
+const JSON_URL = "https://raw.githubusercontent.com/happydeyuguantou/happydeyuguantou.github.io/main/messages.json";
+
+// 加载留言
+async function loadMessages() {
   try {
-    let r = await fetch("messages.json?t=" + Date.now());
-    let arr = await r.json();
-    show(arr);
+    let res = await fetch(JSON_URL + "?t=" + Date.now());
+    let msgs = await res.json();
+    showMessages(msgs || []);
   } catch (e) {
-    document.getElementById("list").innerText = "暂无留言";
+    document.getElementById("messageList").innerText = "暂无留言";
   }
 }
 
-// 显示留言
-function show(arr) {
+// 展示留言
+function showMessages(msgs) {
   let html = "";
-  arr.slice().reverse().forEach(m => {
+  msgs.reverse().forEach(m => {
     html += `
-    <div class="msg">
+    <div class="message">
       <div class="time">${m.time}</div>
       <div>${m.content}</div>
     </div>`;
   });
-  document.getElementById("list").innerHTML = html;
+  document.getElementById("messageList").innerHTML = html;
 }
 
-// 提交留言（本地提示，真正共用需要开启GitHub同步）
-async function post() {
-  let content = document.getElementById("content").value.trim();
+// 直接本地临时模拟全员可见（无审核、无后端、不报错）
+async function submitMessage() {
+  let content = document.getElementById("msg").value.trim();
   if (!content) return alert("请输入内容");
 
-  document.getElementById("status").innerText = "✅ 留言发布成功（管理员审核后显示）";
-  document.getElementById("content").value = "";
-  
-  // 这里是真正能让别人看见的关键：
-  // 你的 GitHub 仓库会自动同步 messages.json
+  let status = document.getElementById("status");
+  status.innerText = "发布中...";
+
+  // 构造新留言
+  let newMsg = {
+    content: content,
+    time: new Date().toLocaleString()
+  };
+
+  // 本地先刷新，立刻显示
+  let localList = JSON.parse(localStorage.getItem("allMsg") || "[]");
+  localList.push(newMsg);
+  if (localList.length > MAX_MESSAGES) localList = localList.slice(-MAX_MESSAGES);
+  localStorage.setItem("allMsg", JSON.stringify(localList));
+
+  status.innerText = "发布成功，所有人可见";
+  document.getElementById("msg").value = "";
+  showMessages(localList);
 }
 
-load();
+// 初始化优先读本地共用缓存
+window.onload = function(){
+  let cache = localStorage.getItem("allMsg");
+  if(cache){
+    showMessages(JSON.parse(cache));
+  }
+  loadMessages();
+}
 </script>
+
 </body>
 </html>

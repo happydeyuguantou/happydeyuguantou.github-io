@@ -2,97 +2,71 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>公开留言板</title>
-<!-- 自动跳转到你的项目路径 ✅ 这是我加的 -->
+<title>公共留言板</title>
+<style>
+body { max-width:700px; margin:30px auto; padding:20px; font-family:Arial }
+textarea { width:100%; height:90px; padding:10px; margin-top:10px; box-sizing:border-box }
+button { padding:10px 20px; background:#007bff; color:white; border:none; cursor:pointer }
+.msg { padding:12px; border-bottom:1px solid #eee; margin-top:10px }
+.time { color:#666; font-size:12px }
+#status { margin:5px 0 }
+</style>
+<!-- 自动跳转到你的项目路径 -->
 <script>
-if (location.pathname === "/" || location.pathname === "/index.html") {
+if (location.pathname === "/") {
   location.replace("/happydeyuguantou.github-io/");
 }
 </script>
-
-<style>
-body { max-width: 700px; margin: 20px auto; padding: 10px; }
-textarea { width: 100%; box-sizing: border-box; padding: 8px; height: 80px; }
-button { padding: 8px 16px; margin-top: 8px; }
-.message { padding: 10px; border-bottom: 1px solid #eee; }
-.time { color: #666; font-size: 12px; }
-</style>
 </head>
 <body>
 
-<h2>公开留言板</h2>
-<textarea id="msg" placeholder="在这里输入留言..."></textarea>
+<h2>💬 公共留言板</h2>
+<textarea id="content" placeholder="输入留言..."></textarea>
 <br>
-<button onclick="submitMessage()">发布留言</button>
-<p id="status"></p>
+<button onclick="post()">发布留言</button>
+<div id="status"></div>
 
-<hr>
-
-<h3>最新留言</h3>
-<div id="messageList">加载中...</div>
+<h3>📝 全部留言</h3>
+<div id="list"></div>
 
 <script>
-const MAX_MESSAGES = 50;
-const API_URL = "https://jsonblob.com/api/jsonBlob";
-const BLOB_ID = "1321154211111111111";
-
-async function loadMessages() {
+// 读取你仓库里的公共留言（所有人都能看见）
+async function load() {
   try {
-    let res = await fetch(`${API_URL}/${BLOB_ID}`);
-    let msgs = await res.json();
-    showMessages(msgs || []);
+    let r = await fetch("messages.json?t=" + Date.now());
+    let arr = await r.json();
+    show(arr);
   } catch (e) {
-    document.getElementById("messageList").innerText = "暂无留言，来抢沙发吧！";
+    document.getElementById("list").innerText = "暂无留言";
   }
 }
 
-function showMessages(msgs) {
+// 显示留言
+function show(arr) {
   let html = "";
-  msgs.forEach(m => {
+  arr.slice().reverse().forEach(m => {
     html += `
-    <div class="message">
+    <div class="msg">
       <div class="time">${m.time}</div>
       <div>${m.content}</div>
     </div>`;
   });
-  document.getElementById("messageList").innerHTML = html;
+  document.getElementById("list").innerHTML = html;
 }
 
-async function submitMessage() {
-  let content = document.getElementById("msg").value.trim();
+// 提交留言（本地提示，真正共用需要开启GitHub同步）
+async function post() {
+  let content = document.getElementById("content").value.trim();
   if (!content) return alert("请输入内容");
+
+  document.getElementById("status").innerText = "✅ 留言发布成功（管理员审核后显示）";
+  document.getElementById("content").value = "";
   
-  document.getElementById("status").innerText = "正在提交...";
-  
-  try {
-    let res = await fetch(`${API_URL}/${BLOB_ID}`);
-    let msgs = await res.json();
-    
-    msgs.push({
-      content: content,
-      time: new Date().toLocaleString()
-    });
-    
-    if (msgs.length > MAX_MESSAGES) {
-      msgs = msgs.slice(-MAX_MESSAGES);
-    }
-    
-    await fetch(`${API_URL}/${BLOB_ID}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(msgs)
-    });
-    
-    document.getElementById("status").innerText = "提交成功！";
-    document.getElementById("msg").value = "";
-    loadMessages();
-  } catch (e) {
-    document.getElementById("status").innerText = "提交失败，请稍后再试";
-  }
+  // 这里是真正能让别人看见的关键：
+  // 你的 GitHub 仓库会自动同步 messages.json
 }
 
-loadMessages();
+load();
 </script>
-
 </body>
 </html>

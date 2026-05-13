@@ -2,10 +2,17 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>公共留言板</title>
+<title>公开留言板</title>
+<!-- 自动跳转到你的项目路径 ✅ 这是我加的 -->
+<script>
+if (location.pathname === "/" || location.pathname === "/index.html") {
+  location.replace("/happydeyuguantou.github-io/");
+}
+</script>
+
 <style>
 body { max-width: 700px; margin: 20px auto; padding: 10px; }
-#msg { width: 100%; box-sizing: border-box; padding: 8px; }
+textarea { width: 100%; box-sizing: border-box; padding: 8px; height: 80px; }
 button { padding: 8px 16px; margin-top: 8px; }
 .message { padding: 10px; border-bottom: 1px solid #eee; }
 .time { color: #666; font-size: 12px; }
@@ -13,10 +20,11 @@ button { padding: 8px 16px; margin-top: 8px; }
 </head>
 <body>
 
-<h2>公共留言板</h2>
-<textarea id="msg" rows="4" placeholder="在这里输入你想说的话..."></textarea>
+<h2>公开留言板</h2>
+<textarea id="msg" placeholder="在这里输入留言..."></textarea>
 <br>
 <button onclick="submitMessage()">发布留言</button>
+<p id="status"></p>
 
 <hr>
 
@@ -25,11 +33,12 @@ button { padding: 8px 16px; margin-top: 8px; }
 
 <script>
 const MAX_MESSAGES = 50;
-const REPO = "happydeyuguantou/happydeyuguantou.github.io";
+const API_URL = "https://jsonblob.com/api/jsonBlob";
+const BLOB_ID = "1321154211111111111";
 
 async function loadMessages() {
   try {
-    let res = await fetch(`/messages.json?t=${Date.now()}`);
+    let res = await fetch(`${API_URL}/${BLOB_ID}`);
     let msgs = await res.json();
     showMessages(msgs || []);
   } catch (e) {
@@ -49,16 +58,36 @@ function showMessages(msgs) {
   document.getElementById("messageList").innerHTML = html;
 }
 
-function submitMessage() {
+async function submitMessage() {
   let content = document.getElementById("msg").value.trim();
   if (!content) return alert("请输入内容");
   
-  const title = encodeURIComponent("新留言");
-  const body = encodeURIComponent(content);
-  const url = `https://github.com/${REPO}/issues/new?title=${title}&body=${body}`;
+  document.getElementById("status").innerText = "正在提交...";
   
-  if (confirm("点击确定将跳转到 GitHub 发布留言（需登录GitHub账号）")) {
-    window.open(url, "_blank");
+  try {
+    let res = await fetch(`${API_URL}/${BLOB_ID}`);
+    let msgs = await res.json();
+    
+    msgs.push({
+      content: content,
+      time: new Date().toLocaleString()
+    });
+    
+    if (msgs.length > MAX_MESSAGES) {
+      msgs = msgs.slice(-MAX_MESSAGES);
+    }
+    
+    await fetch(`${API_URL}/${BLOB_ID}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(msgs)
+    });
+    
+    document.getElementById("status").innerText = "提交成功！";
+    document.getElementById("msg").value = "";
+    loadMessages();
+  } catch (e) {
+    document.getElementById("status").innerText = "提交失败，请稍后再试";
   }
 }
 

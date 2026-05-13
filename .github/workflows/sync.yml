@@ -1,0 +1,52 @@
+name: Sync Messages
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Sync issues to messages.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_MESSAGES: 50
+        run: |
+          import requests, json, os, datetime
+          
+          owner, repo = os.environ['GITHUB_REPOSITORY'].split('/')
+          token = os.environ['GITHUB_TOKEN']
+          headers = {"Authorization": f"token {token}"}
+          
+          res = requests.get(f"https://api.github.com/repos/{owner}/{repo}/issues?state=all&per_page=100", headers=headers)
+          issues = res.json()
+          
+          messages = []
+          for issue in issues:
+              messages.append({
+                  "content": issue['body'],
+                  "time": issue['created_at'].replace("T", " ").replace("Z", ""),
+                  "id": issue['number']
+              })
+          
+          messages.sort(key=lambda x: x['time'], reverse=True)
+          messages = messages[:int(os.environ['MAX_MESSAGES'])]
+          
+          with open("messages.json", "w", encoding="utf-8") as f:
+              json.dump(messages, f, ensure_ascii=False, indent=2)
+          
+          os.system("git config --global user.name 'github-actions[bot]'")
+          os.system("git config --global user.email 'github-actions[bot]@users.noreply.github.com'")
+          os.system("git add messages.json")
+          os.system("git commit -m 'Update messages.json' || echo 'No changes to commit'")
+          os.system("git push")

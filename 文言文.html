@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文言文字词学习&测试（多篇目+计分版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", 宋体;
+        }
+        body {
+            background: #f4f5f7;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #ddd;
+        }
+        header {
+            background: #2d5b99;
+            color: #fff;
+            padding: 18px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        /* 标签栏 */
+        .tab-wrap {
+            display: flex;
+            border-bottom: 1px solid #eee;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            color: #2d5b99;
+            border-bottom: 3px solid #2d5b99;
+            font-weight: bold;
+        }
+        .content {
+            padding: 25px;
+        }
+        .hide {
+            display: none !important;
+        }
+
+        /* ========== 原文浏览页样式 ========== */
+        .select-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        select, input {
+            padding: 7px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 7px 16px;
+            background: #2d5b99;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+        .article-main {
+            border: 1px solid #e8e8e8;
+            padding: 20px;
+            border-radius: 6px;
+            min-height: 240px;
+            line-height: 2.1;
+            font-size: 16px;
+        }
+        .char {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+        .char:hover {
+            background: #e6f0ff;
+        }
+        .char.active {
+            background: #d0e2ff;
+        }
+        /* 悬浮释义弹窗 */
+        .float-tip {
+            position: absolute;
+            background: #fff;
+            border: 2px solid #2d5b99;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0.15);
+            z-index: 999;
+            max-width: 320px;
+            font-size: 14px;
+        }
+        .global-note {
+            margin-top: 20px;
+            border-top: 1px dashed #ccc;
+            padding-top: 15px;
+        }
+        .note-item {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .note-item span {
+            background: #eef4ff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+
+        /* ========== 答题页样式 ========== */
+        .set-panel {
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .row {
+            margin: 12px 0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .article-check {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .check-item {
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .stat-bar {
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 30px;
+        }
+        .q-box {
+            border: 1px solid #e8e8e8;
+            padding: 20px;
+            border-radius: 6px;
+            min-height: 260px;
+        }
+        .q-sentence {
+            font-size: 16px;
+            line-height: 1.8;
+            margin: 15px 0;
+        }
+        .q-word {
+            color: #d82e2e;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .opts {
+            margin: 20px 0;
+            display: grid;
+            gap: 10px;
+        }
+        .opt {
+            border: 1px solid #ccc;
+            padding: 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .opt:hover {
+            border-color: #2d5b99;
+            background: #f7f9ff;
+        }
+        .opt.correct {
+            border-color: #27ae60;
+            background: #f0f9f4;
+            pointer-events: none;
+        }
+        .opt.error {
+            border-color: #e74c3c;
+            background: #fef2f2;
+            pointer-events: none;
+        }
+        .tip-text {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .right {color: #27ae60;}
+        .wrong {color: #e74c3c;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h2>新编初中文言文 字词学习与自测系统</h2>
+    </header>
+
+    <!-- 标签切换 -->
+    <div class="tab-wrap">
+        <button class="tab-btn active" data-page="read">原文浏览</button>
+        <button class="tab-btn" data-page="test">字词测试</button>
+    </div>
+
+    <!-- ===================== 页面1：原文浏览 ===================== -->
+    <div class="content" id="readPage">
+        <div class="select-bar">
+            <label>选择篇目：</label>
+            <select id="artSelect">
+                <option value="">请选择篇目</option>
+                <option value="64">64. 王义士夫妇见义勇为</option>
+                <option value="77">77. 范仲淹巧劝滕子京</option>
+                <option value="83">83. 车夫妻子的规劝</option>
+                <option value="86">86. 仲永的不幸</option>
+                <option value="88">88. 艾子杖责孙儿</option>
+                <option value="89">89. 愚蠢的父子</option>
+                <option value="91">91. 缇萦救父</option>
+                <option value="95">95. 黄仙裳助人</option>
+            </select>
+            <button class="btn" id="switchNoteBtn">全局显示注释</button>
+        </div>
+        <div class="article-main" id="artMain">请在上方选择对应篇目查看原文</div>
+        <div class="global-note hide" id="globalNote"></div>
+        <!-- 悬浮释义弹窗 -->
+        <div class="float-tip hide" id="floatTip"></div>
+    </div>
+
+    <!-- ===================== 页面2：字词测试 ===================== -->
+    <div class="content hide" id="testPage">
+        <div class="set-panel">
+            <div class="row">
+                <label>考察题型：</label>
+                <select id="testType">
+                    <option value="all">全考（虚词+古今异义）</option>
+                    <option value="empty">仅文言虚词</option>
+                    <option value="oldnew">仅古今异义</option>
+                </select>
+                <label>答题总数：</label>
+                <input type="number" id="totalQ" min="1" value="10">
+                <button class="btn" id="startTestBtn">开始答题</button>
+            </div>
+            <div>
+                <p style="margin-bottom:8px;">选择考察篇目（可多选）：</p>
+                <div class="article-check" id="artCheck">
+                    <label class="check-item"><input type="checkbox" value="64" checked> 64</label>
+                    <label class="check-item"><input type="checkbox" value="77" checked> 77</label>
+                    <label class="check-item"><input type="checkbox" value="83" checked> 83</label>
+                    <label class="check-item"><input type="checkbox" value="86" checked> 86</label>
+                    <label class="check-item"><input type="checkbox" value="88" checked> 88</label>
+                    <label class="check-item"><input type="checkbox" value="89" checked> 89</label>
+                    <label class="check-item"><input type="checkbox" value="91" checked> 91</label>
+                    <label class="check-item"><input type="checkbox" value="95" checked> 95</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 计分统计栏 -->
+        <div class="stat-bar" id="statBar">
+            <div>总题数：<span id="allNum">0</span></div>
+            <div>已答：<span id="doneNum">0</span></div>
+            <div>答对：<span id="rightNum">0</span></div>
+            <div>答错：<span id="wrongNum">0</span></div>
+            <div>正确率：<span id="rate">0%</span></div>
+        </div>
+
+        <!-- 题目区域 -->
+        <div class="q-box" id="qBox">请选择篇目、题型并点击【开始答题】</div>
+    </div>
+</div>
+
+<script>
+// ===================== 全局数据（8篇文章 + 扩充混淆释义） =====================
+const articleData = [
+    {
+        id:64,
+        title:"64. 王义士夫妇见义勇为",
+        text:"王义士者，失其名，泰州如泉县隶也。虽隶，能以气节自重，任侠好义。甲申国亡后，同邑布衣许元博德溥不肯剃发，刺臂誓死。有司以抗令弃之市，妻当徙。王适值解，高德溥之义，欲脱其妻而无术，乃终夜欷歔不成寐。其妻怪之，问曰：“君何为彷徨如此耶？”王不答。妻又曰：“子毋以我妇人也而忽之，子第语我，我能为子筹之。”王语之故，妻曰：“子高德溥义而欲脱其妻，此豪杰之举也，诚得一人代之可矣。”王曰：“然。顾安得其人哉？”妻曰：“吾当成子之义，愿代以行。",
+        sentences: [
+            "王义士者，失其名，泰州如泉县隶也。",
+            "虽隶，能以气节自重，任侠好义。",
+            "妻当徙。王适值解，高德溥之义。",
+            "乃终夜欷歔不成寐。",
+            "其妻怪之，问曰：“君何为彷徨如此耶？”",
+            "子毋以我妇人也而忽之。",
+            "子第语我，我能为子筹之。",
+            "诚得一人代之可矣。",
+            "然。顾安得其人哉？"
+        ],
+        chars:[
+            {char:"者",pinyin:"zhě",type:"empty",origin:"表判断的语气词",explain:["表判断","表停顿","......的人","指代事物"]},
+            {char:"隶",pinyin:"lì",type:"oldnew",origin:"差役，古代小官吏",explain:["差役","附属","下属","奴隶"]},
+            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["虽然","即使","纵然","可是"]},
+            {char:"邑",pinyin:"yì",type:"oldnew",origin:"同乡人",explain:["同乡","县城","城镇","封地"]},
+            {char:"徙",pinyin:"xǐ",type:"oldnew",origin:"流放",explain:["流放","迁移","调动官职","搬走"]},
+            {char:"适",pinyin:"shì",type:"empty",origin:"恰逢",explain:["恰逢","前往","适合","刚才"]},
+            {char:"高",pinyin:"gāo",type:"oldnew",origin:"钦佩",explain:["钦佩","高大","抬高","出众"]},
+            {char:"术",pinyin:"shù",type:"oldnew",origin:"办法",explain:["办法","技艺","策略","学问"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["于是","才","竟然","仅仅"]},
+            {char:"怪",pinyin:"guài",type:"oldnew",origin:"感到奇怪",explain:["感到奇怪","怪异","责怪","奇特"]},
+            {char:"毋",pinyin:"wú",type:"empty",origin:"不要",explain:["不要","不","别","无需"]},
+            {char:"忽",pinyin:"hū",type:"oldnew",origin:"轻视",explain:["轻视","忽然","忽略","粗心"]},
+            {char:"第",pinyin:"dì",type:"empty",origin:"只管",explain:["只管","次序","门第","只是"]},
+            {char:"故",pinyin:"gù",type:"empty",origin:"缘故",explain:["缘故","所以","旧的","故意"]},
+            {char:"诚",pinyin:"chéng",type:"empty",origin:"如果",explain:["如果","确实","真心","实在"]},
+            {char:"然",pinyin:"rán",type:"empty",origin:"对",explain:["对","这样","但是","样子"]},
+            {char:"顾",pinyin:"gù",type:"empty",origin:"可是",explain:["可是","回头看","探望","考虑"]}
+        ]
+    },
+    {
+        id:77,
+        title:"77. 范仲淹巧劝滕子京",
+        text:"滕子京谪守巴陵郡，公与友善。滕锐意兴作，劳民伤财，人多议之。仲淹患之，欲谏而恐其不悦。一日，从容谓曰：“君知湖泽之蛙乎？终日鸣不止，人孰听之？若敛声静处，反使人思。”滕悟，遂止其役。",
+        sentences: [
+            "滕子京谪守巴陵郡，公与友善。",
+            "劳民伤财，人多议之。",
+            "仲淹患之，欲谏而恐其不悦。",
+            "终日鸣不止，人孰听之？",
+            "若敛声静处，反使人思。",
+            "滕悟，遂止其役。"
+        ],
+        chars:[
+            {char:"谪",pinyin:"zhé",type:"oldnew",origin:"被贬官",explain:["被贬官","流放","责罚","降职"]},
+            {char:"守",pinyin:"shǒu",type:"oldnew",origin:"担任郡守",explain:["担任郡守","守卫","遵守","太守"]},
+            {char:"与",pinyin:"yǔ",type:"empty",origin:"和",explain:["和","给予","结交","赞同"]},
+            {char:"劳",pinyin:"láo",type:"oldnew",origin:"使劳累",explain:["使劳累","劳动","功劳","辛劳"]},
+            {char:"议",pinyin:"yì",type:"oldnew",origin:"议论",explain:["议论","商讨","意见","批评"]},
+            {char:"患",pinyin:"huàn",type:"oldnew",origin:"担忧",explain:["担忧","灾祸","生病","忧患"]},
+            {char:"欲",pinyin:"yù",type:"empty",origin:"想要",explain:["想要","欲望","将要","希望"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"却",explain:["却","并且","就","表修饰"]},
+            {char:"恐",pinyin:"kǒng",type:"empty",origin:"担心",explain:["担心","害怕","恐怕","恐吓"]},
+            {char:"孰",pinyin:"shú",type:"empty",origin:"谁",explain:["谁","哪一个","什么","何人"]},
+            {char:"若",pinyin:"ruò",type:"empty",origin:"如果",explain:["如果","你","如同","比得上"]},
+            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["于是","最终","终于","而后"]}
+        ]
+    },
+    {
+        id:83,
+        title:"83. 车夫妻子的规劝",
+        text:"晏子为齐相，出，其御之妻从门间而窥。其夫为相御，拥大盖，策驷马，意气洋洋，甚自得。既而归，其妻请去。夫问其故。妻曰：“晏子长不满六尺，身相齐国，名显诸侯。今者妾观其出，志念深矣，常有以自下者。今子长八尺，乃为人仆御，然子之意，自以为足，妾是以求去也。”其后，夫自抑损。晏子怪而问之，御以实对。晏子荐以为大夫。",
+        sentences: [
+            "晏子为齐相，出，其御之妻从门间而窥。",
+            "既而归，其妻请去。",
+            "夫问其故。",
+            "晏子长不满六尺，身相齐国，名显诸侯。",
+            "乃为人仆御，然子之意。",
+            "妾是以求去也。",
+            "晏子怪而问之，御以实对。"
+        ],
+        chars:[
+            {char:"为",pinyin:"wéi",type:"empty",origin:"担任",explain:["担任","做","是","被","替"]},
+            {char:"御",pinyin:"yù",type:"oldnew",origin:"车夫",explain:["车夫","驾驭","抵挡","侍奉"]},
+            {char:"间",pinyin:"jiān",type:"oldnew",origin:"缝隙",explain:["缝隙","中间","期间","暗中"]},
+            {char:"窥",pinyin:"kuī",type:"oldnew",origin:"偷看",explain:["偷看","观察","窥探","查看"]},
+            {char:"策",pinyin:"cè",type:"oldnew",origin:"鞭打",explain:["鞭打","马鞭","计谋","筹划"]},
+            {char:"既",pinyin:"jì",type:"empty",origin:"已经",explain:["已经","既然","随后","之后"]},
+            {char:"去",pinyin:"qù",type:"oldnew",origin:"离开",explain:["离开","前往","距离","除掉"]},
+            {char:"故",pinyin:"gù",type:"empty",origin:"原因",explain:["原因","所以","旧的","特意"]},
+            {char:"长",pinyin:"cháng",type:"oldnew",origin:"身高",explain:["身高","长度","长久","优点"]},
+            {char:"显",pinyin:"xiǎn",type:"oldnew",origin:"扬名",explain:["扬名","明显","显露","显赫"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"用来",explain:["用来","把","凭借","因为"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"竟然",explain:["竟然","于是","才","只"]},
+            {char:"然",pinyin:"rán",type:"empty",origin:"但是",explain:["但是","这样","样子","然而"]},
+            {char:"是",pinyin:"shì",type:"empty",origin:"这",explain:["这","判断词","正确","此处"]},
+            {char:"怪",pinyin:"guài",type:"oldnew",origin:"感到奇怪",explain:["感到奇怪","怪异","责怪","惊奇"]},
+            {char:"对",pinyin:"duì",type:"oldnew",origin:"回答",explain:["回答","面对","相对","应答"]}
+        ]
+    },
+    {
+        id:86,
+        title:"86. 仲永的不幸",
+        text:"金溪民方仲永，世隶耕。仲永生五年，未尝识书具，忽啼求之。父异焉，借旁近与之，即书诗四句，并自为其名。其诗以养父母、收族为意。自是指物作诗立就。邑人奇之，稍稍宾客其父。父利其然也，日扳仲永环谒于邑人，不使学。泯然众人矣。",
+        sentences: [
+            "金溪民方仲永，世隶耕。",
+            "仲永生五年，未尝识书具。",
+            "父异焉，借旁近与之。",
+            "自是指物作诗立就。",
+            "邑人奇之，稍稍宾客其父。",
+            "父利其然也，日扳仲永环谒于邑人。"
+        ],
+        chars:[
+            {char:"隶",pinyin:"lì",type:"oldnew",origin:"属于",explain:["属于","附属","差役","奴隶"]},
+            {char:"生",pinyin:"shēng",type:"oldnew",origin:"长到",explain:["长到","出生","生存","生命"]},
+            {char:"尝",pinyin:"cháng",type:"empty",origin:"曾经",explain:["曾经","品尝","尝试","过往"]},
+            {char:"识",pinyin:"shí",type:"oldnew",origin:"认识",explain:["认识","知识","识别","知道"]},
+            {char:"异",pinyin:"yì",type:"oldnew",origin:"诧异",explain:["诧异","不同","奇异","惊奇"]},
+            {char:"与",pinyin:"yǔ",type:"empty",origin:"给",explain:["给","和","结交","赞许"]},
+            {char:"并",pinyin:"bìng",type:"empty",origin:"并且",explain:["并且","一起","连同","同时"]},
+            {char:"自",pinyin:"zì",type:"empty",origin:"自己",explain:["自己","从","本来","亲自"]},
+            {char:"是",pinyin:"shì",type:"empty",origin:"这",explain:["这","判断词","正确","此物"]},
+            {char:"就",pinyin:"jiù",type:"oldnew",origin:"完成",explain:["完成","靠近","立刻","从事"]},
+            {char:"奇",pinyin:"qí",type:"oldnew",origin:"以...为奇",explain:["以...为奇","奇特","罕见","惊奇"]},
+            {char:"稍",pinyin:"shāo",type:"oldnew",origin:"渐渐",explain:["渐渐","稍微","略微","逐步"]},
+            {char:"利",pinyin:"lì",type:"oldnew",origin:"认为有利",explain:["认为有利","利益","锋利","好处"]},
+            {char:"扳",pinyin:"pān",type:"oldnew",origin:"拉着",explain:["拉着","扳动","拉","拽"]}
+        ]
+    },
+    {
+        id:88,
+        title:"88. 艾子杖责孙儿",
+        text:"艾有孙，年十许，慵劣不学，每加榎楚而不悛。其父仅有是儿，恒恐儿之不胜杖而死也，责必涕泣以请。艾子怒曰：“吾为若教子不善邪？”杖之愈峻。一旦，雪作，孙抟雪而嬉。艾子褫其衣，使跪雪中。其子亦脱其衣跪其旁。",
+        sentences: [
+            "年十许，慵劣不学。",
+            "其父仅有是儿，恒恐儿之不胜杖而死也。",
+            "责必涕泣以请。",
+            "吾为若教子不善邪？",
+            "杖之愈峻。",
+            "一旦，雪作，孙抟雪而嬉。"
+        ],
+        chars:[
+            {char:"许",pinyin:"xǔ",type:"oldnew",origin:"左右",explain:["左右","答应","允许","大约"]},
+            {char:"每",pinyin:"měi",type:"empty",origin:"常常",explain:["常常","每次","每逢","屡屡"]},
+            {char:"是",pinyin:"shì",type:"empty",origin:"这",explain:["这","判断词","正确","此物"]},
+            {char:"恒",pinyin:"héng",type:"empty",origin:"常常",explain:["常常","长久","固定","一直"]},
+            {char:"胜",pinyin:"shèng",type:"oldnew",origin:"承受",explain:["承受","胜利","超过","优美"]},
+            {char:"请",pinyin:"qǐng",type:"oldnew",origin:"求情",explain:["求情","请求","邀请","恳请"]},
+            {char:"为",pinyin:"wèi",type:"empty",origin:"替",explain:["替","做","被","因为"]},
+            {char:"若",pinyin:"ruò",type:"empty",origin:"你",explain:["你","如同","如果","对方"]},
+            {char:"邪",pinyin:"yé",type:"empty",origin:"吗",explain:["吗","呢","啊","语气词"]},
+            {char:"愈",pinyin:"yù",type:"empty",origin:"更加",explain:["更加","痊愈","越过","越发"]},
+            {char:"作",pinyin:"zuò",type:"oldnew",origin:"降下",explain:["降下","劳作","创作","兴起"]},
+            {char:"抟",pinyin:"tuán",type:"oldnew",origin:"揉捏",explain:["揉捏","盘旋","聚集","团起"]},
+            {char:"褫",pinyin:"chǐ",type:"oldnew",origin:"脱下",explain:["脱下","剥夺","除去","取下"]}
+        ]
+    },
+    {
+        id:89,
+        title:"89. 愚蠢的父子",
+        text:"齐有富人，家累千金。其二子甚愚，其父又不教之。艾子谓其父曰：“君之子虽美，而不通世务，他日曷能克家？”父怒。子嘻然笑曰：“每以布囊取来。”其父愀然改容曰：“彼米不是田中来？”",
+        sentences: [
+            "齐有富人，家累千金。",
+            "其二子甚愚，其父又不教之。",
+            "艾子谓其父曰。",
+            "君之子虽美，而不通世务。",
+            "他日曷能克家？",
+            "彼米不是田中来？"
+        ],
+        chars:[
+            {char:"累",pinyin:"lěi",type:"oldnew",origin:"积攒",explain:["积攒","堆积","连累","屡次"]},
+            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["很","过分","甚至","非常"]},
+            {char:"谓",pinyin:"wèi",type:"empty",origin:"对...说",explain:["对...说","认为","称作","告知"]},
+            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["虽然","即使","纵然","虽说"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"却",explain:["却","并且","就","然而"]},
+            {char:"曷",pinyin:"hé",type:"empty",origin:"怎么",explain:["怎么","什么","为何","哪能"]},
+            {char:"克",pinyin:"kè",type:"oldnew",origin:"胜任",explain:["胜任","攻克","克制","打理"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"用",explain:["用","把","凭借","因为"]},
+            {char:"彼",pinyin:"bǐ",type:"empty",origin:"那",explain:["那","他","对方","那个"]}
+        ]
+    },
+    {
+        id:91,
+        title:"91. 缇萦救父",
+        text:"文帝四年中，人上书言意，以刑罪当传西之长安。意有五女，随而泣。意怒，骂曰：“生子不生男，缓急无可使者！”少女缇萦伤父之言，乃随父西。上书曰：“妾愿入身为官婢，以赎父刑罪，使得改行也。”上悲其意，遂除肉刑。",
+        sentences: [
+            "人上书言意，以刑罪当传西之长安。",
+            "生子不生男，缓急无可使者！",
+            "少女缇萦伤父之言，乃随父西。",
+            "妾愿入身为官婢，以赎父刑罪。",
+            "使得改行也。",
+            "上悲其意，遂除肉刑。"
+        ],
+        chars:[
+            {char:"言",pinyin:"yán",type:"oldnew",origin:"告发",explain:["告发","说话","言语","谈论"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"因为",explain:["因为","用","把","凭借"]},
+            {char:"当",pinyin:"dāng",type:"oldnew",origin:"判处",explain:["判处","应当","面对","抵挡"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"到",explain:["到","的","代词","助词"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["于是","才","竟然","随后"]},
+            {char:"妾",pinyin:"qiè",type:"oldnew",origin:"女子自称",explain:["女子自称","小妾","侍女","妇人谦称"]},
+            {char:"赎",pinyin:"shú",type:"oldnew",origin:"抵偿",explain:["抵偿","赎回","赎罪","弥补"]},
+            {char:"使",pinyin:"shǐ",type:"empty",origin:"让",explain:["让","派遣","使唤","令"]},
+            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["于是","最终","终于","而后"]},
+            {char:"除",pinyin:"chú",type:"oldnew",origin:"废除",explain:["废除","清除","去掉","任命"]}
+        ]
+    },
+    {
+        id:95,
+        title:"95. 黄仙裳助人",
+        text:"黄仙裳幼赴童子试，为州守陈澹仙所知。后陈官给事中，以事系狱，贫甚。黄售其负郭田，得百金，尽以赠陈。后田雪龛落职，黄囊中仅有二十金，乃分半赠之。",
+        sentences: [
+            "黄仙裳幼赴童子试，为州守陈澹仙所知。",
+            "后陈官给事中，以事系狱，贫甚。",
+            "得百金，尽以赠陈。",
+            "黄囊中仅有二十金，乃分半赠之。"
+        ],
+        chars:[
+            {char:"赴",pinyin:"fù",type:"oldnew",origin:"参加",explain:["参加","奔赴","前往","参与"]},
+            {char:"为",pinyin:"wéi",type:"empty",origin:"被",explain:["被","担任","替","是"]},
+            {char:"知",pinyin:"zhī",type:"oldnew",origin:"赏识",explain:["赏识","知道","了解","认知"]},
+            {char:"官",pinyin:"guān",type:"oldnew",origin:"担任官职",explain:["担任官职","官员","官府","公职"]},
+            {char:"系",pinyin:"xì",type:"oldnew",origin:"关押",explain:["关押","关系","捆绑","囚禁"]},
+            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["很","过分","非常","格外"]},
+            {char:"尽",pinyin:"jìn",type:"empty",origin:"全部",explain:["全部","用尽","完结","统统"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"把",explain:["把","用","因为","拿来"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["于是","才","竟然","就"]}
+        ]
+    }
+];
+
+// ===================== 页面元素 & 全局变量 =====================
+const tabBtns = document.querySelectorAll('.tab-btn');
+const readPage = document.getElementById('readPage');
+const testPage = document.getElementById('testPage');
+
+// 阅读页
+const artSelect = document.getElementById('artSelect');
+const artMain = document.getElementById('artMain');
+const switchNoteBtn = document.getElementById('switchNoteBtn');
+const globalNote = document.getElementById('globalNote');
+const floatTip = document.getElementById('floatTip');
+let showGlobal = false;
+let currentReadArt = null;
+
+// 答题页
+const testType = document.getElementById('testType');
+const totalQInput = document.getElementById('totalQ');
+const startTestBtn = document.getElementById('startTestBtn');
+const artChecks = document.querySelectorAll('#artCheck input[type="checkbox"]');
+const qBox = document.getElementById('qBox');
+// 统计元素
+const allNum = document.getElementById('allNum');
+const doneNum = document.getElementById('doneNum');
+const rightNum = document.getElementById('rightNum');
+const wrongNum = document.getElementById('wrongNum');
+const rate = document.getElementById('rate');
+
+// 答题全局变量
+let testPool = [];    // 总题库
+let nowIndex = 0;     // 当前题号
+let totalCount = 0;   // 总题数
+let rightCount = 0;   // 答对
+let wrongCount = 0;   // 答错
+
+// ===================== 标签切换 =====================
+tabBtns.forEach(btn => {
+    btn.onclick = () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const page = btn.dataset.page;
+        if(page === 'read'){
+            readPage.classList.remove('hide');
+            testPage.classList.add('hide');
+        }else{
+            readPage.classList.add('hide');
+            testPage.classList.remove('hide');
+        }
+    };
+});
+
+// ===================== 原文浏览逻辑 =====================
+// 选择篇目
+artSelect.onchange = function(){
+    const aid = Number(this.value);
+    if(!aid){
+        artMain.innerText = "请在上方选择对应篇目查看原文";
+        globalNote.classList.add('hide');
+        return;
+    }
+    currentReadArt = articleData.find(d => d.id === aid);
+    renderReadArticle();
+};
+
+// 渲染原文 + 可点击单字
+function renderReadArticle(){
+    if(!currentReadArt) return;
+    let html = "";
+    const charMap = {};
+    currentReadArt.chars.forEach(c => charMap[c.char] = c);
+
+    // 逐字包裹
+    for(let ch of currentReadArt.text){
+        if(charMap[ch]){
+            html += `<span class="char" data-char="${ch}">${ch}</span>`;
+        }else{
+            html += ch;
+        }
+    }
+    artMain.innerHTML = html;
+    bindCharClick();
+    // 同步全局注释
+    if(showGlobal) renderGlobalNote();
+    else globalNote.classList.add('hide');
+}
+
+// 绑定单字点击（悬浮弹窗）
+function bindCharClick(){
+    document.querySelectorAll('.char').forEach(el => {
+        el.onclick = function(e){
+            e.stopPropagation();
+            const ch = this.dataset.char;
+            const data = currentReadArt.chars.find(x => x.char === ch);
+            if(!data) return;
+
+            // 定位弹窗
+            const rect = this.getBoundingClientRect();
+            floatTip.style.left = rect.left + "px";
+            floatTip.style.top = (rect.bottom + 10) + "px";
+            floatTip.classList.remove('hide');
+
+            // 填充内容
+            let exp = data.explain.join("；");
+            floatTip.innerHTML = `
+                <p><strong>字：${ch}</strong> 【${data.pinyin}】</p>
+                <p>本义：${data.origin}</p>
+                <p>其他释义：${exp}</p>
+            `;
+            this.classList.add('active');
+        };
+    });
+}
+
+// 点击空白关闭弹窗
+document.addEventListener('click', () => {
+    floatTip.classList.add('hide');
+    document.querySelectorAll('.char').forEach(el => el.classList.remove('active'));
+});
+
+// 切换全局注释
+switchNoteBtn.onclick = function(){
+    showGlobal = !showGlobal;
+    if(showGlobal){
+        this.innerText = "隐藏全局注释";
+        renderGlobalNote();
+    }else{
+        this.innerText = "全局显示注释";
+        globalNote.classList.add('hide');
+    }
+};
+
+// 渲染全文注释
+function renderGlobalNote(){
+    if(!currentReadArt) return;
+    let html = "<h4>全文字词注释</h4>";
+    currentReadArt.chars.forEach(d => {
+        let exp = d.explain.join("；");
+        html += `<div class="note-item"><span>${d.char}</span>【${d.pinyin}】本义：${d.origin} | 释义：${exp}</div>`;
+    });
+    globalNote.innerHTML = html;
+    globalNote.classList.remove('hide');
+}
+
+// ===================== 答题模块逻辑 =====================
+// 开始答题
+startTestBtn.onclick = function(){
+    // 1. 获取选中篇目
+    const selectIds = [];
+    artChecks.forEach(cb => {
+        if(cb.checked) selectIds.push(Number(cb.value));
+    });
+    if(selectIds.length === 0){
+        alert("请至少选择一篇考察篇目！");
+        return;
+    }
+
+    // 2. 重置数据
+    testPool = [];
+    nowIndex = 0;
+    rightCount = 0;
+    wrongCount = 0;
+    startTestBtn.disabled = true;
+
+    // 3. 筛选篇目 + 筛选题型
+    const type = testType.value;
+    selectIds.forEach(id => {
+        const art = articleData.find(d => d.id === id);
+        if(!art) return;
+        art.chars.forEach(char => {
+            // 过滤短语，只保留虚词/古今异义
+            if(type === 'all'){
+                testPool.push({...char, article: art});
+            }else if(type === 'empty' && char.type === 'empty'){
+                testPool.push({...char, article: art});
+            }else if(type === 'oldnew' && char.type === 'oldnew'){
+                testPool.push({...char, article: art});
+            }
+        });
+    });
+
+    if(testPool.length === 0){
+        alert("当前选择范围+题型下，无可用题目！");
+        startTestBtn.disabled = false;
+        return;
+    }
+
+    // 4. 限制答题数量
+    let wantNum = parseInt(totalQInput.value) || 1;
+    totalCount = Math.min(wantNum, testPool.length);
+    // 打乱题库
+    shuffle(testPool);
+
+    // 5. 初始化统计
+    allNum.innerText = totalCount;
+    doneNum.innerText = 0;
+    rightNum.innerText = 0;
+    wrongNum.innerText = 0;
+    rate.innerText = "0%";
+
+    // 渲染第一题
+    renderQuestion();
+};
+
+// 数组打乱
+function shuffle(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+// 渲染单题（只展示所在句子，不展示全文）
+function renderQuestion(){
+    if(nowIndex >= totalCount){
+        // 答题结束
+        qBox.innerHTML = `
+            <h3>✅ 答题完成！</h3>
+            <p>总计${totalCount}题，答对${rightCount}题，答错${wrongCount}题</p>
+            <p>正确率：${((rightCount/totalCount)*100).toFixed(1)}%</p>
+        `;
+        startTestBtn.disabled = false;
+        return;
+    }
+
+    const item = testPool[nowIndex];
+    const art = item.article;
+    // 找到所有包含这个字的句子，然后随机取一个
+    const hasCharSentences = art.sentences.filter(s => s.includes(item.char));
+    let targetSentence;
+    if(hasCharSentences.length > 0){
+        targetSentence = hasCharSentences[Math.floor(Math.random()*hasCharSentences.length)];
+    }else{
+        // 如果没找到，就用全文
+        targetSentence = art.text;
+    }
+    // 标记考点字
+    let showSen = targetSentence.replace(item.char, `<span class="q-word">${item.char}</span>`);
+
+    // 生成选项：正确释义 + 自己的混淆义，然后去重，再打乱
+    let options = [];
+    // 先把所有的释义都加进去，然后去重
+    let allMeanings = [item.origin, ...item.explain];
+    // 去重，去掉重复的
+    allMeanings = [...new Set(allMeanings)];
+    // 然后，把这些都做成选项
+    allMeanings.forEach((text, idx) => {
+        options.push({text: text, isRight: idx === 0});
+    });
+    // 如果不够4个，就从其他的字词的origin里补
+    if(options.length < 4){
+        // 从其他的字词的origin里取，补到4个
+        let otherOrigins = testPool.filter(d => d.char !== item.char).map(d => d.origin);
+        otherOrigins = [...new Set(otherOrigins)]; // 去重
+        shuffle(otherOrigins);
+        while(options.length < 4 && otherOrigins.length > 0){
+            let ex = otherOrigins.pop();
+            // 确保不重复
+            if(!options.find(o => o.text === ex)){
+                options.push({text: ex, isRight: false});
+            }
+        }
+    }
+    // 打乱选项
+    shuffle(options);
+    // 只取前4个
+    options = options.slice(0,4);
+
+    // 拼接HTML
+    let html = `
+        <p><strong>第${nowIndex+1}题</strong></p>
+        <p>请解释划线字词含义：</p>
+        <div class="q-sentence">${showSen}</div>
+        <div class="opts">
+    `;
+    options.forEach((opt, idx) => {
+        html += `<div class="opt" data-right="${opt.isRight}">${idx+1}. ${opt.text}</div>`;
+    });
+    html += `</div><div class="tip-text"></div>`;
+    qBox.innerHTML = html;
+
+    // 绑定选项点击
+    document.querySelectorAll('.opt').forEach(el => el.onclick = selectAnswer);
+}
+
+// 选择答案 & 计分
+function selectAnswer(e){
+    const el = e.target;
+    const isRight = el.dataset.right === "true";
+    const tip = document.querySelector('.tip-text');
+    // 禁用所有选项
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = "none");
+
+    if(isRight){
+        el.classList.add('correct');
+        tip.className = "tip-text right";
+        tip.innerText = "✅ 回答正确";
+        rightCount++;
+    }else{
+        el.classList.add('error');
+        // 标出正确答案
+        document.querySelectorAll('.opt').forEach(o => {
+            if(o.dataset.right === "true") o.classList.add('correct');
+        });
+        tip.className = "tip-text wrong";
+        tip.innerText = "❌ 回答错误";
+        wrongCount++;
+    }
+
+    // 更新统计
+    doneNum.innerText = nowIndex + 1;
+    rightNum.innerText = rightCount;
+    wrongNum.innerText = wrongCount;
+    let r = ((rightCount / (nowIndex+1)) * 100).toFixed(1);
+    rate.innerText = r + "%";
+
+    // 延迟下一题
+    setTimeout(() => {
+        nowIndex++;
+        renderQuestion();
+    }, 1500);
+}
+</script>
+</body>
+</html>

@@ -214,7 +214,7 @@
 <body>
 <div class="container">
     <header>
-        <h2>新编初中文言文 字词学习与自测系统</h2>
+        <h2>新编初中文言文 字词学习&测试</h2>
     </header>
 
     <!-- 标签切换 -->
@@ -287,7 +287,7 @@
 </div>
 
 <script>
-// 释义数据（虚词已按古汉语字典修正，删除完全同义词，保留辨析项）
+// 修正所有「以」字语境释义（删除错误的“因为”，统一改为用来/为了/把/用等正确用法）
 const articleData = [
     {
         id:64,
@@ -324,7 +324,7 @@ const articleData = [
             {char:"然",pinyin:"rán",type:"empty",origin:"说得对",explain:["这样","样子"]},
             {char:"顾",pinyin:"gù",type:"empty",origin:"可是，然而",explain:["回头看","探望"]},
             {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他、它",explain:["结构助词，的","动词，前往","语气助词"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，凭借、因为",explain:["介词，把","介词，用","介词，用来"]}
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，凭借",explain:["介词，把","介词，用","连词，用来"]}
         ]
     },
     {
@@ -381,7 +381,7 @@ const articleData = [
             {char:"故",pinyin:"gù",type:"empty",origin:"原因",explain:["所以","旧的"]},
             {char:"长",pinyin:"cháng",type:"oldnew",origin:"身高",explain:["长度","长久"]},
             {char:"显",pinyin:"xiǎn",type:"oldnew",origin:"扬名",explain:["明显","显露"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，用来；以是（因此）",explain:["介词，把","介词，凭借","介词，因为"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，用来；以是（因此）",explain:["介词，把","介词，凭借"]},
             {char:"乃",pinyin:"nǎi",type:"empty",origin:"竟然",explain:["于是","才"]},
             {char:"然",pinyin:"rán",type:"empty",origin:"表转折，但是",explain:["这样","样子"]},
             {char:"是",pinyin:"shì",type:"empty",origin:"这；以是（因此）",explain:["判断词","正确"]},
@@ -417,7 +417,7 @@ const articleData = [
             {char:"利",pinyin:"lì",type:"oldnew",origin:"认为……有利可图",explain:["利益","锋利"]},
             {char:"扳",pinyin:"pān",type:"oldnew",origin:"拉着，牵拉",explain:["扳动","拽"]},
             {char:"之",pinyin:"zhī",type:"empty",origin:"代词，它",explain:["结构助词，的","动词，前往","语气助词"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把、用",explain:["介词，凭借","介词，因为","连词，来"]}
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["介词，用","连词，用来"]}
         ]
     },
     {
@@ -448,7 +448,7 @@ const articleData = [
             {char:"抟",pinyin:"tuán",type:"oldnew",origin:"揉捏",explain:["盘旋","聚集"]},
             {char:"褫",pinyin:"chǐ",type:"oldnew",origin:"脱下",explain:["剥夺","除去"]},
             {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表承接","表并列"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，来、用来",explain:["介词，把","介词，用"]}
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，为了、用来",explain:["介词，把","介词，用"]}
         ]
     },
     {
@@ -471,9 +471,9 @@ const articleData = [
             {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表承接","表并列"]},
             {char:"曷",pinyin:"hé",type:"empty",origin:"怎么；曷能（怎么能够）",explain:["什么","为何"]},
             {char:"克",pinyin:"kè",type:"oldnew",origin:"胜任，打理",explain:["攻克","克制"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，用",explain:["介词，把","介词，凭借"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，用",explain:["介词，把","连词，用来"]},
             {char:"彼",pinyin:"bǐ",type:"empty",origin:"那",explain:["他","那个"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["代词","动词，前往","语气助词"]}
+            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["代词"]}
         ]
     },
     {
@@ -490,16 +490,16 @@ const articleData = [
         ],
         chars:[
             {char:"言",pinyin:"yán",type:"oldnew",origin:"告发",explain:["说话","谈论"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，因为",explain:["介词，用","介词，把","连词，来"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，因为",explain:["介词，用","连词，为了、用来"]},
             {char:"当",pinyin:"dāng",type:"oldnew",origin:"判处",explain:["应当","抵挡"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"动词，前往、到",explain:["结构助词，的","代词","语气助词"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"动词，前往、到",explain:["结构助词，的"]},
             {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["才","随后"]},
             {char:"妾",pinyin:"qiè",type:"oldnew",origin:"女子谦称",explain:["侍女","妇人自称"]},
             {char:"赎",pinyin:"shú",type:"oldnew",origin:"抵偿，赎罪",explain:["赎回","弥补"]},
             {char:"使",pinyin:"shǐ",type:"empty",origin:"让",explain:["派遣","使唤"]},
             {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终","而后"]},
             {char:"除",pinyin:"chú",type:"oldnew",origin:"废除",explain:["清除","去掉"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折，却","表承接","表并列"]}
+            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折，却"]}
         ]
     },
     {
@@ -520,7 +520,7 @@ const articleData = [
             {char:"系",pinyin:"xì",type:"oldnew",origin:"关押",explain:["捆绑","囚禁"]},
             {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["非常","格外"]},
             {char:"尽",pinyin:"jìn",type:"empty",origin:"全部",explain:["用尽","统统"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["介词，用","介词，因为"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["介词，用","连词，为了"]},
             {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["才","就"]},
             {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他",explain:["结构助词，的","动词，前往","语气助词"]}
         ]
@@ -741,20 +741,17 @@ function renderQuestion(){
         });
     }
 
-    // 固定补足到4个选项（不足则从当前题库随机补充不同释义，保证不重复、有区分度）
+    // 固定补足到4个选项
     if(options.length < 4){
-        // 从整个题库取额外干扰项
         const extraPool = [];
         testPool.forEach(cc => {
             if(cc.char !== item.char){
                 extraPool.push(...cc.explain, cc.origin);
             }
         });
-        // 去重、过滤已存在选项
         const existTxt = options.map(o => o.text);
         const validExtra = [...new Set(extraPool)].filter(t => !existTxt.includes(t));
         shuffle(validExtra);
-        // 补足至4个
         while(options.length < 4 && validExtra.length > 0){
             options.push({
                 text: validExtra.shift(),
@@ -792,7 +789,6 @@ function selectAnswer(e){
     if(isRight){
         el.classList.add('correct');
         tip.className = "tip-text right";
-        tip.innerText = "✅ 回答正确";
         rightCount++;
     }else{
         el.classList.add('error');

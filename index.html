@@ -30,7 +30,6 @@
             text-align: center;
             border-radius: 8px 8px 0 0;
         }
-        /* 标签栏 */
         .tab-wrap {
             display: flex;
             border-bottom: 1px solid #eee;
@@ -54,8 +53,6 @@
         .hide {
             display: none !important;
         }
-
-        /* 原文浏览页样式 */
         .select-bar {
             margin-bottom: 20px;
             display: flex;
@@ -82,7 +79,7 @@
             cursor: not-allowed;
         }
         .article-main {
-            border: 1px solid #e8e8;
+            border: 1px solid #e8e8e8;
             padding: 20px;
             border-radius: 6px;
             min-height: 240px;
@@ -101,14 +98,13 @@
         .char.active {
             background: #d0e2ff;
         }
-        /* 悬浮弹窗 */
         .float-tip {
             position: absolute;
             background: #fff;
             border: 2px solid #2d5b99;
             border-radius: 6px;
             padding: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 999;
             max-width: 320px;
             font-size: 14px;
@@ -128,8 +124,6 @@
             border-radius: 3px;
             margin-right: 6px;
         }
-
-        /* 答题页样式 */
         .set-panel {
             background: #f8f9fa;
             padding: 18px;
@@ -214,16 +208,13 @@
 <body>
 <div class="container">
     <header>
-        <h2>新编初中文言文 字词学习&测试</h2>
+        <h2>新编初中文言文 字词学习&自测系统</h2>
     </header>
-
-    <!-- 标签切换 -->
     <div class="tab-wrap">
         <button class="tab-btn active" data-page="read">原文浏览</button>
         <button class="tab-btn" data-page="test">字词测试</button>
     </div>
 
-    <!-- 原文浏览 -->
     <div class="content" id="readPage">
         <div class="select-bar">
             <label>选择篇目：</label>
@@ -237,6 +228,8 @@
                 <option value="89">89. 愚蠢的父子</option>
                 <option value="91">91. 缇萦救父</option>
                 <option value="95">95. 黄仙裳助人</option>
+                <option value="201">201. 圬者王承福传</option>
+                <option value="202">202. 秦良玉传</option>
             </select>
             <button class="btn" id="switchNoteBtn">全局显示注释</button>
         </div>
@@ -245,7 +238,6 @@
         <div class="float-tip hide" id="floatTip"></div>
     </div>
 
-    <!-- 字词测试 -->
     <div class="content hide" id="testPage">
         <div class="set-panel">
             <div class="row">
@@ -270,10 +262,11 @@
                     <label class="check-item"><input type="checkbox" value="89" checked> 89</label>
                     <label class="check-item"><input type="checkbox" value="91" checked> 91</label>
                     <label class="check-item"><input type="checkbox" value="95" checked> 95</label>
+                    <label class="check-item"><input type="checkbox" value="201" checked> 201</label>
+                    <label class="check-item"><input type="checkbox" value="202" checked> 202</label>
                 </div>
             </div>
         </div>
-
         <div class="stat-bar" id="statBar">
             <div>总题数：<span id="allNum">0</span></div>
             <div>已答：<span id="doneNum">0</span></div>
@@ -281,13 +274,11 @@
             <div>答错：<span id="wrongNum">0</span></div>
             <div>正确率：<span id="rate">0%</span></div>
         </div>
-
         <div class="q-box" id="qBox">请选择篇目、题型并点击【开始答题】</div>
     </div>
 </div>
 
 <script>
-// 修正所有「以」字语境释义（删除错误的“因为”，统一改为用来/为了/把/用等正确用法）
 const articleData = [
     {
         id:64,
@@ -305,26 +296,26 @@ const articleData = [
             "然。顾安得其人哉？"
         ],
         chars:[
-            {char:"者",pinyin:"zhě",type:"empty",origin:"表判断语气词",explain:["表停顿","......的人","指代事物"]},
-            {char:"隶",pinyin:"lì",type:"oldnew",origin:"差役，古代小官吏",explain:["附属","下属","奴隶"]},
-            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["即使","纵然"]},
-            {char:"邑",pinyin:"yì",type:"oldnew",origin:"同乡人",explain:["县城","城镇"]},
-            {char:"徙",pinyin:"xǐ",type:"oldnew",origin:"流放",explain:["迁移","调动官职"]},
-            {char:"适",pinyin:"shì",type:"empty",origin:"恰逢",explain:["前往","刚才"]},
-            {char:"高",pinyin:"gāo",type:"oldnew",origin:"钦佩",explain:["高大","抬高"]},
-            {char:"术",pinyin:"shù",type:"oldnew",origin:"办法",explain:["技艺","策略"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是，就",explain:["才","竟然"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表承接","表并列"]},
-            {char:"怪",pinyin:"guài",type:"oldnew",origin:"对……感到奇怪",explain:["怪异","责怪"]},
-            {char:"毋",pinyin:"wú",type:"empty",origin:"不要",explain:["不","别"]},
-            {char:"忽",pinyin:"hū",type:"oldnew",origin:"轻视",explain:["忽然","忽略"]},
-            {char:"第",pinyin:"dì",type:"empty",origin:"只管，尽管",explain:["次序","门第"]},
-            {char:"故",pinyin:"gù",type:"empty",origin:"缘故",explain:["所以","旧的"]},
-            {char:"诚",pinyin:"chéng",type:"empty",origin:"如果，果真",explain:["确实","真心"]},
-            {char:"然",pinyin:"rán",type:"empty",origin:"说得对",explain:["这样","样子"]},
-            {char:"顾",pinyin:"gù",type:"empty",origin:"可是，然而",explain:["回头看","探望"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他、它",explain:["结构助词，的","动词，前往","语气助词"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，凭借",explain:["介词，把","介词，用","连词，用来"]}
+            {char:"者",pinyin:"zhě",type:"empty",origin:"表判断语气词",explain:["句末停顿","指代人群"]},
+            {char:"隶",pinyin:"lì",type:"oldnew",origin:"差役，古代小官吏",explain:["依附他人","基层下属"]},
+            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["纵使"]},
+            {char:"邑",pinyin:"yì",type:"oldnew",origin:"同乡人",explain:["城镇"]},
+            {char:"徙",pinyin:"xǐ",type:"oldnew",origin:"流放",explain:["调动官职"]},
+            {char:"适",pinyin:"shì",type:"empty",origin:"恰逢",explain:["前往某地"]},
+            {char:"高",pinyin:"gāo",type:"oldnew",origin:"钦佩",explain:["抬高地位"]},
+            {char:"术",pinyin:"shù",type:"oldnew",origin:"办法",explain:["谋略"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是，就",explain:["竟然"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表并列"]},
+            {char:"怪",pinyin:"guài",type:"oldnew",origin:"对……感到奇怪",explain:["责备他人"]},
+            {char:"毋",pinyin:"不要",type:"empty",origin:"不要",explain:["切莫"]},
+            {char:"忽",pinyin:"hū",type:"oldnew",origin:"轻视",explain:["疏忽大意"]},
+            {char:"第",pinyin:"dì",type:"empty",origin:"只管，尽管",explain:["门第出身"]},
+            {char:"故",pinyin:"gù",type:"empty",origin:"缘故",explain:["旧日事物"]},
+            {char:"诚",pinyin:"chéng",type:"empty",origin:"如果，果真",explain:["真心实意"]},
+            {char:"然",pinyin:"rán",type:"empty",origin:"说得对",explain:["外表模样"]},
+            {char:"顾",pinyin:"gù",type:"empty",origin:"可是，然而",explain:["探望亲友"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他、它",explain:["结构助词，的","动词，去往"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，凭借",explain:["介词，把","连词，继而"]}
         ]
     },
     {
@@ -340,19 +331,19 @@ const articleData = [
             "滕悟，遂止其役。"
         ],
         chars:[
-            {char:"谪",pinyin:"zhé",type:"oldnew",origin:"被贬官",explain:["流放","责罚","降职"]},
-            {char:"守",pinyin:"shǒu",type:"oldnew",origin:"担任郡守",explain:["守卫","遵守"]},
-            {char:"与",pinyin:"yǔ",type:"empty",origin:"和，同",explain:["给予","结交","赞同"]},
-            {char:"劳",pinyin:"láo",type:"oldnew",origin:"使……劳累",explain:["劳动","辛劳"]},
-            {char:"议",pinyin:"yì",type:"oldnew",origin:"议论，批评",explain:["商讨","意见"]},
-            {char:"患",pinyin:"huàn",type:"oldnew",origin:"担忧，忧虑",explain:["灾祸","生病"]},
-            {char:"欲",pinyin:"yù",type:"empty",origin:"想要",explain:["欲望","希望"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表承接","表并列"]},
-            {char:"恐",pinyin:"kǒng",type:"empty",origin:"担心",explain:["害怕","恐怕"]},
-            {char:"孰",pinyin:"shú",type:"empty",origin:"谁",explain:["哪一个","什么"]},
-            {char:"若",pinyin:"ruò",type:"empty",origin:"如果",explain:["你","如同"]},
-            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终","而后"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，这件",explain:["结构助词，的","动词，前往","语气助词"]}
+            {char:"谪",pinyin:"zhé",type:"oldnew",origin:"被贬官",explain:["流放边陲"]},
+            {char:"守",pinyin:"shǒu",type:"oldnew",origin:"担任郡守",explain:["看护城池"]},
+            {char:"与",pinyin:"yǔ",type:"empty",origin:"和，同",explain:["赠予物品"]},
+            {char:"劳",pinyin:"láo",type:"oldnew",origin:"使……劳累",explain:["体力劳作"]},
+            {char:"议",pinyin:"yì",type:"oldnew",origin:"议论，批评",explain:["商讨事务"]},
+            {char:"患",pinyin:"huàn",type:"oldnew",origin:"担忧，忧虑",explain:["遭遇灾祸"]},
+            {char:"欲",pinyin:"yù",type:"empty",origin:"想要",explain:["内心期许"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表承接","表并列"]},
+            {char:"恐",pinyin:"kǒng",type:"empty",origin:"担心",explain:["心生畏惧"]},
+            {char:"孰",pinyin:"shú",type:"empty",origin:"谁",explain:["何物"]},
+            {char:"若",pinyin:"ruò",type:"empty",origin:"如果",explain:["旁人"]},
+            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终结局"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，这件",explain:["结构助词，的"]}
         ]
     },
     {
@@ -369,24 +360,24 @@ const articleData = [
             "晏子怪而问之，御以实对。"
         ],
         chars:[
-            {char:"为",pinyin:"wéi",type:"empty",origin:"担任",explain:["做","是","被"]},
-            {char:"御",pinyin:"yù",type:"oldnew",origin:"车夫",explain:["驾驭","侍奉"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["代词","动词，前往","语气助词"]},
-            {char:"间",pinyin:"jiān",type:"oldnew",origin:"缝隙",explain:["中间","暗中"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折，却","表承接","表并列"]},
-            {char:"窥",pinyin:"kuī",type:"oldnew",origin:"偷看",explain:["观察","窥探"]},
-            {char:"策",pinyin:"cè",type:"oldnew",origin:"鞭打",explain:["马鞭","计谋"]},
-            {char:"既",pinyin:"jì",type:"empty",origin:"已经；既而（不久）",explain:["既然","随后"]},
-            {char:"去",pinyin:"qù",type:"oldnew",origin:"离开",explain:["前往","距离"]},
-            {char:"故",pinyin:"gù",type:"empty",origin:"原因",explain:["所以","旧的"]},
-            {char:"长",pinyin:"cháng",type:"oldnew",origin:"身高",explain:["长度","长久"]},
-            {char:"显",pinyin:"xiǎn",type:"oldnew",origin:"扬名",explain:["明显","显露"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，用来；以是（因此）",explain:["介词，把","介词，凭借"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"竟然",explain:["于是","才"]},
-            {char:"然",pinyin:"rán",type:"empty",origin:"表转折，但是",explain:["这样","样子"]},
-            {char:"是",pinyin:"shì",type:"empty",origin:"这；以是（因此）",explain:["判断词","正确"]},
-            {char:"怪",pinyin:"guài",type:"oldnew",origin:"感到奇怪",explain:["怪异","惊奇"]},
-            {char:"对",pinyin:"duì",type:"oldnew",origin:"回答",explain:["面对","应答"]}
+            {char:"为",pinyin:"wéi",type:"empty",origin:"担任",explain:["动手劳作","被他人驱使"]},
+            {char:"御",pinyin:"yù",type:"oldnew",origin:"车夫",explain:["驾驭车马"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["人称代词","动词，去往"]},
+            {char:"间",pinyin:"jiān",type:"oldnew",origin:"缝隙",explain:["暗中行事"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折","表并列"]},
+            {char:"窥",pinyin:"kuī",type:"oldnew",origin:"偷看",explain:["实地观察"]},
+            {char:"策",pinyin:"cè",type:"oldnew",origin:"鞭打",explain:["谋划计策"]},
+            {char:"既",pinyin:"jì",type:"empty",origin:"已经；既而（不久）",explain:["依照常理"]},
+            {char:"去",pinyin:"qù",type:"oldnew",origin:"离开",explain:["两地距离"]},
+            {char:"故",pinyin:"gù",type:"empty",origin:"原因",explain:["旧事往事"]},
+            {char:"长",pinyin:"cháng",type:"oldnew",origin:"身高",explain:["时间久远"]},
+            {char:"显",pinyin:"xiǎn",type:"oldnew",origin:"扬名",explain:["显露神色"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，用来；以是（因此）",explain:["介词，凭借"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"竟然",explain:["紧接着"]},
+            {char:"然",pinyin:"rán",type:"empty",origin:"表转折，但是",explain:["外在形态"]},
+            {char:"是",pinyin:"shì",type:"empty",origin:"这；以是（因此）",explain:["判断动词"]},
+            {char:"怪",pinyin:"guài",type:"oldnew",origin:"感到奇怪",explain:["面露诧异"]},
+            {char:"对",pinyin:"duì",type:"oldnew",origin:"回答",explain:["直面对方"]}
         ]
     },
     {
@@ -402,22 +393,22 @@ const articleData = [
             "父利其然也，日扳仲永环谒于邑人。"
         ],
         chars:[
-            {char:"隶",pinyin:"lì",type:"oldnew",origin:"属于",explain:["附属","差役"]},
-            {char:"生",pinyin:"shēng",type:"oldnew",origin:"长到",explain:["出生","生存"]},
-            {char:"尝",pinyin:"cháng",type:"empty",origin:"曾经",explain:["品尝","过往"]},
-            {char:"识",pinyin:"shí",type:"oldnew",origin:"认识",explain:["知识","识别"]},
-            {char:"异",pinyin:"yì",type:"oldnew",origin:"对……感到诧异",explain:["不同","惊奇"]},
-            {char:"与",pinyin:"yǔ",type:"empty",origin:"给",explain:["和","结交"]},
-            {char:"并",pinyin:"bìng",type:"empty",origin:"并且",explain:["一起","连同"]},
-            {char:"自",pinyin:"zì",type:"empty",origin:"自己；自是（从此）",explain:["从","亲自"]},
-            {char:"是",pinyin:"shì",type:"empty",origin:"这；自是（从此）",explain:["判断词","正确"]},
-            {char:"就",pinyin:"jiù",type:"oldnew",origin:"完成；立就（立刻完成）",explain:["靠近","从事"]},
-            {char:"奇",pinyin:"qí",type:"oldnew",origin:"以……为奇",explain:["奇特","罕见"]},
-            {char:"稍",pinyin:"shāo",type:"oldnew",origin:"渐渐；稍稍（渐渐）",explain:["稍微","略微"]},
-            {char:"利",pinyin:"lì",type:"oldnew",origin:"认为……有利可图",explain:["利益","锋利"]},
-            {char:"扳",pinyin:"pān",type:"oldnew",origin:"拉着，牵拉",explain:["扳动","拽"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，它",explain:["结构助词，的","动词，前往","语气助词"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["介词，用","连词，用来"]}
+            {char:"隶",pinyin:"lì",type:"oldnew",origin:"属于",explain:["依附于"]},
+            {char:"生",pinyin:"shēng",type:"oldnew",origin:"长到",explain:["降生出世"]},
+            {char:"尝",pinyin:"cháng",type:"empty",origin:"曾经",explain:["品尝食物"]},
+            {char:"识",pinyin:"shí",type:"oldnew",origin:"认识",explain:["分辨事物"]},
+            {char:"异",pinyin:"yì",type:"oldnew",origin:"对……感到诧异",explain:["两者不同"]},
+            {char:"与",pinyin:"yǔ",type:"empty",origin:"给",explain:["相伴同行"]},
+            {char:"并",pinyin:"bìng",type:"empty",origin:"并且",explain:["合并在一起"]},
+            {char:"自",pinyin:"zì",type:"empty",origin:"自己；自是（从此）",explain:["来自某处"]},
+            {char:"是",pinyin:"shì",type:"empty",origin:"这；自是（从此）",explain:["正确做法"]},
+            {char:"就",pinyin:"jiù",type:"oldnew",origin:"完成；立就（立刻完成）",explain:["走近身旁"]},
+            {char:"奇",pinyin:"qí",type:"oldnew",origin:"以……为奇",explain:["样貌奇特"]},
+            {char:"稍",pinyin:"shāo",type:"oldnew",origin:"渐渐；稍稍（渐渐）",explain:["略微减少"]},
+            {char:"利",pinyin:"lì",type:"oldnew",origin:"认为……有利可图",explain:["器物锋利"]},
+            {char:"扳",pinyin:"pān",type:"oldnew",origin:"拉着，牵拉",explain:["撬动物件"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，它",explain:["结构助词，的"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["连词，继而"]}
         ]
     },
     {
@@ -433,22 +424,22 @@ const articleData = [
             "一旦，雪作，孙抟雪而嬉。"
         ],
         chars:[
-            {char:"许",pinyin:"xǔ",type:"oldnew",origin:"左右；十许（十来岁）",explain:["答应","大约"]},
-            {char:"每",pinyin:"měi",type:"empty",origin:"常常",explain:["每次","屡屡"]},
-            {char:"是",pinyin:"shì",type:"empty",origin:"这",explain:["判断词","此物"]},
-            {char:"恒",pinyin:"héng",type:"empty",origin:"常常",explain:["长久","固定"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"主谓之间，取消句子独立性（不译）",explain:["代词","结构助词，的","动词，前往"]},
-            {char:"胜",pinyin:"shèng",type:"oldnew",origin:"承受；不胜（承受不住）",explain:["胜利","超过"]},
-            {char:"请",pinyin:"qǐng",type:"oldnew",origin:"求情",explain:["请求","恳请"]},
-            {char:"为",pinyin:"wèi",type:"empty",origin:"替",explain:["做","被"]},
-            {char:"若",pinyin:"ruò",type:"empty",origin:"你",explain:["如同","对方"]},
-            {char:"邪",pinyin:"yé",type:"empty",origin:"语气词，吗、呢（表反问）",explain:["语气词，啊"]},
-            {char:"愈",pinyin:"yù",type:"empty",origin:"更加",explain:["越过"]},
-            {char:"作",pinyin:"zuò",type:"oldnew",origin:"降下",explain:["劳作","兴起"]},
-            {char:"抟",pinyin:"tuán",type:"oldnew",origin:"揉捏",explain:["盘旋","聚集"]},
-            {char:"褫",pinyin:"chǐ",type:"oldnew",origin:"脱下",explain:["剥夺","除去"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表承接","表并列"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，为了、用来",explain:["介词，把","介词，用"]}
+            {char:"许",pinyin:"xǔ",type:"oldnew",origin:"左右；十来岁",explain:["应允请求"]},
+            {char:"每",pinyin:"měi",type:"empty",origin:"常常",explain:["逐一逐个"]},
+            {char:"是",pinyin:"shì",type:"empty",origin:"这",explain:["判定对错"]},
+            {char:"恒",pinyin:"héng",type:"empty",origin:"常常",explain:["长久不变"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"主谓之间，取消句子独立性（不译）",explain:["人称代词","动词，去往"]},
+            {char:"胜",pinyin:"shèng",type:"oldnew",origin:"承受；承受不住",explain:["夺得胜利"]},
+            {char:"请",pinyin:"qǐng",type:"oldnew",origin:"求情",explain:["正式请求"]},
+            {char:"为",pinyin:"wèi",type:"empty",origin:"替",explain:["被他人任用"]},
+            {char:"若",pinyin:"ruò",type:"empty",origin:"你",explain:["外形相像"]},
+            {char:"邪",pinyin:"yé",type:"empty",origin:"语气词，吗、呢",explain:["感叹语气词"]},
+            {char:"愈",pinyin:"yù",type:"empty",origin:"更加",explain:["翻越山岭"]},
+            {char:"作",pinyin:"zuò",type:"oldnew",origin:"降下",explain:["动手劳作"]},
+            {char:"抟",pinyin:"tuán",type:"oldnew",origin:"揉捏",explain:["盘旋飞舞"]},
+            {char:"褫",pinyin:"chǐ",type:"oldnew",origin:"脱下",explain:["剥夺身份"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表并列"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，为了、用来",explain:["介词，凭借"]}
         ]
     },
     {
@@ -464,16 +455,16 @@ const articleData = [
             "彼米不是田中来？"
         ],
         chars:[
-            {char:"累",pinyin:"lěi",type:"oldnew",origin:"积攒",explain:["堆积","屡次"]},
-            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["过分","非常"]},
-            {char:"谓",pinyin:"wèi",type:"empty",origin:"对……说",explain:["认为","告知"]},
-            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["即使","纵然"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表承接","表并列"]},
-            {char:"曷",pinyin:"hé",type:"empty",origin:"怎么；曷能（怎么能够）",explain:["什么","为何"]},
-            {char:"克",pinyin:"kè",type:"oldnew",origin:"胜任，打理",explain:["攻克","克制"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，用",explain:["介词，把","连词，用来"]},
-            {char:"彼",pinyin:"bǐ",type:"empty",origin:"那",explain:["他","那个"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["代词"]}
+            {char:"累",pinyin:"lěi",type:"oldnew",origin:"积攒",explain:["堆叠物品"]},
+            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["程度过分"]},
+            {char:"谓",pinyin:"wèi",type:"empty",origin:"对……说",explain:["内心看法"]},
+            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["纵使如此"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表承接","表并列"]},
+            {char:"曷",pinyin:"hé",type:"empty",origin:"怎么；怎么能够",explain:["缘由为何"]},
+            {char:"克",pinyin:"kè",type:"oldnew",origin:"胜任，打理",explain:["攻占城池"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，用",explain:["连词，继而"]},
+            {char:"彼",pinyin:"bǐ",type:"empty",origin:"那",explain:["对方之人"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["人称代词"]}
         ]
     },
     {
@@ -489,17 +480,17 @@ const articleData = [
             "上悲其意，遂除肉刑。"
         ],
         chars:[
-            {char:"言",pinyin:"yán",type:"oldnew",origin:"告发",explain:["说话","谈论"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，因为",explain:["介词，用","连词，为了、用来"]},
-            {char:"当",pinyin:"dāng",type:"oldnew",origin:"判处",explain:["应当","抵挡"]},
+            {char:"言",pinyin:"yán",type:"oldnew",origin:"告发",explain:["交谈话语"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，因为",explain:["连词，继而"]},
+            {char:"当",pinyin:"dāng",type:"oldnew",origin:"判处",explain:["抵挡外力"]},
             {char:"之",pinyin:"zhī",type:"empty",origin:"动词，前往、到",explain:["结构助词，的"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["才","随后"]},
-            {char:"妾",pinyin:"qiè",type:"oldnew",origin:"女子谦称",explain:["侍女","妇人自称"]},
-            {char:"赎",pinyin:"shú",type:"oldnew",origin:"抵偿，赎罪",explain:["赎回","弥补"]},
-            {char:"使",pinyin:"shǐ",type:"empty",origin:"让",explain:["派遣","使唤"]},
-            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终","而后"]},
-            {char:"除",pinyin:"chú",type:"oldnew",origin:"废除",explain:["清除","去掉"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折，却"]}
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["随后"]},
+            {char:"妾",pinyin:"qiè",type:"oldnew",origin:"女子谦称",explain:["贴身侍女"]},
+            {char:"赎",pinyin:"shú",type:"oldnew",origin:"抵偿，赎罪",explain:["用钱赎回"]},
+            {char:"使",pinyin:"shǐ",type:"empty",origin:"让",explain:["派遣人员"]},
+            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终结局"]},
+            {char:"除",pinyin:"chú",type:"oldnew",origin:"废除",explain:["清理杂物"]},
+            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折"]}
         ]
     },
     {
@@ -513,26 +504,116 @@ const articleData = [
             "黄囊中仅有二十金，乃分半赠之。"
         ],
         chars:[
-            {char:"赴",pinyin:"fù",type:"oldnew",origin:"参加",explain:["奔赴","前往"]},
-            {char:"为",pinyin:"wéi",type:"empty",origin:"被",explain:["担任","替"]},
-            {char:"知",pinyin:"zhī",type:"oldnew",origin:"赏识",explain:["知道","了解"]},
-            {char:"官",pinyin:"guān",type:"oldnew",origin:"担任官职",explain:["官员","官府"]},
-            {char:"系",pinyin:"xì",type:"oldnew",origin:"关押",explain:["捆绑","囚禁"]},
-            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["非常","格外"]},
-            {char:"尽",pinyin:"jìn",type:"empty",origin:"全部",explain:["用尽","统统"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["介词，用","连词，为了"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["才","就"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他",explain:["结构助词，的","动词，前往","语气助词"]}
+            {char:"赴",pinyin:"fù",type:"oldnew",origin:"参加",explain:["奔赴远方"]},
+            {char:"为",pinyin:"wéi",type:"empty",origin:"被",explain:["担任官职"]},
+            {char:"知",pinyin:"zhī",type:"oldnew",origin:"赏识",explain:["知晓事情"]},
+            {char:"官",pinyin:"guān",type:"oldnew",origin:"担任官职",explain:["官府机构"]},
+            {char:"系",pinyin:"xì",type:"oldnew",origin:"关押",explain:["捆绑物件"]},
+            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["格外突出"]},
+            {char:"尽",pinyin:"jìn",type:"empty",origin:"全部",explain:["耗尽资源"]},
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["连词，继而"]},
+            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["紧接着"]},
+            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他",explain:["结构助词，的"]}
+        ]
+    },
+    // 圬者王承福传（已删除括号注释）
+    {
+        id:201,
+        title:"201. 圬者王承福传",
+        text:"圬之为技贱且劳者也。有业之，其色若自得者。听其言，约而尽。问之，王其姓，承福其名。世为京兆长安农夫。天宝之乱，发人为兵。持弓矢十叁年，有官勋，弃之来归。丧其土田，手镘衣食，馀叁十年。舍于市之主人，而归其屋食之当焉。视时屋食之贵贱，而上其圬之佣以偿之；有馀，则以与道路之废疾饿者焉。承福曰：“粟，稼而生者也；若布与帛。必蚕绩而后成者也；其他所以养生之具，皆待人力而后完也；吾皆赖之。然人不可遍为，宜乎各致其能以相生也。故君者，理我所以生者也；而百官者，承君之化者也。任有大小，惟其所能，若器皿焉。食焉而怠其事，必有天殃，故吾不敢一日舍镘以嬉。夫镘易能，可力焉，又诚有功；取其直虽劳无愧，吾心安焉。夫力易强而有功也；心难强而有智也。用力者使于人，用心者使人，亦其宜也。吾特择其易为无傀者取焉。",
+        sentences: [
+            "圬之为技贱且劳者也。",
+            "有业之，其色若自得者。",
+            "世为京兆长安农夫。",
+            "发人为兵，持弓矢十叁年。",
+            "舍于市之主人，而归其屋食之当焉。",
+            "粟，稼而生者也；若布与帛。",
+            "食焉而怠其事，必有天殃。"
+        ],
+        chars:[
+            {char:"之",pinyin:"zhī",type:"empty",origin:"主谓之间，取消句子独立性（不译）",explain:["人称代词","结构助词，的"]},
+            {char:"为",pinyin:"wéi",type:"empty",origin:"作为",explain:["动手劳作","判断动词"]},
+            {char:"业",pinyin:"yè",type:"oldnew",origin:"以……为职业",explain:["谋生行当"]},
+            {char:"若",pinyin:"ruò",type:"empty",origin:"好像",explain:["旁人"]},
+            {char:"约",pinyin:"yuē",type:"oldnew",origin:"简要",explain:["定下约定"]},
+            {char:"尽",pinyin:"jìn",type:"oldnew",origin:"透彻",explain:["全部完毕"]},
+            {char:"世",pinyin:"shì",type:"empty",origin:"世代",explain:["世间众人"]},
+            {char:"发",pinyin:"fā",type:"oldnew",origin:"征发",explain:["出发上路"]},
+            {char:"矢",pinyin:"shǐ",type:"oldnew",origin:"箭",explain:["弓箭兵器"]},
+            {char:"弃",pinyin:"qì",type:"oldnew",origin:"放弃",explain:["随手丢弃"]},
+            {char:"归",pinyin:"guī",type:"oldnew",origin:"回归",explain:"偿还钱款"},
+            {char:"舍",pinyin:"shè",type:"oldnew",origin:"住宿",explain:["舍弃事物"]},
+            {char:"当",pinyin:"dāng",type:"oldnew",origin:"相当、抵得上",explain:["应当如此"]},
+            {char:"视",pinyin:"shì",type:"oldnew",origin:"比照",explain:["目视观察"]},
+            {char:"上",pinyin:"shàng",type:"oldnew",origin:"增加",explain:["方位上方"]},
+            {char:"佣",pinyin:"yōng",type:"oldnew",origin:"工钱",explain:["雇佣劳工"]},
+            {char:"偿",pinyin:"cháng",type:"oldnew",origin:"补偿",explain:["偿还债务"]},
+            {char:"馀",pinyin:"yú",type:"empty",origin:"同“余”，剩余",explain:["多余物资"]},
+            {char:"与",pinyin:"yǔ",type:"empty",origin:"给",explain:["相伴之人"]},
+            {char:"稼",pinyin:"jià",type:"oldnew",origin:"耕种",explain:["田间庄稼"]},
+            {char:"所以",pinyin:"suǒ yǐ",type:"empty",origin:"用来……的",explain:["因此故而"]},
+            {char:"具",pinyin:"jù",type:"oldnew",origin:"器具、物资",explain:["具备能力"]},
+            {char:"赖",pinyin:"lài",type:"oldnew",origin:"仰赖、倚靠",explain:["依赖他人"]},
+            {char:"宜",pinyin:"yí",type:"empty",origin:"应该",explain:["环境适宜"]},
+            {char:"致",pinyin:"zhì",type:"oldnew",origin:"奉献、发挥",explain:["抵达目的地"]},
+            {char:"理",pinyin:"lǐ",type:"oldnew",origin:"治理",explain:["道理规则"]},
+            {char:"承",pinyin:"chéng",type:"oldnew",origin:"秉承、受到",explain:["承接事务"]},
+            {char:"化",pinyin:"huà",type:"oldnew",origin:"教化",explain:["形态变化"]},
+            {char:"怠",pinyin:"dài",type:"oldnew",origin:"懈怠",explain:["待人怠慢"]},
+            {char:"殃",pinyin:"yāng",type:"oldnew",origin:"灾祸",explain:["遭遇祸事"]},
+            {char:"嬉",pinyin:"xī",type:"oldnew",origin:"嬉戏、玩乐",explain:["嬉笑打闹"]},
+            {char:"诚",pinyin:"chéng",type:"empty",origin:"确实",explain:["为人真诚"]},
+            {char:"直",pinyin:"zhí",type:"oldnew",origin:"价值、报酬",explain:["形态笔直"]},
+            {char:"劳",pinyin:"láo",type:"oldnew",origin:"辛苦",explain:["体力劳作"]}
+        ]
+    },
+    // 秦良玉传
+    {
+        id:202,
+        title:"202. 秦良玉传",
+        text:"秦良玉，忠州人，嫁石砫宣抚使马千乘。万历二十七年，千乘以三千人从征播州，良玉别统精卒五百裹粮自随。明年正月二日，贼乘官军宴，夜袭。良玉夫妇首击败之，追入贼境，连破七寨，大败贼众，为南川路战功第一。贼平，良玉不言功。其后，千乘为部民所讼，瘐死云阳狱，良玉代领其职。良玉为人饶胆智，善骑射，兼通词翰，仪度娴雅。而驭下严峻，每行军发令，戎伍肃然。所部号“白杆兵”，为远近所惮。",
+        sentences: [
+            "千乘以三千人从征播州。",
+            "明年正月二日，贼乘官军宴，夜袭。",
+            "良玉夫妇首击败之。",
+            "贼平，良玉不言功。",
+            "千乘为部民所讼，瘐死云阳狱。",
+            "而驭下严峻，每行军发令，戎伍肃然。"
+        ],
+        chars:[
+            {char:"以",pinyin:"yǐ",type:"empty",origin:"凭借",explain:["使用兵器"]},
+            {char:"从",pinyin:"cóng",type:"oldnew",origin:"跟随",explain:["听从指令"]},
+            {char:"征",pinyin:"zhēng",type:"oldnew",origin:"征讨",explain:["远行闯荡"]},
+            {char:"别",pinyin:"bié",type:"empty",origin:"另外",explain:["区分开来"]},
+            {char:"统",pinyin:"tǒng",type:"oldnew",origin:"统领",explain:["统一管理"]},
+            {char:"裹",pinyin:"guǒ",type:"oldnew",origin:"携带",explain:["包裹物品"]},
+            {char:"明年",pinyin:"míng nián",type:"oldnew",origin:"第二年",explain:["来年之后"]},
+            {char:"乘",pinyin:"chéng",type:"empty",origin:"趁着",explain:["乘坐车马"]},
+            {char:"首",pinyin:"shǒu",type:"oldnew",origin:"首先",explain:["头部位置"]},
+            {char:"平",pinyin:"píng",type:"oldnew",origin:"平定",explain:["生活安宁"]},
+            {char:"言",pinyin:"yán",type:"oldnew",origin:"夸耀",explain:["口头讲述"]},
+            {char:"为",pinyin:"wéi",type:"empty",origin:"被",explain:["担任职务"]},
+            {char:"讼",pinyin:"sòng",type:"oldnew",origin:"控告",explain:["法庭诉讼"]},
+            {char:"瘐",pinyin:"yǔ",type:"oldnew",origin:"囚犯病死",explain:["身形瘦弱"]},
+            {char:"代",pinyin:"dài",type:"oldnew",origin:"代替",explain:["临时代理"]},
+            {char:"饶",pinyin:"ráo",type:"oldnew",origin:"富有",explain:["物产富饶"]},
+            {char:"善",pinyin:"shàn",type:"oldnew",origin:"擅长",explain:["品性善良"]},
+            {char:"兼",pinyin:"jiān",type:"empty",origin:"同时",explain:["两者合并"]},
+            {char:"驭",pinyin:"yù",type:"oldnew",origin:"管理",explain:["驾驭牲畜"]},
+            {char:"下",pinyin:"xià",type:"oldnew",origin:"下属",explain:["方位下方"]},
+            {char:"每",pinyin:"měi",type:"empty",origin:"每次",explain:["逐一统计"]},
+            {char:"戎",pinyin:"róng",type:"oldnew",origin:"军队",explain:["作战兵器"]},
+            {char:"伍",pinyin:"wǔ",type:"oldnew",origin:"队伍",explain:["同伴伙伴"]},
+            {char:"肃然",pinyin:"sù rán",type:"oldnew",origin:"严谨恭敬的样子",explain:["神情严肃"]},
+            {char:"惮",pinyin:"dàn",type:"oldnew",origin:"畏惧、害怕",explain:["心存戒备"]}
         ]
     }
 ];
 
-// 页面元素 & 全局变量
+// 全局变量
 const tabBtns = document.querySelectorAll('.tab-btn');
 const readPage = document.getElementById('readPage');
 const testPage = document.getElementById('testPage');
-
-// 阅读页
 const artSelect = document.getElementById('artSelect');
 const artMain = document.getElementById('artMain');
 const switchNoteBtn = document.getElementById('switchNoteBtn');
@@ -541,39 +622,37 @@ const floatTip = document.getElementById('floatTip');
 let showGlobal = false;
 let currentReadArt = null;
 
-// 答题页
 const testType = document.getElementById('testType');
 const totalQInput = document.getElementById('totalQ');
 const startTestBtn = document.getElementById('startTestBtn');
 const artChecks = document.querySelectorAll('#artCheck input[type="checkbox"]');
 const qBox = document.getElementById('qBox');
 const allNum = document.getElementById('allNum');
-const doneNum = document.getElementById('doneNum');
+const doneNum = document.getElementById('rightNum');
 const rightNum = document.getElementById('rightNum');
 const wrongNum = document.getElementById('wrongNum');
 const rate = document.getElementById('rate');
 
-// 答题全局变量
 let testPool = [];
 let nowIndex = 0;
 let totalCount = 0;
 let rightCount = 0;
 let wrongCount = 0;
+let usedIndex = [];
 
 // 标签切换
 tabBtns.forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = function(){
         tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const page = btn.dataset.page;
-        if(page === 'read'){
+        this.classList.add('active');
+        if(this.dataset.page === 'read'){
             readPage.classList.remove('hide');
             testPage.classList.add('hide');
         }else{
             readPage.classList.add('hide');
             testPage.classList.remove('hide');
         }
-    };
+    }
 });
 
 // 选择篇目
@@ -594,7 +673,6 @@ function renderReadArticle(){
     let html = "";
     const charMap = {};
     currentReadArt.chars.forEach(c => charMap[c.char] = c);
-
     for(let ch of currentReadArt.text){
         if(charMap[ch]){
             html += `<span class="char" data-char="${ch}">${ch}</span>`;
@@ -608,7 +686,7 @@ function renderReadArticle(){
     else globalNote.classList.add('hide');
 }
 
-// 绑定单字点击
+// 单字点击释义
 function bindCharClick(){
     document.querySelectorAll('.char').forEach(el => {
         el.onclick = function(e){
@@ -616,15 +694,13 @@ function bindCharClick(){
             const ch = this.dataset.char;
             const data = currentReadArt.chars.find(x => x.char === ch);
             if(!data) return;
-
             const rect = this.getBoundingClientRect();
             floatTip.style.left = rect.left + "px";
             floatTip.style.top = (rect.bottom + 10) + "px";
             floatTip.classList.remove('hide');
-
             let exp = data.explain.join("；");
             floatTip.innerHTML = `
-                <p><strong>字：${ch}</strong> 【${data.pinyin}】</p>
+                <p><strong>字：${ch}</strong>【${data.pinyin}】</p>
                 <p>本义/语境释义：${data.origin}</p>
                 <p>其他释义/语法：${exp}</p>
             `;
@@ -645,7 +721,6 @@ switchNoteBtn.onclick = function(){
     this.innerText = showGlobal ? "隐藏全局注释" : "全局显示注释";
     showGlobal ? renderGlobalNote() : globalNote.classList.add('hide');
 };
-
 function renderGlobalNote(){
     if(!currentReadArt) return;
     let html = "<h4>全文字词注释</h4>";
@@ -675,44 +750,46 @@ startTestBtn.onclick = function(){
         alert("请至少选择一篇考察篇目！");
         return;
     }
-
     testPool = [];
     nowIndex = 0;
     rightCount = 0;
     wrongCount = 0;
+    usedIndex = [];
     startTestBtn.disabled = true;
-
     const type = testType.value;
     selectIds.forEach(id => {
         const art = articleData.find(d => d.id === id);
         if(!art) return;
+        // 关键：绑定字词所属原句子，一一对应
         art.chars.forEach(char => {
-            if(type === 'all' || (type === 'empty' && char.type === 'empty') || (type === 'oldnew')){
-                testPool.push({...char, article: art});
-            }
+            art.sentences.forEach(sen => {
+                if(sen.includes(char.char)){
+                    testPool.push({
+                        ...char,
+                        article: art,
+                        sourceSentence: sen // 记录该字真实所在句子
+                    });
+                }
+            });
         });
     });
-
     if(testPool.length === 0){
-        alert("当前选择范围+题型下，无可用题目！");
+        alert("当前选择范围下无可用题目！");
         startTestBtn.disabled = false;
         return;
     }
-
     let wantNum = parseInt(totalQInput.value) || 1;
     totalCount = Math.min(wantNum, testPool.length);
     shuffle(testPool);
-
     allNum.innerText = totalCount;
     doneNum.innerText = 0;
     rightNum.innerText = 0;
     wrongNum.innerText = 0;
     rate.innerText = "0%";
-
     renderQuestion();
 };
 
-// 渲染题目：固定4个选项，原有逻辑全部保留
+// 渲染题目（核心修复：使用绑定的原句，精准标记考察字）
 function renderQuestion(){
     if(nowIndex >= totalCount){
         qBox.innerHTML = `
@@ -723,14 +800,17 @@ function renderQuestion(){
         startTestBtn.disabled = false;
         return;
     }
+    let currentIdx;
+    do{
+        currentIdx = Math.floor(Math.random() * testPool.length);
+    }while(usedIndex.includes(currentIdx));
+    usedIndex.push(currentIdx);
 
-    const item = testPool[nowIndex];
-    const art = item.article;
-    const hasCharSentences = art.sentences.filter(s => s.includes(item.char));
-    const targetSentence = hasCharSentences.length > 0 ? hasCharSentences[Math.floor(Math.random()*hasCharSentences.length)] : art.text;
+    const item = testPool[currentIdx];
+    // 直接使用预先绑定的、包含该字的原句，彻底解决不匹配问题
+    const targetSentence = item.sourceSentence;
     const showSen = targetSentence.replace(item.char, `<span class="q-word">${item.char}</span>`);
 
-    // 合并释义 + 去重
     let allMean = [item.origin, ...item.explain];
     const uniqueMean = [...new Set(allMean)];
     let options = [];
@@ -740,8 +820,7 @@ function renderQuestion(){
             isRight: text === item.origin
         });
     }
-
-    // 固定补足到4个选项
+    // 补充选项到4个
     if(options.length < 4){
         const extraPool = [];
         testPool.forEach(cc => {
@@ -759,11 +838,8 @@ function renderQuestion(){
             });
         }
     }
-
-    // 打乱选项顺序
     shuffle(options);
 
-    // 拼接HTML
     let html = `
         <p><strong>第${nowIndex+1}题</strong></p>
         <p>请解释划线字词含义/语法作用：</p>
@@ -776,27 +852,35 @@ function renderQuestion(){
     html += `</div><div class="tip-text"></div>`;
     qBox.innerHTML = html;
 
-    document.querySelectorAll('.opt').forEach(el => el.onclick = selectAnswer);
+    // 绑定答题点击事件
+    document.querySelectorAll('.opt').forEach(el => {
+        el.onclick = selectAnswer;
+    });
 }
 
-// 选择答案 & 计分（原逻辑不变）
+// 答题逻辑
 function selectAnswer(e){
     const el = e.target;
     const isRight = el.dataset.right === "true";
     const tip = document.querySelector('.tip-text');
-    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = "none");
+    const allOpts = document.querySelectorAll('.opt');
+    allOpts.forEach(o => o.style.pointerEvents = "none");
 
     if(isRight){
         el.classList.add('correct');
         tip.className = "tip-text right";
+        tip.innerText = "✅ 回答正确";
         rightCount++;
     }else{
         el.classList.add('error');
-        document.querySelectorAll('.opt').forEach(o => {
-            if(o.dataset.right === "true") o.classList.add('correct');
+        allOpts.forEach(o => {
+            if(o.dataset.right === "true"){
+                o.classList.add('correct');
+            }
         });
         tip.className = "tip-text wrong";
-        tip.innerText = "❌ 回答错误";
+        tip.innerText = "❌ 回答错误，上方绿色为正确答案";
+        wrongCount++;
     }
 
     doneNum.innerText = nowIndex + 1;

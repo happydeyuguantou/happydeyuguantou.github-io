@@ -40,11 +40,11 @@
     <button class="tab-btn" data-tab="tab-ssp">SSP语法选词</button>
   </div>
 
-  <!-- Wonder页面（完全未改动） -->
+  <!-- Wonder页面 -->
   <div id="tab-wonder" class="panel show">
     <div class="control-row">
       <label>出题数量：</label>
-      <input id="wonder-count" type="number" min="1" max="78" value="10">
+      <input id="wonder-count" type="number" min="1" max="102" value="10">
       <label><input type="checkbox" id="show-chinese"> 显示中文释义括号</label>
       <button class="blue" id="gen-wonder">生成题目</button>
       <button class="secondary" id="check-wonder">批改全部</button>
@@ -69,7 +69,7 @@
   </div>
 
 <script>
-// ===================== WONDER题库【完全保留，无修改】 =====================
+// ===================== 修正后完整Wonder题库（所有题目均补全下划线占位） =====================
 const wonderDB = [
   {en:"She left her job on Wall Street about six years ago to ______________ her “dream” and teach kids.", ans:"pursue", cn:"追求"},
   {en:"But the ______________of you, I guess, are new to the school, right?", ans:"rest", cn:"其余人"},
@@ -92,10 +92,10 @@ const wonderDB = [
   {en:"They had taken a piece of bone from my hip bone to _________________ into my _________________ to make it look more normal", ans:"insert;chin", cn:"植入;下巴"},
   {en:"Then she would tell the doctor when he made his rounds what needed _____________________ or things like that", ans:"adjusting", cn:"调整"},
   {en:"I had started kicking a rock between my feet like it was a soccer ball, ___________ it _________________________ across the sidewalk.", ans:"chasing;back and forth", cn:"来回踢着"},
-  {en:"... then practically slammed my bedroom door as she left the room.", ans:"practically slammed", cn:"猛地关上"},
+  {en:"... then _______________ my bedroom door as she left the room.", ans:"practically slammed", cn:"猛地关上"},
   {en:"“So it looks like it was ______________________, your going to school.”", ans:"a good call", cn:"明智决定"},
-  {en:"She just flipped through the pages until she got to where we had left off.", ans:"flipped through", cn:"快速翻阅"},
-  {en:"She said soft words that I know were meant to help me, but words can’t change my face.", ans:"were meant to", cn:"意在"},
+  {en:"She just _______________ the pages until she got to where we had left off.", ans:"flipped through", cn:"快速翻阅"},
+  {en:"She said soft words that I know _______________ help me, but words can’t change my face.", ans:"were meant to", cn:"意在"},
   {en:"I wasn’t used to this whole _______________ of homework.", ans:"notion", cn:"概念"},
   {en:"Five hundred kids in a school: _______________ every one of them was going to see my face at some time.", ans:"eventually", cn:"最终"},
   {en:"I can only _______________ what they were saying about me. Actually, I prefer not to even try to imagine it.", ans:"imagine", cn:"想象"},
@@ -108,7 +108,7 @@ const wonderDB = [
   {en:"The things we do are like monuments that people build to _______________ heroes after they’ve died", ans:"honor", cn:"纪念"},
   {en:"Only instead of being _______________ stone, they’re made out of the memories people have of you.", ans:"made out of", cn:"由石头制成"},
   {en:"it really felt like there were a lot of people there to _______________ my birthday", ans:"celebrate", cn:"庆祝"},
-  {en:"what dorky thing do you want to dress up as?", ans:"dress up", cn:"装扮"},
+  {en:"what dorky thing do you want to _______________ as?", ans:"dress up", cn:"装扮"},
   {en:"I’m sure he thought I _______________ the picture.", ans:"ruined", cn:"毁掉"},
   {en:"She got really nervous and turned pale and literally ________________ a sweat, an then she she came up with some ______________ excuse about really having to go to the bathroom.", ans:"broke into;lame", cn:"冒出;蹩脚的"},
   {en:"Anyway, Mrs. Atanabi ___________________, because she ended up not making anyone dance together.", ans:"let her off the hook", cn:"放过她"},
@@ -120,14 +120,14 @@ const wonderDB = [
   {en:"I ___________________ the Bleeding Scream costume from last year.", ans:"threw on", cn:"穿上"},
   {en:"“Just ___________________ him,” said Julian.", ans:"ditch", cn:"甩掉不理"},
   {en:"The tears were so ___________________ in my eyes I could barely see.", ans:"thick", cn:"浓厚"},
-  {en:"“There’s a stomach bug going around,”", ans:"stomach bug", cn:"肠胃病毒"},
-  {en:"If he starts throwing up or runs a temperature, you should call the doctor.", ans:"runs a temperature", cn:"发烧"},
+  {en:"“There’s a _______________ going around,”", ans:"stomach bug", cn:"肠胃病毒"},
+  {en:"If he starts throwing up or _______________, you should call the doctor.", ans:"runs a temperature", cn:"发烧"},
   {en:"If I wanted Mom and Dad to watch me play soccer, I knew that nine out of ten times they’d miss it because they were busy ___________________August to speech therapy or physical therapy or a new specialist or a surgery.", ans:"shuttling", cn:"接送"},
   {en:"Mom and Dad would always say I was the most____________________ little girl in the world.", ans:"understanding", cn:"懂事的"},
   {en:"After you’ve seen someone else going through that, it feels kind of crazy to _______________________ not getting the toy you had asked for…", ans:"complain over", cn:"抱怨"},
-  {en:"I knew he didn’t look exactly normal, but I really didn’t understand why strangers seemed so shocked when they saw him. Horrified. Sickened. Scared.", ans:"shocked", cn:"震惊"},
+  {en:"I knew he didn’t look exactly normal, but I really didn’t understand why strangers seemed so ______________ when they saw him. Horrified. Sickened. Scared.", ans:"shocked", cn:"震惊"},
   {en:"It was only a flash, an ______________________while he was hugging me, so happy that I was home, but it surprised me because I’d never seen him like that before.", ans:"instant", cn:"瞬间"},
-  {en:"But just two months after I stayed with her in Montauk, my beautiful Grans died. It was so completely out of the blue.", ans:"out of the blue", cn:"突如其来"},
+  {en:"But just two months after I stayed with her in Montauk, my beautiful Grans died. It was so completely ______________.", ans:"out of the blue", cn:"突如其来"},
   {en:"I love Auggie very, very much, but he has many angels ____________________________him already.", ans:"looking out for", cn:"守护"},
   {en:"We change plans, go to plan B, interrupt conversations, ____________________________depending on his moods, his whims, his needs.", ans:"go back on promises", cn:"违背承诺"},
   {en:"I knew those kinds of conversations probably happened all the time _____________________________.", ans:"out of earshot", cn:"听不到的地方"},
@@ -135,16 +135,16 @@ const wonderDB = [
   {en:"Ella said he __________________ her of E.T. She didn’t say this to be mean, of course.", ans:"reminded", cn:"使想起"},
   {en:"I even texted her and she didn’t reply. I __________________ maybe she had ended up staying in the camp longer, now that she was a counselor.", ans:"figured", cn:"猜想"},
   {en:"I can’t say she wasn’t nice, because she was, but she seemed kind of distant, like I was a__________________ friend.", ans:"casual", cn:"普通泛泛之交"},
-  {en:"It’s like they had talked to each other beforehand about redoing their image at the new school, but hadn’t bothered to clue me in.", ans:"clue", cn:"告知内情"},
+  {en:"It’s like they had talked to each other beforehand about redoing their image at the new school, but hadn’t bothered to ______________ me in.", ans:"clue", cn:"告知内情"},
   {en:"After school I __________________a restroom to avoid bumping into Miranda’s mother outside.", ans:"ducked into", cn:"躲进"},
   {en:"“We stopped for pizza.” Incredible how easily a lie can__________________ through your lips.", ans:"slip", cn:"脱口而出"},
-  {en:"“Just forget I asked anything at all,” I answered, and stormed dramatically into Auggie’s room and slammed the door.", ans:"stormed", cn:"冲进去"},
-  {en:"He was on his PlayStation and didn’t even look up.", ans:"look up", cn:"抬头"},
+  {en:"“Just forget I asked anything at all,” I answered, and __________________dramatically into Auggie’s room and slammed the door.", ans:"stormed", cn:"冲进去"},
+  {en:"He was on his PlayStation and didn’t even _______________.", ans:"look up", cn:"抬头"},
   {en:"She looked __________________ , and I realized that between me and Auggie, today had been a tough day for her, too.", ans:"drained", cn:"疲惫不堪"},
-  {en:"The hallway lights were out. The only thing illuminating her was the blue night-light in August’s bedroom.", ans:"out", cn:"熄灭"},
+  {en:"The hallway lights were _______________. The only thing illuminating her was the blue night-light in August’s bedroom.", ans:"out", cn:"熄灭"},
   {en:"Mom took his temperature, brought him some hot tea, and __________________ the “August’s mom’ role again.”", ans:"assumed", cn:"承担"},
   {en:"It was a larger group than I’d been accustomed to hanging out with, and a more __________________ crowd.", ans:"diverse", cn:"多元的"},
-  {en:"But for all they know, there’s more they don’t know. They can try to forecast the odds, but they can’t guarantee them.", ans:"odds", cn:"概率"},
+  {en:"But for all they know, there’s more they don’t know. They can try to forecast the ______________, but they can’t guarantee them.", ans:"odds", cn:"概率"},
   {en:"She tried to __________________ even the slightest trace of August’s face in their faces.", ans:"detect", cn:"察觉"},
   {en:"August had __________________ some very mean things some boys were saying about him.", ans:"overheard", cn:"无意中听到"},
   {en:"Girls like Eleanor who were members of the yearbook __________________ and the debate club.", ans:"committee", cn:"委员会"},
@@ -152,10 +152,10 @@ const wonderDB = [
   {en:"Even though I was well beyond the trick-or-treating __________________ myself, I usually threw on some mask or other to accompany him up and down the blocks, watching him knocking on people’s doors.", ans:"stage", cn:"阶段"},
   {en:"Mom looked at both of us. “Is something going on?” She didn’t __________________ her question to either one of us in particular.", ans:"address", cn:"针对"},
   {en:"In August’s case, the doctors were able to __________________ one of the “single nucleotide deletion mutations” that made war on his face.", ans:"identify", cn:"识别"},
-  {en:"He didn’t say anything, but I think that last bit was getting to him.", ans:"was getting to him", cn:"戳到他痛处"},
-  {en:"Not one person in the exotic mix of my family gene pool has ever shown any obvious signs of having what August has.", ans:"exotic", cn:"奇特的"},
+  {en:"He didn’t say anything, but I think that last bit _________________________.", ans:"was getting to him", cn:"戳到他痛处"},
+  {en:"Not one person in the __________________ mix of my family gene pool has ever shown any obvious signs of having what August has.", ans:"exotic", cn:"奇特的"},
   {en:"If I have children, there’s a one-in-two chance that I will pass on the __________________ gene to them.", ans:"defective", cn:"有缺陷的"},
-  {en:"Countless doctors have drawn little tic-tac-toe grids for my parents over the years to try to explain the genetic lottery to them.”", ans:"lottery", cn:"随机遗传概率"},
+  {en:"Countless doctors have drawn little tic-tac-toe grids for my parents over the years to try to explain the genetic ______________ to them.”", ans:"lottery", cn:"随机遗传概率"},
   {en:"This is normal! We all have to go to school sometimes __________________ the fact that we have bad days.", ans:"despite", cn:"尽管"},
   {en:"Via threatened to tell Mom and Dad what Jack did, and then Tushman would make Jack apologize to you. ... Otherwise, just go back to school and act like nothing happened. Or if you want to __________________ Jack about it, fine.", ans:"confront", cn:"对质"},
   {en:"Not a biggie. I wish people would stop trying to turn it into something_________________.", ans:"major", cn:"大事"},
@@ -457,13 +457,13 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   }
 });
 
-// Wonder渲染
+// ========== 修复：优化下划线匹配正则，兼容2个及以上连续下划线 ==========
 function renderWonder(){
   const wrap = document.getElementById("wonder-qs");
   wrap.innerHTML = "";
   const showCn = showChineseCheckbox.checked;
   currentWonderQs.forEach((item,idx)=>{
-    let sentence = item.en.replace(/_{4,}/g,"___");
+    let sentence = item.en.replace(/_{2,}/g,"___");
     let hint = showCn ? `(${item.cn})` : "";
     let html = `
       <div class="question-item" data-index="${idx}">

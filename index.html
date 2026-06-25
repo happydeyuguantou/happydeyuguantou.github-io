@@ -10,7 +10,7 @@
     .tab-wrap {margin-bottom: 20px;}
     .tab-btn {padding: 10px 24px; font-size: 16px; border: none; cursor: pointer; background: #e2e8f0;}
     .tab-btn.active {background: #2563eb; color: white;}
-    .panel {display: none; background: white; padding: 24px; border-radius 10px; box-shadow: 0 2px 12px #00000012;}
+    .panel {display: none; background: white; padding: 24px; border-radius: 10px; box-shadow: 0 2px 12px #00000012;}
     .panel.show {display: block;}
     .control-row {margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;}
     input[type="number"], select {padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 140px;}
@@ -69,7 +69,7 @@
   </div>
 
 <script>
-// ===================== 修正后完整Wonder题库（所有题目均补全下划线占位） =====================
+// ===================== Wonder题库 =====================
 const wonderDB = [
   {en:"She left her job on Wall Street about six years ago to ______________ her “dream” and teach kids.", ans:"pursue", cn:"追求"},
   {en:"But the ______________of you, I guess, are new to the school, right?", ans:"rest", cn:"其余人"},
@@ -175,7 +175,7 @@ const wonderDB = [
   {en:"Since it was dark, we used our flashlights to _________________ the artifacts while we were talking.", ans:"illuminate", cn:"照亮"}
 ];
 
-// ===================== SSP完整题库 =====================
+// ===================== 修正后SSP完整题库（词框与答案一一对应，所有题干均带填空横线） =====================
 const sspDB = [
   {
     id:"3.13增刊+4.10刊",
@@ -262,22 +262,22 @@ const sspDB = [
           {en:"The manager ____ thanked each employee for their hard work.",ans:"personally"},
           {en:"The singer’s ____ has grown rapidly since releasing her first album.",ans:"popularity"},
           {en:"She practices daily to ____ in mastering the piano piece.",ans:"succeed"},
-          {en:"The street musician played ____ beautifully to draw a crowd.",ans:"music"},
+          {en:"The street ____ played his guitar so beautifully that a small crowd gathered.",ans:"musician"},
         ]
       },
       {
         box:["clear one’s mind","fail","manage","reliable","attitude","describe","confident","remove","give up","mistake"],
         qs:[
-          {en:"The beauty was beyond ____ when watching sunset over ocean.",ans:"description"},
-          {en:"He’s nice but totally ____ for on-time meetings.",ans:"unreliable"},
-          {en:"His negative ____ makes teamwork hard.",ans:"attitude"},
-          {en:"Fans lost ____ after several losses.",ans:"confidence"},
-          {en:"It’s hard to ____ a big team with many personalities.",ans:"manage"},
-          {en:"The movie ____ my high expectations; it was boring.",ans:"failed"},
-          {en:"We all make ____ but fix them and move on.",ans:"mistakes"},
-          {en:"If you ____ too early, you’ll never know your potential.",ans:"give up"},
-          {en:"Deep breaths help you ____ and focus.",ans:"clear one’s mind"},
-          {en:"This tool can ____ background noise automatically.",ans:"remove"},
+          {en:"The beauty of the sunset was beyond ____.",ans:"description"},
+          {en:"He’s nice but totally ____ when it comes to showing up on time.",ans:"unreliable"},
+          {en:"His negative ____ toward teamwork makes it difficult for others to work with him.",ans:"attitude"},
+          {en:"Many fans have lost ____ in the team after several consecutive losses.",ans:"confidence"},
+          {en:"It’s not easy to ____ a large department with so many different personalities.",ans:"manage"},
+          {en:"The movie ____ to live up to my expectations; it was quite boring.",ans:"failed"},
+          {en:"We all make ____, but the important thing is to fix them and move on.",ans:"mistakes"},
+          {en:"If a student ____ too soon, he or she will never know what could have been achieved.",ans:"gives up"},
+          {en:"Taking a few deep breaths helped her ____ and focus on the problem.",ans:"clear her mind"},
+          {en:"The new software can ____ background noise from your recordings automatically.",ans:"remove"},
         ]
       }
     ]
@@ -286,33 +286,33 @@ const sspDB = [
     id:"5.15刊",
     sets:[
       {
-        box:["die","surprise","groundbreaking","volunteer","experience","moving","celebrate","mix","patience","confident"],
+        box:["die","surprise","groundbreaking","volunteer","experience","move","promote","mix","patience","confident"],
         qs:[
-          {en:"Doctors tried everything to save the ____ patient.",ans:"dying"},
-          {en:"She loves to ____ friends with handmade birthday gifts.",ans:"surprise"},
-          {en:"The scientist’s ____ discovery hit all headlines.",ans:"groundbreaking"},
-          {en:"She ____ at a free meal charity every weekend.",ans:"volunteers"},
-          {en:"An experienced traveller knows how to travel light and stay ____.",ans:"safe"},
+          {en:"The doctors tried everything to save the ____ patient.",ans:"dying"},
+          {en:"She always ____ her friends with handmade gifts on their birthdays.",ans:"surprises"},
+          {en:"The young scientist’s ____ discovery made the headlines around the world last week.",ans:"groundbreaking"},
+          {en:"She has been ____ at a charity that provides free meals to elderly people every weekend.",ans:"volunteering"},
+          {en:"An ____ traveler knows how to pack light and stay safe.",ans:"experienced"},
           {en:"My sister gave a ____ speech at my wedding.",ans:"moving"},
-          {en:"Stars use social media to ____ their new works.",ans:"promote"},
-          {en:"Raising kids needs love and humour ____ together.",ans:"mixed"},
-          {en:"After waiting 30 mins rain, she lost ____.",ans:"patience"},
-          {en:"I am ____ everything will turn out well.",ans:"confident"},
+          {en:"Many celebrities use social media to connect with their fans and ____ their latest projects.",ans:"promote"},
+          {en:"To raise a child well, you need to ____ together love, patience, and a sense of humor.",ans:"mix"},
+          {en:"After waiting for 30 minutes in the rain, she completely lost ____ with her late friend.",ans:"patience"},
+          {en:"I am ____ that everything will work out in the end.",ans:"confident"},
         ]
       },
       {
         box:["behave","attention","live in harmony with","responsible","generation","neighbouring","serve","approach","suggest","certain"],
         qs:[
-          {en:"The storm is ____ the coast, recall all ships.",ans:"approaching"},
-          {en:"Shouting in library draws others’ ____.",ans:"attention"},
-          {en:"His checking phone ____ he waits for a message.",ans:"suggests"},
-          {en:"Your ____ should match your words.",ans:"behaviour"},
-          {en:"We ____ cannot change what already happened.",ans:"certainly"},
-          {en:"Young ____ are more tech-savvy than parents.",ans:"generation"},
-          {en:"It’s ____ to leave young kids home alone all day.",ans:"irresponsible"},
-          {en:"Humans must ____ all living creatures.",ans:"live in harmony with"},
-          {en:"The storm damaged town and several ____ villages.",ans:"neighbouring"},
-          {en:"Our team ____ local residents all summer.",ans:"served"},
+          {en:"The storm is ____ the coast, so all the ships have been called back to the port.",ans:"approaching"},
+          {en:"If you shout in the library, you will draw ____ from everyone around you.",ans:"attention"},
+          {en:"The way he keeps checking his phone ____ that he is waiting for an important message.",ans:"suggests"},
+          {en:"If you want people to trust you, your ____ should match your words.",ans:"behaviour"},
+          {en:"We ____ can’t change the past, but we can learn from it.",ans:"certainly"},
+          {en:"The younger ____ is more comfortable with technology than their parents ever were.",ans:"generation"},
+          {en:"It is ____ to leave a young child alone at home for the entire day.",ans:"irresponsible"},
+          {en:"If humans want to survive on this planet, we must find a way to ____ all other living creatures.",ans:"live in harmony with"},
+          {en:"The earthquake caused serious damage to the city and several ____ villages.",ans:"neighbouring"},
+          {en:"Our dedicated team ____ the local community faithfully throughout last summer.",ans:"served"},
         ]
       }
     ]
@@ -321,33 +321,33 @@ const sspDB = [
     id:"5.22刊",
     sets:[
       {
-        box:["wisdom","appear","reflective","impress","disturb","out of place","thoroughly","advice","accidentally","widely"],
+        box:["wisdom","appear","reflective","impress","disturb","out of place","thoroughly","advice","accident","wide"],
         qs:[
-          {en:"True ____ is knowing how much you don’t know.",ans:"wisdom"},
-          {en:"The two paintings ____ identical at first glance.",ans:"appear"},
-          {en:"Bright clothes help you stay ____ cycling at night.",ans:"safe"},
-          {en:"She ____ interviewer with confident answers.",ans:"impressed"},
-          {en:"My favourite show airs at 9, don’t ____ me then.",ans:"disturb"},
-          {en:"Modern building looks ____ among old stone houses.",ans:"out of place"},
-          {en:"She felt stressed but studied ____ for finals.",ans:"thoroughly"},
-          {en:"Ask trusted people for ____ before big choices.",ans:"advice"},
-          {en:"He dropped pen and ink spread ____ over paper.",ans:"accidentally"},
-          {en:"Retirement news was ____ shared online.",ans:"widely"},
+          {en:"True ____ is knowing how much you don’t know, for it keeps the mind open and curious.",ans:"wisdom"},
+          {en:"The two paintings ____ identical at first glance, but there are small differences.",ans:"appear"},
+          {en:"Wearing bright or ____ clothing goes a long way toward staying safe when cycling at night.",ans:"reflective"},
+          {en:"She managed to ____ the hiring manager with her confident answers and relevant experience.",ans:"impress"},
+          {en:"My favourite programme comes on at 9 o’clock, so please don’t ____ me then.",ans:"disturb"},
+          {en:"The modern glass building feels ____ among the old stone houses in the village.",ans:"out of place"},
+          {en:"She felt stressed before her final exam, even though she had studied ____.",ans:"thoroughly"},
+          {en:"Before making a big decision, seek ____ from people you trust.",ans:"advice"},
+          {en:"The ink spread through the wet paper immediately after he ____ dropped the pen.",ans:"accidentally"},
+          {en:"When the celebrity announced his retirement, the news was ____ discussed on social media.",ans:"widely"},
         ]
       },
       {
-        box:["personal","get along with","design","suffer","noise","consist of","happiness","architect","hold","crowded"],
+        box:["personal","get along with","design","suffer","noise","consist of","happy","architect","hold","crowded"],
         qs:[
-          {en:"Volunteering brings true ____ helping others.",ans:"happiness"},
-          {en:"The group ____ twelve different departments.",ans:"consists of"},
-          {en:"She wants to be an ____ for low-cost homes.",ans:"architect"},
-          {en:"My neighbour’s dog makes ____ sounds all night.",ans:"noisy"},
-          {en:"She is easy to ____ and never judges.",ans:"get along with"},
-          {en:"Many ____ headaches from screen time.",ans:"suffer"},
-          {en:"____ I prefer quiet mornings to write.",ans:"Personally"},
-          {en:"The little girl ____ her mom’s hand tightly.",ans:"held"},
-          {en:"The ____ simplified app for children.",ans:"designer"},
-          {en:"The subway was so ____ this morning that I could barely move.",ans:"crowded"},
+          {en:"Through volunteering at the local shelter, we found true ____ in helping others.",ans:"happiness"},
+          {en:"The committee ____ twelve members, each representing a different department.",ans:"consists of"},
+          {en:"She dreams of becoming an ____ who builds affordable homes for low-income families.",ans:"architect"},
+          {en:"My neighbour’s dog is very ____ at night, barking for hours and making it hard for me to sleep.",ans:"noisy"},
+          {en:"She is easy to ____ because she is always patient and never judges others.",ans:"get along with"},
+          {en:"Many people ____ from headaches when they spend too much time in front of a screen.",ans:"suffer"},
+          {en:"____, I find that early morning is the best time to focus and write, when the world is still quiet.",ans:"Personally"},
+          {en:"The little girl ____ her mother’s dress tightly and refused to walk into the doctor’s office alone.",ans:"held"},
+          {en:"To reach a younger audience, the ____ made his app simple enough for children to use.",ans:"designer"},
+          {en:"The subway was so ____ this morning that I could barely breathe or move my arms.",ans:"crowded"},
         ]
       }
     ]
@@ -356,13 +356,13 @@ const sspDB = [
     id:"5.29刊",
     sets:[
       {
-        box:["interest","beautiful","speed up","bill","arrive","abroad","risk","schedule","irregular","contact"],
+        box:["pay","arrive","speed up","regular","keep in touch with","beautiful","abroad","interest","schedule","risk"],
         qs:[
-          {en:"My brother is ____ in space travel.",ans:"interested"},
-          {en:"The singer sang ____ and moved everyone.",ans:"beautifully"},
+          {en:"My brother is very ____ in space exploration and wants to be an astronaut one day.",ans:"interested"},
+          {en:"The singer performed the song so ____ that everyone in the audience was moved to tears.",ans:"beautifully"},
           {en:"The traffic light turned yellow, so the driver had to ____ to pass the crossroads.",ans:"speed up"},
-          {en:"The bill was paid by my friend before I could take out my wallet.",ans:"bill"},
-          {en:"When we ____ at the party, the music was already playing loudly.",ans:"arrived"},
+          {en:"The bill was ____ by my friend before I could take out my wallet.",ans:"paid"},
+          {en:"When we ____ at the party, the music was already playing loudly and almost everyone was dancing.",ans:"arrived"},
           {en:"He has been living ____ for nearly a decade and rarely comes back home.",ans:"abroad"},
           {en:"Entrepreneurs often have to take ____ if they want their businesses to succeed.",ans:"risks"},
           {en:"Our travel ____ includes visits to three different cities in five days.",ans:"schedule"},
@@ -371,16 +371,16 @@ const sspDB = [
         ]
       },
       {
-        box:["patient","come across","patient","unbelievable","breathe","keep a close eye on","lift","perfectly","outsider","still"],
+        box:["patient","come across","health","unbelievable","breathe","keep a close eye on","lift","perfectly","outsider","still"],
         qs:[
           {en:"Your suggestion came at a ____ right time yesterday evening.",ans:"perfectly"},
           {en:"Yesterday evening, she ____ a useful recipe online when she wasn’t even looking for one.",ans:"came across"},
-          {en:"The ____ lay still on the bed while the doctor listened to his heartbeat.",ans:"patient"},
+          {en:"The patient lay ____ on the bed while the doctor listened to his heartbeat.",ans:"still"},
           {en:"In the hospital, the head nurse ____ the patient’s condition day and night.",ans:"keeps a close eye on"},
           {en:"At the party last Friday, I felt like an ____ because I didn’t know anyone there.",ans:"outsider"},
           {en:"The price of that used car was ____ — only 500 dollars!",ans:"unbelievable"},
-          {en:"It is important to keep a healthy balance between work and rest, or you may easily burn out.",ans:"healthy"},
-          {en:"____ your breath for ten seconds, then slowly let it out to calm your mind and body.",ans:"Hold"},
+          {en:"It is important to keep a ____ balance between work and rest, or you may easily burn out.",ans:"healthy"},
+          {en:"Hold your ____ for ten seconds, then slowly let it out to calm your mind and body.",ans:"breath"},
           {en:"Learning a musical instrument requires a lot of ____, as progress often comes slowly over months or years of daily practice.",ans:"patience"},
           {en:"Her spirits ____ at the sound of her child’s voice every evening after a long day at work.",ans:"lift"},
         ]
@@ -412,12 +412,12 @@ const sspDB = [
           {en:"After months of intense training, it all ____ on race day.",ans:"paid off"},
           {en:"The competitions between tech companies are becoming increasingly ____.",ans:"fierce"},
           {en:"The bread still held the ____ from the oven when I tore it open.",ans:"warmth"},
-          {en:"Drinking coffee helps me stay ____ through work.",ans:"alert"},
-          {en:"Our city ____ an international music festival every summer.",ans:"hosts"},
-          {en:"Their latest product ____ AI to deliver personalized experience.",ans:"integrates"},
-          {en:"The smartphone is ____ available worldwide.",ans:"internationally"},
-          {en:"Every autumn farmers ____ corn before heavy rain.",ans:"harvest"},
-          {en:"My brother ____ mobile apps for a tech company.",ans:"designs"},
+          {en:"Drinking coffee helps me stay ____ through the rest of the workday.",ans:"alert"},
+          {en:"Our city ____ an international music festival every summer in the central park.",ans:"hosts"},
+          {en:"Their latest product ____ AI technology to deliver a truly personalized user experience.",ans:"integrates"},
+          {en:"The smartphone is ____ available, so you can buy it almost anywhere in the world.",ans:"internationally"},
+          {en:"Every autumn, the farmers ____ the corn before the heavy rains arrive.",ans:"harvest"},
+          {en:"My brother is a software engineer who ____ mobile apps for a well-known tech company.",ans:"designs"},
         ]
       }
     ]
@@ -457,7 +457,7 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   }
 });
 
-// ========== 修复：优化下划线匹配正则，兼容2个及以上连续下划线 ==========
+// Wonder渲染
 function renderWonder(){
   const wrap = document.getElementById("wonder-qs");
   wrap.innerHTML = "";

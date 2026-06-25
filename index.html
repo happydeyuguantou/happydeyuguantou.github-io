@@ -1,899 +1,636 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文言文字词学习&测试</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "微软雅黑", 宋体;
-        }
-        body {
-            background: #f4f5f7;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #ddd;
-        }
-        header {
-            background: #2d5b99;
-            color: #fff;
-            padding: 18px;
-            text-align: center;
-            border-radius: 8px 8px 0 0;
-        }
-        .tab-wrap {
-            display: flex;
-            border-bottom: 1px solid #eee;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            background: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .tab-btn.active {
-            color: #2d5b99;
-            border-bottom: 3px solid #2d5b99;
-            font-weight: bold;
-        }
-        .content {
-            padding: 25px;
-        }
-        .hide {
-            display: none !important;
-        }
-        .select-bar {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        select, input {
-            padding: 7px 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .btn {
-            padding: 7px 16px;
-            background: #2d5b99;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn:disabled {
-            background: #999;
-            cursor: not-allowed;
-        }
-        .article-main {
-            border: 1px solid #e8e8e8;
-            padding: 20px;
-            border-radius: 6px;
-            min-height: 240px;
-            line-height: 2.1;
-            font-size: 16px;
-        }
-        .char {
-            display: inline-block;
-            cursor: pointer;
-            padding: 0 3px;
-            border-radius: 3px;
-        }
-        .char:hover {
-            background: #e6f0ff;
-        }
-        .char.active {
-            background: #d0e2ff;
-        }
-        .float-tip {
-            position: absolute;
-            background: #fff;
-            border: 2px solid #2d5b99;
-            border-radius: 6px;
-            padding: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 999;
-            max-width: 320px;
-            font-size: 14px;
-        }
-        .global-note {
-            margin-top: 20px;
-            border-top: 1px dashed #ccc;
-            padding-top: 15px;
-        }
-        .note-item {
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        .note-item span {
-            background: #eef4ff;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-right: 6px;
-        }
-        .set-panel {
-            background: #f8f9fa;
-            padding: 18px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        .row {
-            margin: 12px 0;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .article-check {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin: 10px 0;
-        }
-        .check-item {
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .stat-bar {
-            background: #f0f7ff;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 30px;
-        }
-        .q-box {
-            border: 1px solid #e8e8e8;
-            padding: 20px;
-            border-radius: 6px;
-            min-height: 260px;
-        }
-        .q-sentence {
-            font-size: 16px;
-            line-height: 1.8;
-            margin: 15px 0;
-        }
-        .q-word {
-            color: #d82e2e;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-        .opts {
-            margin: 20px 0;
-            display: grid;
-            gap: 10px;
-        }
-        .opt {
-            border: 1px solid #ccc;
-            padding: 11px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .opt:hover {
-            border-color: #2d5b99;
-            background: #f7f9ff;
-        }
-        .opt.correct {
-            border-color: #27ae60;
-            background: #f0f9f4;
-            pointer-events: none;
-        }
-        .opt.error {
-            border-color: #e74c3c;
-            background: #fef2f2;
-            pointer-events: none;
-        }
-        .tip-text {
-            margin-top: 15px;
-            font-weight: bold;
-        }
-        .right {color: #27ae60;}
-        .wrong {color: #e74c3c;}
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wonder & SSP 英语刷题工具</title>
+  <style>
+    * {box-sizing: border-box; font-family: system-ui, sans-serif;}
+    body {max-width: 1200px; margin: 0 auto; padding: 20px; background: #f7f9fc;}
+    .tab-wrap {margin-bottom: 20px;}
+    .tab-btn {padding: 10px 24px; font-size: 16px; border: none; cursor: pointer; background: #e2e8f0;}
+    .tab-btn.active {background: #2563eb; color: white;}
+    .panel {display: none; background: white; padding: 24px; border-radius 10px; box-shadow: 0 2px 12px #00000012;}
+    .panel.show {display: block;}
+    .control-row {margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;}
+    input[type="number"], select {padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 140px;}
+    button {padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer;}
+    button.blue {background: #3b82f6; color:#fff;}
+    button.secondary {background: #64748b; color:#fff;}
+    button.danger {background: #ef4444; color:#fff;}
+    button.success {background: #10b981; color:#fff;}
+    button:disabled {background: #cbd5e1; color: #64748b; cursor: not-allowed;}
+    .question-item {border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px; margin-bottom: 12px;}
+    .blank-input {width: 180px; padding: 6px 8px; margin: 0 6px; border: 1px solid #94a3b8; border-radius: 4px;}
+    .wrong {background: #fee2e2; border: 1px solid #f87171;}
+    .correct-ans {color: #16a34a; font-weight: bold; margin-left: 8px;}
+    .chinese-hint {color: #6b7280; font-size: 14px;}
+    .word-box {background: #f1f5f9; padding: 10px; border-radius: 6px; margin: 8px 0;}
+    .stat-box {margin-top: 20px; padding: 16px; background: #dbeafe; border-radius: 8px; font-size: 18px;}
+    .journal-checklist {display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;}
+    .journal-item {display: flex; align-items: center; gap: 4px; width: 180px;}
+    .hidden {display: none;}
+    .ssp-title {margin-top: 0;}
+  </style>
 </head>
 <body>
-<div class="container">
-    <header>
-        <h2>新编初中文言文 字词学习&自测系统</h2>
-    </header>
-    <div class="tab-wrap">
-        <button class="tab-btn active" data-page="read">原文浏览</button>
-        <button class="tab-btn" data-page="test">字词测试</button>
-    </div>
+  <h1>Wonder词汇 / SSP选词填空刷题器</h1>
+  <div class="tab-wrap">
+    <button class="tab-btn active" data-tab="tab-wonder">Wonder词汇填空</button>
+    <button class="tab-btn" data-tab="tab-ssp">SSP语法选词</button>
+  </div>
 
-    <div class="content" id="readPage">
-        <div class="select-bar">
-            <label>选择篇目：</label>
-            <select id="artSelect">
-                <option value="">请选择篇目</option>
-                <option value="64">64. 王义士夫妇见义勇为</option>
-                <option value="77">77. 范仲淹巧劝滕子京</option>
-                <option value="83">83. 车夫妻子的规劝</option>
-                <option value="86">86. 仲永的不幸</option>
-                <option value="88">88. 艾子杖责孙儿</option>
-                <option value="89">89. 愚蠢的父子</option>
-                <option value="91">91. 缇萦救父</option>
-                <option value="95">95. 黄仙裳助人</option>
-                <option value="201">201. 圬者王承福传</option>
-                <option value="202">202. 秦良玉传</option>
-            </select>
-            <button class="btn" id="switchNoteBtn">全局显示注释</button>
-        </div>
-        <div class="article-main" id="artMain">请在上方选择对应篇目查看原文</div>
-        <div class="global-note hide" id="globalNote"></div>
-        <div class="float-tip hide" id="floatTip"></div>
+  <!-- Wonder页面（完全未改动） -->
+  <div id="tab-wonder" class="panel show">
+    <div class="control-row">
+      <label>出题数量：</label>
+      <input id="wonder-count" type="number" min="1" max="78" value="10">
+      <label><input type="checkbox" id="show-chinese"> 显示中文释义括号</label>
+      <button class="blue" id="gen-wonder">生成题目</button>
+      <button class="secondary" id="check-wonder">批改全部</button>
+      <button class="danger" id="reset-wonder">重置</button>
     </div>
+    <div id="wonder-qs"></div>
+  </div>
 
-    <div class="content hide" id="testPage">
-        <div class="set-panel">
-            <div class="row">
-                <label>考察题型：</label>
-                <select id="testType">
-                    <option value="all">全考（虚词+古今异义）</option>
-                    <option value="empty">仅文言虚词</option>
-                    <option value="oldnew">仅古今异义</option>
-                </select>
-                <label>答题总数：</label>
-                <input type="number" id="totalQ" min="1" value="10">
-                <button class="btn" id="startTestBtn">开始答题</button>
-            </div>
-            <div>
-                <p style="margin-bottom:8px;">选择考察篇目（可多选）：</p>
-                <div class="article-check" id="artCheck">
-                    <label class="check-item"><input type="checkbox" value="64" checked> 64</label>
-                    <label class="check-item"><input type="checkbox" value="77" checked> 77</label>
-                    <label class="check-item"><input type="checkbox" value="83" checked> 83</label>
-                    <label class="check-item"><input type="checkbox" value="86" checked> 86</label>
-                    <label class="check-item"><input type="checkbox" value="88" checked> 88</label>
-                    <label class="check-item"><input type="checkbox" value="89" checked> 89</label>
-                    <label class="check-item"><input type="checkbox" value="91" checked> 91</label>
-                    <label class="check-item"><input type="checkbox" value="95" checked> 95</label>
-                    <label class="check-item"><input type="checkbox" value="201" checked> 201</label>
-                    <label class="check-item"><input type="checkbox" value="202" checked> 202</label>
-                </div>
-            </div>
-        </div>
-        <div class="stat-bar" id="statBar">
-            <div>总题数：<span id="allNum">0</span></div>
-            <div>已答：<span id="doneNum">0</span></div>
-            <div>答对：<span id="rightNum">0</span></div>
-            <div>答错：<span id="wrongNum">0</span></div>
-            <div>正确率：<span id="rate">0%</span></div>
-        </div>
-        <div class="q-box" id="qBox">请选择篇目、题型并点击【开始答题】</div>
+  <!-- SSP页面 -->
+  <div id="tab-ssp" class="panel">
+    <div class="control-row">
+      <label>选择期刊套题：</label>
+      <div class="journal-checklist" id="journal-list"></div>
+      <button class="blue" id="select-all-journals">一键全选</button>
+      <button class="success" id="start-ssp">开始答题</button>
+      <button class="secondary" id="check-ssp">批改本套</button>
+      <button class="blue" id="next-ssp" disabled>下一套</button>
+      <button class="danger" id="reset-ssp">重置全部</button>
     </div>
-</div>
+    <div id="ssp-current-set"></div>
+    <div class="stat-box hidden" id="ssp-stat"></div>
+  </div>
 
 <script>
-const articleData = [
-    {
-        id:64,
-        title:"64. 王义士夫妇见义勇为",
-        text:"王义士者，失其名，泰州如泉县隶也。虽隶，能以气节自重，任侠好义。甲申国亡后，同邑布衣许元博德溥不肯剃发，刺臂誓死。有司以抗令弃之市，妻当徙。王适值解，高德溥之义，欲脱其妻而无术，乃终夜欷歔不成寐。其妻怪之，问曰：“君何为彷徨如此耶？”王不答。妻又曰：“子毋以我妇人也而忽之，子第语我，我能为子筹之。”王语之故，妻曰：“子高德溥义而欲脱其妻，此豪杰之举也，诚得一人代之可矣。”王曰：“然。顾安得其人哉？”妻曰：“吾当成子之义，愿代以行。",
-        sentences: [
-            "王义士者，失其名，泰州如泉县隶也。",
-            "虽隶，能以气节自重，任侠好义。",
-            "妻当徙。王适值解，高德溥之义。",
-            "乃终夜欷歔不成寐。",
-            "其妻怪之，问曰：“君何为彷徨如此耶？”",
-            "子毋以我妇人也而忽之。",
-            "子第语我，我能为子筹之。",
-            "诚得一人代之可矣。",
-            "然。顾安得其人哉？"
-        ],
-        chars:[
-            {char:"者",pinyin:"zhě",type:"empty",origin:"表判断语气词",explain:["句末停顿","指代人群"]},
-            {char:"隶",pinyin:"lì",type:"oldnew",origin:"差役，古代小官吏",explain:["依附他人","基层下属"]},
-            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["纵使"]},
-            {char:"邑",pinyin:"yì",type:"oldnew",origin:"同乡人",explain:["城镇"]},
-            {char:"徙",pinyin:"xǐ",type:"oldnew",origin:"流放",explain:["调动官职"]},
-            {char:"适",pinyin:"shì",type:"empty",origin:"恰逢",explain:["前往某地"]},
-            {char:"高",pinyin:"gāo",type:"oldnew",origin:"钦佩",explain:["抬高地位"]},
-            {char:"术",pinyin:"shù",type:"oldnew",origin:"办法",explain:["谋略"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是，就",explain:["竟然"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表并列"]},
-            {char:"怪",pinyin:"guài",type:"oldnew",origin:"对……感到奇怪",explain:["责备他人"]},
-            {char:"毋",pinyin:"不要",type:"empty",origin:"不要",explain:["切莫"]},
-            {char:"忽",pinyin:"hū",type:"oldnew",origin:"轻视",explain:["疏忽大意"]},
-            {char:"第",pinyin:"dì",type:"empty",origin:"只管，尽管",explain:["门第出身"]},
-            {char:"故",pinyin:"gù",type:"empty",origin:"缘故",explain:["旧日事物"]},
-            {char:"诚",pinyin:"chéng",type:"empty",origin:"如果，果真",explain:["真心实意"]},
-            {char:"然",pinyin:"rán",type:"empty",origin:"说得对",explain:["外表模样"]},
-            {char:"顾",pinyin:"gù",type:"empty",origin:"可是，然而",explain:["探望亲友"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他、它",explain:["结构助词，的","动词，去往"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，凭借",explain:["介词，把","连词，继而"]}
-        ]
-    },
-    {
-        id:77,
-        title:"77. 范仲淹巧劝滕子京",
-        text:"滕子京谪守巴陵郡，公与友善。滕锐意兴作，劳民伤财，人多议之。仲淹患之，欲谏而恐其不悦。一日，从容谓曰：“君知湖泽之蛙乎？终日鸣不止，人孰听之？若敛声静处，反使人思。”滕悟，遂止其役。",
-        sentences: [
-            "滕子京谪守巴陵郡，公与友善。",
-            "劳民伤财，人多议之。",
-            "仲淹患之，欲谏而恐其不悦。",
-            "终日鸣不止，人孰听之？",
-            "若敛声静处，反使人思。",
-            "滕悟，遂止其役。"
-        ],
-        chars:[
-            {char:"谪",pinyin:"zhé",type:"oldnew",origin:"被贬官",explain:["流放边陲"]},
-            {char:"守",pinyin:"shǒu",type:"oldnew",origin:"担任郡守",explain:["看护城池"]},
-            {char:"与",pinyin:"yǔ",type:"empty",origin:"和，同",explain:["赠予物品"]},
-            {char:"劳",pinyin:"láo",type:"oldnew",origin:"使……劳累",explain:["体力劳作"]},
-            {char:"议",pinyin:"yì",type:"oldnew",origin:"议论，批评",explain:["商讨事务"]},
-            {char:"患",pinyin:"huàn",type:"oldnew",origin:"担忧，忧虑",explain:["遭遇灾祸"]},
-            {char:"欲",pinyin:"yù",type:"empty",origin:"想要",explain:["内心期许"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表承接","表并列"]},
-            {char:"恐",pinyin:"kǒng",type:"empty",origin:"担心",explain:["心生畏惧"]},
-            {char:"孰",pinyin:"shú",type:"empty",origin:"谁",explain:["何物"]},
-            {char:"若",pinyin:"ruò",type:"empty",origin:"如果",explain:["旁人"]},
-            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终结局"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，这件",explain:["结构助词，的"]}
-        ]
-    },
-    {
-        id:83,
-        title:"83. 车夫妻子的规劝",
-        text:"晏子为齐相，出，其御之妻从门间而窥。其夫为相御，拥大盖，策驷马，意气洋洋，甚自得。既而归，其妻请去。夫问其故。妻曰：“晏子长不满六尺，身相齐国，名显诸侯。今者妾观其出，志念深矣，常有以自下者。今子长八尺，乃为人仆御，然子之意，自以为足，妾是以求去也。”其后，夫自抑损。晏子怪而问之，御以实对。晏子荐以为大夫。",
-        sentences: [
-            "晏子为齐相，出，其御之妻从门间而窥。",
-            "既而归，其妻请去。",
-            "夫问其故。",
-            "晏子长不满六尺，身相齐国，名显诸侯。",
-            "乃为人仆御，然子之意。",
-            "妾是以求去也。",
-            "晏子怪而问之，御以实对。"
-        ],
-        chars:[
-            {char:"为",pinyin:"wéi",type:"empty",origin:"担任",explain:["动手劳作","被他人驱使"]},
-            {char:"御",pinyin:"yù",type:"oldnew",origin:"车夫",explain:["驾驭车马"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["人称代词","动词，去往"]},
-            {char:"间",pinyin:"jiān",type:"oldnew",origin:"缝隙",explain:["暗中行事"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折","表并列"]},
-            {char:"窥",pinyin:"kuī",type:"oldnew",origin:"偷看",explain:["实地观察"]},
-            {char:"策",pinyin:"cè",type:"oldnew",origin:"鞭打",explain:["谋划计策"]},
-            {char:"既",pinyin:"jì",type:"empty",origin:"已经；既而（不久）",explain:["依照常理"]},
-            {char:"去",pinyin:"qù",type:"oldnew",origin:"离开",explain:["两地距离"]},
-            {char:"故",pinyin:"gù",type:"empty",origin:"原因",explain:["旧事往事"]},
-            {char:"长",pinyin:"cháng",type:"oldnew",origin:"身高",explain:["时间久远"]},
-            {char:"显",pinyin:"xiǎn",type:"oldnew",origin:"扬名",explain:["显露神色"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，用来；以是（因此）",explain:["介词，凭借"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"竟然",explain:["紧接着"]},
-            {char:"然",pinyin:"rán",type:"empty",origin:"表转折，但是",explain:["外在形态"]},
-            {char:"是",pinyin:"shì",type:"empty",origin:"这；以是（因此）",explain:["判断动词"]},
-            {char:"怪",pinyin:"guài",type:"oldnew",origin:"感到奇怪",explain:["面露诧异"]},
-            {char:"对",pinyin:"duì",type:"oldnew",origin:"回答",explain:["直面对方"]}
-        ]
-    },
-    {
-        id:86,
-        title:"86. 仲永的不幸",
-        text:"金溪民方仲永，世隶耕。仲永生五年，未尝识书具，忽啼求之。父异焉，借旁近与之，即书诗四句，并自为其名。其诗以养父母、收族为意。自是指物作诗立就。邑人奇之，稍稍宾客其父。父利其然也，日扳仲永环谒于邑人，不使学。泯然众人矣。",
-        sentences: [
-            "金溪民方仲永，世隶耕。",
-            "仲永生五年，未尝识书具。",
-            "父异焉，借旁近与之。",
-            "自是指物作诗立就。",
-            "邑人奇之，稍稍宾客其父。",
-            "父利其然也，日扳仲永环谒于邑人。"
-        ],
-        chars:[
-            {char:"隶",pinyin:"lì",type:"oldnew",origin:"属于",explain:["依附于"]},
-            {char:"生",pinyin:"shēng",type:"oldnew",origin:"长到",explain:["降生出世"]},
-            {char:"尝",pinyin:"cháng",type:"empty",origin:"曾经",explain:["品尝食物"]},
-            {char:"识",pinyin:"shí",type:"oldnew",origin:"认识",explain:["分辨事物"]},
-            {char:"异",pinyin:"yì",type:"oldnew",origin:"对……感到诧异",explain:["两者不同"]},
-            {char:"与",pinyin:"yǔ",type:"empty",origin:"给",explain:["相伴同行"]},
-            {char:"并",pinyin:"bìng",type:"empty",origin:"并且",explain:["合并在一起"]},
-            {char:"自",pinyin:"zì",type:"empty",origin:"自己；自是（从此）",explain:["来自某处"]},
-            {char:"是",pinyin:"shì",type:"empty",origin:"这；自是（从此）",explain:["正确做法"]},
-            {char:"就",pinyin:"jiù",type:"oldnew",origin:"完成；立就（立刻完成）",explain:["走近身旁"]},
-            {char:"奇",pinyin:"qí",type:"oldnew",origin:"以……为奇",explain:["样貌奇特"]},
-            {char:"稍",pinyin:"shāo",type:"oldnew",origin:"渐渐；稍稍（渐渐）",explain:["略微减少"]},
-            {char:"利",pinyin:"lì",type:"oldnew",origin:"认为……有利可图",explain:["器物锋利"]},
-            {char:"扳",pinyin:"pān",type:"oldnew",origin:"拉着，牵拉",explain:["撬动物件"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，它",explain:["结构助词，的"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["连词，继而"]}
-        ]
-    },
-    {
-        id:88,
-        title:"88. 艾子杖责孙儿",
-        text:"艾有孙，年十许，慵劣不学，每加榎楚而不悛。其父仅有是儿，恒恐儿之不胜杖而死也，责必涕泣以请。艾子怒曰：“吾为若教子不善邪？”杖之愈峻。一旦，雪作，孙抟雪而嬉。艾子褫其衣，使跪雪中。其子亦脱其衣跪其旁。",
-        sentences: [
-            "年十许，慵劣不学。",
-            "其父仅有是儿，恒恐儿之不胜杖而死也。",
-            "责必涕泣以请。",
-            "吾为若教子不善邪？",
-            "杖之愈峻。",
-            "一旦，雪作，孙抟雪而嬉。"
-        ],
-        chars:[
-            {char:"许",pinyin:"xǔ",type:"oldnew",origin:"左右；十来岁",explain:["应允请求"]},
-            {char:"每",pinyin:"měi",type:"empty",origin:"常常",explain:["逐一逐个"]},
-            {char:"是",pinyin:"shì",type:"empty",origin:"这",explain:["判定对错"]},
-            {char:"恒",pinyin:"héng",type:"empty",origin:"常常",explain:["长久不变"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"主谓之间，取消句子独立性（不译）",explain:["人称代词","动词，去往"]},
-            {char:"胜",pinyin:"shèng",type:"oldnew",origin:"承受；承受不住",explain:["夺得胜利"]},
-            {char:"请",pinyin:"qǐng",type:"oldnew",origin:"求情",explain:["正式请求"]},
-            {char:"为",pinyin:"wèi",type:"empty",origin:"替",explain:["被他人任用"]},
-            {char:"若",pinyin:"ruò",type:"empty",origin:"你",explain:["外形相像"]},
-            {char:"邪",pinyin:"yé",type:"empty",origin:"语气词，吗、呢",explain:["感叹语气词"]},
-            {char:"愈",pinyin:"yù",type:"empty",origin:"更加",explain:["翻越山岭"]},
-            {char:"作",pinyin:"zuò",type:"oldnew",origin:"降下",explain:["动手劳作"]},
-            {char:"抟",pinyin:"tuán",type:"oldnew",origin:"揉捏",explain:["盘旋飞舞"]},
-            {char:"褫",pinyin:"chǐ",type:"oldnew",origin:"脱下",explain:["剥夺身份"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表修饰","表并列"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"连词，为了、用来",explain:["介词，凭借"]}
-        ]
-    },
-    {
-        id:89,
-        title:"89. 愚蠢的父子",
-        text:"齐有富人，家累千金。其二子甚愚，其父又不教之。艾子谓其父曰：“君之子虽美，而不通世务，他日曷能克家？”父怒。子嘻然笑曰：“每以布囊取来。”其父愀然改容曰：“彼米不是田中来？”",
-        sentences: [
-            "齐有富人，家累千金。",
-            "其二子甚愚，其父又不教之。",
-            "艾子谓其父曰。",
-            "君之子虽美，而不通世务。",
-            "他日曷能克家？",
-            "彼米不是田中来？"
-        ],
-        chars:[
-            {char:"累",pinyin:"lěi",type:"oldnew",origin:"积攒",explain:["堆叠物品"]},
-            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["程度过分"]},
-            {char:"谓",pinyin:"wèi",type:"empty",origin:"对……说",explain:["内心看法"]},
-            {char:"虽",pinyin:"suī",type:"empty",origin:"虽然",explain:["纵使如此"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表转折，却",explain:["表承接","表并列"]},
-            {char:"曷",pinyin:"hé",type:"empty",origin:"怎么；怎么能够",explain:["缘由为何"]},
-            {char:"克",pinyin:"kè",type:"oldnew",origin:"胜任，打理",explain:["攻占城池"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，用",explain:["连词，继而"]},
-            {char:"彼",pinyin:"bǐ",type:"empty",origin:"那",explain:["对方之人"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"结构助词，的",explain:["人称代词"]}
-        ]
-    },
-    {
-        id:91,
-        title:"91. 缇萦救父",
-        text:"文帝四年中，人上书言意，以刑罪当传西之长安。意有五女，随而泣。意怒，骂曰：“生子不生男，缓急无可使者！”少女缇萦伤父之言，乃随父西。上书曰：“妾愿入身为官婢，以赎父刑罪，使得改行也。”上悲其意，遂除肉刑。",
-        sentences: [
-            "人上书言意，以刑罪当传西之长安。",
-            "生子不生男，缓急无可使者！",
-            "少女缇萦伤父之言，乃随父西。",
-            "妾愿入身为官婢，以赎父刑罪。",
-            "使得改行也。",
-            "上悲其意，遂除肉刑。"
-        ],
-        chars:[
-            {char:"言",pinyin:"yán",type:"oldnew",origin:"告发",explain:["交谈话语"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，因为",explain:["连词，继而"]},
-            {char:"当",pinyin:"dāng",type:"oldnew",origin:"判处",explain:["抵挡外力"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"动词，前往、到",explain:["结构助词，的"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["随后"]},
-            {char:"妾",pinyin:"qiè",type:"oldnew",origin:"女子谦称",explain:["贴身侍女"]},
-            {char:"赎",pinyin:"shú",type:"oldnew",origin:"抵偿，赎罪",explain:["用钱赎回"]},
-            {char:"使",pinyin:"shǐ",type:"empty",origin:"让",explain:["派遣人员"]},
-            {char:"遂",pinyin:"suì",type:"empty",origin:"于是",explain:["最终结局"]},
-            {char:"除",pinyin:"chú",type:"oldnew",origin:"废除",explain:["清理杂物"]},
-            {char:"而",pinyin:"ér",type:"empty",origin:"表修饰，地",explain:["表转折"]}
-        ]
-    },
-    {
-        id:95,
-        title:"95. 黄仙裳助人",
-        text:"黄仙裳幼赴童子试，为州守陈澹仙所知。后陈官给事中，以事系狱，贫甚。黄售其负郭田，得百金，尽以赠陈。后田雪龛落职，黄囊中仅有二十金，乃分半赠之。",
-        sentences: [
-            "黄仙裳幼赴童子试，为州守陈澹仙所知。",
-            "后陈官给事中，以事系狱，贫甚。",
-            "得百金，尽以赠陈。",
-            "黄囊中仅有二十金，乃分半赠之。"
-        ],
-        chars:[
-            {char:"赴",pinyin:"fù",type:"oldnew",origin:"参加",explain:["奔赴远方"]},
-            {char:"为",pinyin:"wéi",type:"empty",origin:"被",explain:["担任官职"]},
-            {char:"知",pinyin:"zhī",type:"oldnew",origin:"赏识",explain:["知晓事情"]},
-            {char:"官",pinyin:"guān",type:"oldnew",origin:"担任官职",explain:["官府机构"]},
-            {char:"系",pinyin:"xì",type:"oldnew",origin:"关押",explain:["捆绑物件"]},
-            {char:"甚",pinyin:"shèn",type:"empty",origin:"很",explain:["格外突出"]},
-            {char:"尽",pinyin:"jìn",type:"empty",origin:"全部",explain:["耗尽资源"]},
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"介词，把",explain:["连词，继而"]},
-            {char:"乃",pinyin:"nǎi",type:"empty",origin:"于是",explain:["紧接着"]},
-            {char:"之",pinyin:"zhī",type:"empty",origin:"代词，他",explain:["结构助词，的"]}
-        ]
-    },
-    // 圬者王承福传（已删除括号注释）
-    {
-        id:201,
-        title:"201. 圬者王承福传",
-        text:"圬之为技贱且劳者也。有业之，其色若自得者。听其言，约而尽。问之，王其姓，承福其名。世为京兆长安农夫。天宝之乱，发人为兵。持弓矢十叁年，有官勋，弃之来归。丧其土田，手镘衣食，馀叁十年。舍于市之主人，而归其屋食之当焉。视时屋食之贵贱，而上其圬之佣以偿之；有馀，则以与道路之废疾饿者焉。承福曰：“粟，稼而生者也；若布与帛。必蚕绩而后成者也；其他所以养生之具，皆待人力而后完也；吾皆赖之。然人不可遍为，宜乎各致其能以相生也。故君者，理我所以生者也；而百官者，承君之化者也。任有大小，惟其所能，若器皿焉。食焉而怠其事，必有天殃，故吾不敢一日舍镘以嬉。夫镘易能，可力焉，又诚有功；取其直虽劳无愧，吾心安焉。夫力易强而有功也；心难强而有智也。用力者使于人，用心者使人，亦其宜也。吾特择其易为无傀者取焉。",
-        sentences: [
-            "圬之为技贱且劳者也。",
-            "有业之，其色若自得者。",
-            "世为京兆长安农夫。",
-            "发人为兵，持弓矢十叁年。",
-            "舍于市之主人，而归其屋食之当焉。",
-            "粟，稼而生者也；若布与帛。",
-            "食焉而怠其事，必有天殃。"
-        ],
-        chars:[
-            {char:"之",pinyin:"zhī",type:"empty",origin:"主谓之间，取消句子独立性（不译）",explain:["人称代词","结构助词，的"]},
-            {char:"为",pinyin:"wéi",type:"empty",origin:"作为",explain:["动手劳作","判断动词"]},
-            {char:"业",pinyin:"yè",type:"oldnew",origin:"以……为职业",explain:["谋生行当"]},
-            {char:"若",pinyin:"ruò",type:"empty",origin:"好像",explain:["旁人"]},
-            {char:"约",pinyin:"yuē",type:"oldnew",origin:"简要",explain:["定下约定"]},
-            {char:"尽",pinyin:"jìn",type:"oldnew",origin:"透彻",explain:["全部完毕"]},
-            {char:"世",pinyin:"shì",type:"empty",origin:"世代",explain:["世间众人"]},
-            {char:"发",pinyin:"fā",type:"oldnew",origin:"征发",explain:["出发上路"]},
-            {char:"矢",pinyin:"shǐ",type:"oldnew",origin:"箭",explain:["弓箭兵器"]},
-            {char:"弃",pinyin:"qì",type:"oldnew",origin:"放弃",explain:["随手丢弃"]},
-            {char:"归",pinyin:"guī",type:"oldnew",origin:"回归",explain:"偿还钱款"},
-            {char:"舍",pinyin:"shè",type:"oldnew",origin:"住宿",explain:["舍弃事物"]},
-            {char:"当",pinyin:"dāng",type:"oldnew",origin:"相当、抵得上",explain:["应当如此"]},
-            {char:"视",pinyin:"shì",type:"oldnew",origin:"比照",explain:["目视观察"]},
-            {char:"上",pinyin:"shàng",type:"oldnew",origin:"增加",explain:["方位上方"]},
-            {char:"佣",pinyin:"yōng",type:"oldnew",origin:"工钱",explain:["雇佣劳工"]},
-            {char:"偿",pinyin:"cháng",type:"oldnew",origin:"补偿",explain:["偿还债务"]},
-            {char:"馀",pinyin:"yú",type:"empty",origin:"同“余”，剩余",explain:["多余物资"]},
-            {char:"与",pinyin:"yǔ",type:"empty",origin:"给",explain:["相伴之人"]},
-            {char:"稼",pinyin:"jià",type:"oldnew",origin:"耕种",explain:["田间庄稼"]},
-            {char:"所以",pinyin:"suǒ yǐ",type:"empty",origin:"用来……的",explain:["因此故而"]},
-            {char:"具",pinyin:"jù",type:"oldnew",origin:"器具、物资",explain:["具备能力"]},
-            {char:"赖",pinyin:"lài",type:"oldnew",origin:"仰赖、倚靠",explain:["依赖他人"]},
-            {char:"宜",pinyin:"yí",type:"empty",origin:"应该",explain:["环境适宜"]},
-            {char:"致",pinyin:"zhì",type:"oldnew",origin:"奉献、发挥",explain:["抵达目的地"]},
-            {char:"理",pinyin:"lǐ",type:"oldnew",origin:"治理",explain:["道理规则"]},
-            {char:"承",pinyin:"chéng",type:"oldnew",origin:"秉承、受到",explain:["承接事务"]},
-            {char:"化",pinyin:"huà",type:"oldnew",origin:"教化",explain:["形态变化"]},
-            {char:"怠",pinyin:"dài",type:"oldnew",origin:"懈怠",explain:["待人怠慢"]},
-            {char:"殃",pinyin:"yāng",type:"oldnew",origin:"灾祸",explain:["遭遇祸事"]},
-            {char:"嬉",pinyin:"xī",type:"oldnew",origin:"嬉戏、玩乐",explain:["嬉笑打闹"]},
-            {char:"诚",pinyin:"chéng",type:"empty",origin:"确实",explain:["为人真诚"]},
-            {char:"直",pinyin:"zhí",type:"oldnew",origin:"价值、报酬",explain:["形态笔直"]},
-            {char:"劳",pinyin:"láo",type:"oldnew",origin:"辛苦",explain:["体力劳作"]}
-        ]
-    },
-    // 秦良玉传
-    {
-        id:202,
-        title:"202. 秦良玉传",
-        text:"秦良玉，忠州人，嫁石砫宣抚使马千乘。万历二十七年，千乘以三千人从征播州，良玉别统精卒五百裹粮自随。明年正月二日，贼乘官军宴，夜袭。良玉夫妇首击败之，追入贼境，连破七寨，大败贼众，为南川路战功第一。贼平，良玉不言功。其后，千乘为部民所讼，瘐死云阳狱，良玉代领其职。良玉为人饶胆智，善骑射，兼通词翰，仪度娴雅。而驭下严峻，每行军发令，戎伍肃然。所部号“白杆兵”，为远近所惮。",
-        sentences: [
-            "千乘以三千人从征播州。",
-            "明年正月二日，贼乘官军宴，夜袭。",
-            "良玉夫妇首击败之。",
-            "贼平，良玉不言功。",
-            "千乘为部民所讼，瘐死云阳狱。",
-            "而驭下严峻，每行军发令，戎伍肃然。"
-        ],
-        chars:[
-            {char:"以",pinyin:"yǐ",type:"empty",origin:"凭借",explain:["使用兵器"]},
-            {char:"从",pinyin:"cóng",type:"oldnew",origin:"跟随",explain:["听从指令"]},
-            {char:"征",pinyin:"zhēng",type:"oldnew",origin:"征讨",explain:["远行闯荡"]},
-            {char:"别",pinyin:"bié",type:"empty",origin:"另外",explain:["区分开来"]},
-            {char:"统",pinyin:"tǒng",type:"oldnew",origin:"统领",explain:["统一管理"]},
-            {char:"裹",pinyin:"guǒ",type:"oldnew",origin:"携带",explain:["包裹物品"]},
-            {char:"明年",pinyin:"míng nián",type:"oldnew",origin:"第二年",explain:["来年之后"]},
-            {char:"乘",pinyin:"chéng",type:"empty",origin:"趁着",explain:["乘坐车马"]},
-            {char:"首",pinyin:"shǒu",type:"oldnew",origin:"首先",explain:["头部位置"]},
-            {char:"平",pinyin:"píng",type:"oldnew",origin:"平定",explain:["生活安宁"]},
-            {char:"言",pinyin:"yán",type:"oldnew",origin:"夸耀",explain:["口头讲述"]},
-            {char:"为",pinyin:"wéi",type:"empty",origin:"被",explain:["担任职务"]},
-            {char:"讼",pinyin:"sòng",type:"oldnew",origin:"控告",explain:["法庭诉讼"]},
-            {char:"瘐",pinyin:"yǔ",type:"oldnew",origin:"囚犯病死",explain:["身形瘦弱"]},
-            {char:"代",pinyin:"dài",type:"oldnew",origin:"代替",explain:["临时代理"]},
-            {char:"饶",pinyin:"ráo",type:"oldnew",origin:"富有",explain:["物产富饶"]},
-            {char:"善",pinyin:"shàn",type:"oldnew",origin:"擅长",explain:["品性善良"]},
-            {char:"兼",pinyin:"jiān",type:"empty",origin:"同时",explain:["两者合并"]},
-            {char:"驭",pinyin:"yù",type:"oldnew",origin:"管理",explain:["驾驭牲畜"]},
-            {char:"下",pinyin:"xià",type:"oldnew",origin:"下属",explain:["方位下方"]},
-            {char:"每",pinyin:"měi",type:"empty",origin:"每次",explain:["逐一统计"]},
-            {char:"戎",pinyin:"róng",type:"oldnew",origin:"军队",explain:["作战兵器"]},
-            {char:"伍",pinyin:"wǔ",type:"oldnew",origin:"队伍",explain:["同伴伙伴"]},
-            {char:"肃然",pinyin:"sù rán",type:"oldnew",origin:"严谨恭敬的样子",explain:["神情严肃"]},
-            {char:"惮",pinyin:"dàn",type:"oldnew",origin:"畏惧、害怕",explain:["心存戒备"]}
-        ]
-    }
+// ===================== WONDER题库【完全保留，无修改】 =====================
+const wonderDB = [
+  {en:"She left her job on Wall Street about six years ago to ______________ her “dream” and teach kids.", ans:"pursue", cn:"追求"},
+  {en:"But the ______________of you, I guess, are new to the school, right?", ans:"rest", cn:"其余人"},
+  {en:"We got her from an animal ______________.", ans:"shelter", cn:"收容所"},
+  {en:"So, are you ______________Star Wars, August? I nodded, not looking up because what I really wanted was to just ______________under the desk.", ans:"into;slide", cn:"喜欢;溜到"},
+  {en:"I ______________Julian and he was looking at me. Yeah, he knew what he was saying.", ans:"peeked at", cn:"偷看"},
+  {en:"Any saying or ground rule that can ______________you.", ans:"motivate", cn:"激励"},
+  {en:"We all looked at him, ______________ ideas.", ans:"out of", cn:"想不出"},
+  {en:"He turned around and wrote in big huge block letters that ______________all the way across the chalkboard", ans:"spread", cn:"铺满"},
+  {en:"I’ve had students send me new precepts years after they’ve ______________ from this school", ans:"graduated", cn:"毕业"},
+  {en:"Via had ______________me about lunch in middle school", ans:"warned", cn:"提醒"},
+  {en:"______________, all the kids from all the fifth grade classes ______________ the ______________ at the same time", ans:"Basically;poured into;cafeteria", cn:"基本上;涌入;食堂"},
+  {en:"I just _______________________opening my backpack, pulling out my lunch bag", ans:"concentrated on", cn:"专注于"},
+  {en:"I have to ______________food in the front of my mouth.", ans:"chew", cn:"咀嚼"},
+  {en:"because I was too ______________with all the food crumbs shooting out of my mouth.", ans:"messy", cn:"邋遢的"},
+  {en:"“Ugh,” she said after _________________________. “I should have brought a sandwich like you did.”", ans:"swallowing the first bite", cn:"咽下第一口"},
+  {en:"“There’s a Maya,” I said. “_________________________, May is spring,” Summer answered, “but if she wanted to sit here, we could ____________________.” She said it as if she’d actually _________________________.", ans:"Technically;make an exception;thought the whole thing through", cn:"严格来说;破例;全盘考虑"},
+  {en:"By the end of lunch, we had _________________________ a whole list of names of kids and teachers who could sit at our table", ans:"come up with", cn:"想出"},
+  {en:"Mom always had this habit of asking me how something felt on a _______________________ of one to tens.", ans:"scale", cn:"等级"},
+  {en:"They had taken a piece of bone from my hip bone to _________________ into my _________________ to make it look more normal", ans:"insert;chin", cn:"植入;下巴"},
+  {en:"Then she would tell the doctor when he made his rounds what needed _____________________ or things like that", ans:"adjusting", cn:"调整"},
+  {en:"I had started kicking a rock between my feet like it was a soccer ball, ___________ it _________________________ across the sidewalk.", ans:"chasing;back and forth", cn:"来回踢着"},
+  {en:"... then practically slammed my bedroom door as she left the room.", ans:"practically slammed", cn:"猛地关上"},
+  {en:"“So it looks like it was ______________________, your going to school.”", ans:"a good call", cn:"明智决定"},
+  {en:"She just flipped through the pages until she got to where we had left off.", ans:"flipped through", cn:"快速翻阅"},
+  {en:"She said soft words that I know were meant to help me, but words can’t change my face.", ans:"were meant to", cn:"意在"},
+  {en:"I wasn’t used to this whole _______________ of homework.", ans:"notion", cn:"概念"},
+  {en:"Five hundred kids in a school: _______________ every one of them was going to see my face at some time.", ans:"eventually", cn:"最终"},
+  {en:"I can only _______________ what they were saying about me. Actually, I prefer not to even try to imagine it.", ans:"imagine", cn:"想象"},
+  {en:"The teachers assigned seats in every class, and I ended up sitting next to Jack in every single class. so I figured either the teachers were told to put me and Jack together, or it was a totally incredible _______________.", ans:"coincidence", cn:"巧合"},
+  {en:"As the guy helped me stand up, he got a look at my face, and without even _______________, he just said: “Whoa!” Then he patted me on the shoulder, like he was dusting me off, and _______________ after his friends.", ans:"meaning to;took off", cn:"有意;跑开"},
+  {en:"“I swear, I think he _______________ his pants!”", ans:"wet", cn:"尿湿"},
+  {en:"I’d want to. I think you should get a secret squirt gun or something and _______________ it to your eyes somehow.", ans:"attach", cn:"固定"},
+  {en:"“Dude, you should _______________ your doctor!”", ans:"sue", cn:"起诉"},
+  {en:"The things we do ______________________________.", ans:"outlast our mortality", cn:"超越生命长存"},
+  {en:"The things we do are like monuments that people build to _______________ heroes after they’ve died", ans:"honor", cn:"纪念"},
+  {en:"Only instead of being _______________ stone, they’re made out of the memories people have of you.", ans:"made out of", cn:"由石头制成"},
+  {en:"it really felt like there were a lot of people there to _______________ my birthday", ans:"celebrate", cn:"庆祝"},
+  {en:"what dorky thing do you want to dress up as?", ans:"dress up", cn:"装扮"},
+  {en:"I’m sure he thought I _______________ the picture.", ans:"ruined", cn:"毁掉"},
+  {en:"She got really nervous and turned pale and literally ________________ a sweat, an then she she came up with some ______________ excuse about really having to go to the bathroom.", ans:"broke into;lame", cn:"冒出;蹩脚的"},
+  {en:"Anyway, Mrs. Atanabi ___________________, because she ended up not making anyone dance together.", ans:"let her off the hook", cn:"放过她"},
+  {en:"“Guys, there’s ___________________ on that side. Tristan, Nino, go over there,”", ans:"plenty of room", cn:"很多空位"},
+  {en:"So Tristan and Nino ___________________ to my side.", ans:"scooted over", cn:"挪过来"},
+  {en:"Then my hand accidentally bumped his hand for ___________________.", ans:"a fraction of second", cn:"一瞬间"},
+  {en:"The kids in that story were afraid they’d catch the cooties if they touched the old ______________ cheese on the basketball court.", ans:"moldy", cn:"发霉的"},
+  {en:"For me, Halloween is the best holiday in the world. It even __________________ Christmas.", ans:"beats", cn:"胜过"},
+  {en:"I ___________________ the Bleeding Scream costume from last year.", ans:"threw on", cn:"穿上"},
+  {en:"“Just ___________________ him,” said Julian.", ans:"ditch", cn:"甩掉不理"},
+  {en:"The tears were so ___________________ in my eyes I could barely see.", ans:"thick", cn:"浓厚"},
+  {en:"“There’s a stomach bug going around,”", ans:"stomach bug", cn:"肠胃病毒"},
+  {en:"If he starts throwing up or runs a temperature, you should call the doctor.", ans:"runs a temperature", cn:"发烧"},
+  {en:"If I wanted Mom and Dad to watch me play soccer, I knew that nine out of ten times they’d miss it because they were busy ___________________August to speech therapy or physical therapy or a new specialist or a surgery.", ans:"shuttling", cn:"接送"},
+  {en:"Mom and Dad would always say I was the most____________________ little girl in the world.", ans:"understanding", cn:"懂事的"},
+  {en:"After you’ve seen someone else going through that, it feels kind of crazy to _______________________ not getting the toy you had asked for…", ans:"complain over", cn:"抱怨"},
+  {en:"I knew he didn’t look exactly normal, but I really didn’t understand why strangers seemed so shocked when they saw him. Horrified. Sickened. Scared.", ans:"shocked", cn:"震惊"},
+  {en:"It was only a flash, an ______________________while he was hugging me, so happy that I was home, but it surprised me because I’d never seen him like that before.", ans:"instant", cn:"瞬间"},
+  {en:"But just two months after I stayed with her in Montauk, my beautiful Grans died. It was so completely out of the blue.", ans:"out of the blue", cn:"突如其来"},
+  {en:"I love Auggie very, very much, but he has many angels ____________________________him already.", ans:"looking out for", cn:"守护"},
+  {en:"We change plans, go to plan B, interrupt conversations, ____________________________depending on his moods, his whims, his needs.", ans:"go back on promises", cn:"违背承诺"},
+  {en:"I knew those kinds of conversations probably happened all the time _____________________________.", ans:"out of earshot", cn:"听不到的地方"},
+  {en:"I’m always going to be the sister of a kid with a birth ______________: that’s not the issue.", ans:"defect", cn:"先天缺陷"},
+  {en:"Ella said he __________________ her of E.T. She didn’t say this to be mean, of course.", ans:"reminded", cn:"使想起"},
+  {en:"I even texted her and she didn’t reply. I __________________ maybe she had ended up staying in the camp longer, now that she was a counselor.", ans:"figured", cn:"猜想"},
+  {en:"I can’t say she wasn’t nice, because she was, but she seemed kind of distant, like I was a__________________ friend.", ans:"casual", cn:"普通泛泛之交"},
+  {en:"It’s like they had talked to each other beforehand about redoing their image at the new school, but hadn’t bothered to clue me in.", ans:"clue", cn:"告知内情"},
+  {en:"After school I __________________a restroom to avoid bumping into Miranda’s mother outside.", ans:"ducked into", cn:"躲进"},
+  {en:"“We stopped for pizza.” Incredible how easily a lie can__________________ through your lips.", ans:"slip", cn:"脱口而出"},
+  {en:"“Just forget I asked anything at all,” I answered, and stormed dramatically into Auggie’s room and slammed the door.", ans:"stormed", cn:"冲进去"},
+  {en:"He was on his PlayStation and didn’t even look up.", ans:"look up", cn:"抬头"},
+  {en:"She looked __________________ , and I realized that between me and Auggie, today had been a tough day for her, too.", ans:"drained", cn:"疲惫不堪"},
+  {en:"The hallway lights were out. The only thing illuminating her was the blue night-light in August’s bedroom.", ans:"out", cn:"熄灭"},
+  {en:"Mom took his temperature, brought him some hot tea, and __________________ the “August’s mom’ role again.”", ans:"assumed", cn:"承担"},
+  {en:"It was a larger group than I’d been accustomed to hanging out with, and a more __________________ crowd.", ans:"diverse", cn:"多元的"},
+  {en:"But for all they know, there’s more they don’t know. They can try to forecast the odds, but they can’t guarantee them.", ans:"odds", cn:"概率"},
+  {en:"She tried to __________________ even the slightest trace of August’s face in their faces.", ans:"detect", cn:"察觉"},
+  {en:"August had __________________ some very mean things some boys were saying about him.", ans:"overheard", cn:"无意中听到"},
+  {en:"Girls like Eleanor who were members of the yearbook __________________ and the debate club.", ans:"committee", cn:"委员会"},
+  {en:"Don’t give them that __________________ over you.", ans:"power", cn:"掌控力"},
+  {en:"Even though I was well beyond the trick-or-treating __________________ myself, I usually threw on some mask or other to accompany him up and down the blocks, watching him knocking on people’s doors.", ans:"stage", cn:"阶段"},
+  {en:"Mom looked at both of us. “Is something going on?” She didn’t __________________ her question to either one of us in particular.", ans:"address", cn:"针对"},
+  {en:"In August’s case, the doctors were able to __________________ one of the “single nucleotide deletion mutations” that made war on his face.", ans:"identify", cn:"识别"},
+  {en:"He didn’t say anything, but I think that last bit was getting to him.", ans:"was getting to him", cn:"戳到他痛处"},
+  {en:"Not one person in the exotic mix of my family gene pool has ever shown any obvious signs of having what August has.", ans:"exotic", cn:"奇特的"},
+  {en:"If I have children, there’s a one-in-two chance that I will pass on the __________________ gene to them.", ans:"defective", cn:"有缺陷的"},
+  {en:"Countless doctors have drawn little tic-tac-toe grids for my parents over the years to try to explain the genetic lottery to them.”", ans:"lottery", cn:"随机遗传概率"},
+  {en:"This is normal! We all have to go to school sometimes __________________ the fact that we have bad days.", ans:"despite", cn:"尽管"},
+  {en:"Via threatened to tell Mom and Dad what Jack did, and then Tushman would make Jack apologize to you. ... Otherwise, just go back to school and act like nothing happened. Or if you want to __________________ Jack about it, fine.", ans:"confront", cn:"对质"},
+  {en:"Not a biggie. I wish people would stop trying to turn it into something_________________.", ans:"major", cn:"大事"},
+  {en:"I’ve been sitting with him for two weeks now, and let’s just say he’s not the_________________eater in the world.", ans:"neatest", cn:"最整洁的"},
+  {en:"And all they talk about now is who likes who and who is cute and isn’t cute. August doesn’t_________________about that stuff.", ans:"bother", cn:"在意"},
+  {en:"Even though I’m not in the “popular” group, I _________________ got invited, which is very cool.", ans:"somehow", cn:"不知怎么地"},
+  {en:"I guess they’ve all kind of _________________ one big supergroup of popular kids.", ans:"merged into", cn:"合并成"},
+  {en:"I actually looked away because between the way he was chewing, which almost seemed like he was being gross on purpose, and the way his eyes were just kind of closed down, I was getting a really bad _________________ from him.", ans:"vibe", cn:"不适感"},
+  {en:"It was only nine-thirty. The Halloween Parade was_________________down Amesfort Avenue.", ans:"in full swing", cn:"如火如荼进行"},
+  {en:"Everyone in the grade got_________________ an Egyptian artifact to work on for Egyptian Museum Day, which was in December.", ans:"assigned", cn:"分配到"},
+  {en:"So I _________________ Auggie’s little slip of paper.", ans:"unfolded", cn:"展开"},
+  {en:"“No he didn’t!! I_________________ on my life!” I put my hands up in the air so he could see I wasn’t crossing my fingers.", ans:"swear", cn:"发誓"},
+  {en:"It took a second for my question to even _________________.", ans:"register", cn:"反应过来"},
+  {en:"He was such___________________ about himself. That’s one of the things I like most about Auggie.", ans:"a good sport", cn:"心态超好的人"},
+  {en:"On the day of the Egyptian Museum _________________, we were all really excited.", ans:"exhibit", cn:"展览"},
+  {en:"The gym was turned into a giant museum, with everyone’s Egyptian artifact displayed on a table with a little___________________card explaining what the thing was.", ans:"caption", cn:"说明"},
+  {en:"Since it was dark, we used our flashlights to _________________ the artifacts while we were talking.", ans:"illuminate", cn:"照亮"}
 ];
 
-// 全局变量
-const tabBtns = document.querySelectorAll('.tab-btn');
-const readPage = document.getElementById('readPage');
-const testPage = document.getElementById('testPage');
-const artSelect = document.getElementById('artSelect');
-const artMain = document.getElementById('artMain');
-const switchNoteBtn = document.getElementById('switchNoteBtn');
-const globalNote = document.getElementById('globalNote');
-const floatTip = document.getElementById('floatTip');
-let showGlobal = false;
-let currentReadArt = null;
+// ===================== SSP完整题库 =====================
+const sspDB = [
+  {
+    id:"3.13增刊+4.10刊",
+    sets:[
+      {
+        box:["on the same page","curiosity","be accused of","choose","important","electric","memorise","a game changer","missing","apologise"],
+        qs:[
+          {en:"It was a choice between pain now or pain later, so I ____ pain later.",ans:"chose"},
+          {en:"Remote work has been ____, giving people more time with their families.",ans:"a game changer"},
+          {en:"You should eat well and, more ____, get enough sleep.",ans:"importantly"},
+          {en:"The journalists ____ spreading false information last month.",ans:"were accused of"},
+          {en:"We should save ____ by turning off lights when we leave a room.",ans:"electricity"},
+          {en:"After a long discussion, the two departments are finally ____ regarding the deadline.",ans:"on the same page"},
+          {en:"Out of ____, I opened the old box to see what was inside.",ans:"curiosity"},
+          {en:"The painting had been ____ for over twenty years before it was discovered in an attic.",ans:"missing"},
+          {en:"It took me an hour to ____ all the new words for the test.",ans:"memorise"},
+          {en:"You should ____ to your sister for breaking her toy.",ans:"apologise"},
+        ]
+      },
+      {
+        box:["jump out of the box","impression","create","talent","compete","pretend","argument","entertain","right around the corner","properly"],
+        qs:[
+          {en:"The teacher encouraged students to find ____ solutions to the problem.",ans:"creative"},
+          {en:"They had several ____ about money last month.",ans:"arguments"},
+          {en:"He understood the power of music — not just to ____, but to inspire and change the world.",ans:"entertain"},
+          {en:"The ____ young artist won first prize in the school art contest.",ans:"talented"},
+          {en:"His speech made a strong ____ on the audience.",ans:"impression"},
+          {en:"You need to warm up ____ before exercising to avoid injury.",ans:"properly"},
+          {en:"A big opportunity might be ____, so don’t give up yet.",ans:"right around the corner"},
+          {en:"We’re going to have a ____ to see who can swim the fastest.",ans:"competition"},
+          {en:"He ____ that nothing had happened and went back to work.",ans:"pretended"},
+          {en:"Jackson was the kind of person who would ____ without fear.",ans:"jump out of the box"},
+        ]
+      }
+    ]
+  },
+  {
+    id:"4.3刊+5.8刊",
+    sets:[
+      {
+        box:["imagine","appear","honour","invisible","accident","sort","expand","a helping hand","belief","victory"],
+        qs:[
+          {en:"The small bookstore has ____ into a large chain with stores in over twenty cities.",ans:"expanded"},
+          {en:"The team worked together and finally won a ____ in the final match.",ans:"victory"},
+          {en:"Air is ____, but without it, no one can survive for more than a few minutes.",ans:"invisible"},
+          {en:"We ____ took the wrong bus and ended up in the next town.",ans:"accidentally"},
+          {en:"Many people ____ that a positive attitude can overcome hard challenges.",ans:"believe"},
+          {en:"He is always ready to give ____ to anyone who needs support.",ans:"a helping hand"},
+          {en:"Every Qingming Festival, we sweep tombs and ____ the dead.",ans:"honour"},
+          {en:"He always tries to ____ confident in front of his team.",ans:"appear"},
+          {en:"The library offers all ____ of books, from science to poetry.",ans:"sorts"},
+          {en:"Children have great ____; they can turn a box into a spaceship.",ans:"imagination"},
+        ]
+      },
+      {
+        box:["perfect","perform","come into view","amaze","rebuild","challenge","freeze","trend","safe","rewarding"],
+        qs:[
+          {en:"As fog lifted, the old stone bridge began to ____ over the river.",ans:"come into view"},
+          {en:"When temperature dropped below zero, the lake ____ solid.",ans:"froze"},
+          {en:"The singer will ____ new songs on stage tonight.",ans:"perform"},
+          {en:"Wearing a helmet increases ____ while riding a bike.",ans:"safety"},
+          {en:"The vase is beautiful though its surface is ____ with small cracks.",ans:"imperfect"},
+          {en:"He faced numerous ____ with courage all his career.",ans:"challenges"},
+          {en:"Kids were ____ at how fast the seed grew into a sunflower.",ans:"amazed"},
+          {en:"After earthquake, people worked together to ____ homes.",ans:"rebuild"},
+          {en:"Learning piano takes patience but it is truly a ____ journey.",ans:"rewarding"},
+          {en:"Young people follow fashion ____ to show personal style.",ans:"trends"},
+        ]
+      }
+    ]
+  },
+  {
+    id:"4.17刊",
+    sets:[
+      {
+        box:["pay off","afford","personal","perform","attention","stress over","success","popularity","forget","music"],
+        qs:[
+          {en:"The athlete’s ____ at the Olympics was the best of her career.",ans:"performance"},
+          {en:"Their patience ____ when the business started to boom.",ans:"paid off"},
+          {en:"The bright yellow poster drew my ____ as soon as I entered the room.",ans:"attention"},
+          {en:"She was so tired after work that she ____ to reply to her boss’s email.",ans:"forgot"},
+          {en:"No one in this fast-paced industry ____ to waste time on unimportant meetings.",ans:"affords"},
+          {en:"He tends to ____ every little detail before a presentation.",ans:"stress over"},
+          {en:"The manager ____ thanked each employee for their hard work.",ans:"personally"},
+          {en:"The singer’s ____ has grown rapidly since releasing her first album.",ans:"popularity"},
+          {en:"She practices daily to ____ in mastering the piano piece.",ans:"succeed"},
+          {en:"The street musician played ____ beautifully to draw a crowd.",ans:"music"},
+        ]
+      },
+      {
+        box:["clear one’s mind","fail","manage","reliable","attitude","describe","confident","remove","give up","mistake"],
+        qs:[
+          {en:"The beauty was beyond ____ when watching sunset over ocean.",ans:"description"},
+          {en:"He’s nice but totally ____ for on-time meetings.",ans:"unreliable"},
+          {en:"His negative ____ makes teamwork hard.",ans:"attitude"},
+          {en:"Fans lost ____ after several losses.",ans:"confidence"},
+          {en:"It’s hard to ____ a big team with many personalities.",ans:"manage"},
+          {en:"The movie ____ my high expectations; it was boring.",ans:"failed"},
+          {en:"We all make ____ but fix them and move on.",ans:"mistakes"},
+          {en:"If you ____ too early, you’ll never know your potential.",ans:"give up"},
+          {en:"Deep breaths help you ____ and focus.",ans:"clear one’s mind"},
+          {en:"This tool can ____ background noise automatically.",ans:"remove"},
+        ]
+      }
+    ]
+  },
+  {
+    id:"5.15刊",
+    sets:[
+      {
+        box:["die","surprise","groundbreaking","volunteer","experience","moving","celebrate","mix","patience","confident"],
+        qs:[
+          {en:"Doctors tried everything to save the ____ patient.",ans:"dying"},
+          {en:"She loves to ____ friends with handmade birthday gifts.",ans:"surprise"},
+          {en:"The scientist’s ____ discovery hit all headlines.",ans:"groundbreaking"},
+          {en:"She ____ at a free meal charity every weekend.",ans:"volunteers"},
+          {en:"An experienced traveller knows how to travel light and stay ____.",ans:"safe"},
+          {en:"My sister gave a ____ speech at my wedding.",ans:"moving"},
+          {en:"Stars use social media to ____ their new works.",ans:"promote"},
+          {en:"Raising kids needs love and humour ____ together.",ans:"mixed"},
+          {en:"After waiting 30 mins rain, she lost ____.",ans:"patience"},
+          {en:"I am ____ everything will turn out well.",ans:"confident"},
+        ]
+      },
+      {
+        box:["behave","attention","live in harmony with","responsible","generation","neighbouring","serve","approach","suggest","certain"],
+        qs:[
+          {en:"The storm is ____ the coast, recall all ships.",ans:"approaching"},
+          {en:"Shouting in library draws others’ ____.",ans:"attention"},
+          {en:"His checking phone ____ he waits for a message.",ans:"suggests"},
+          {en:"Your ____ should match your words.",ans:"behaviour"},
+          {en:"We ____ cannot change what already happened.",ans:"certainly"},
+          {en:"Young ____ are more tech-savvy than parents.",ans:"generation"},
+          {en:"It’s ____ to leave young kids home alone all day.",ans:"irresponsible"},
+          {en:"Humans must ____ all living creatures.",ans:"live in harmony with"},
+          {en:"The storm damaged town and several ____ villages.",ans:"neighbouring"},
+          {en:"Our team ____ local residents all summer.",ans:"served"},
+        ]
+      }
+    ]
+  },
+  {
+    id:"5.22刊",
+    sets:[
+      {
+        box:["wisdom","appear","reflective","impress","disturb","out of place","thoroughly","advice","accidentally","widely"],
+        qs:[
+          {en:"True ____ is knowing how much you don’t know.",ans:"wisdom"},
+          {en:"The two paintings ____ identical at first glance.",ans:"appear"},
+          {en:"Bright clothes help you stay ____ cycling at night.",ans:"safe"},
+          {en:"She ____ interviewer with confident answers.",ans:"impressed"},
+          {en:"My favourite show airs at 9, don’t ____ me then.",ans:"disturb"},
+          {en:"Modern building looks ____ among old stone houses.",ans:"out of place"},
+          {en:"She felt stressed but studied ____ for finals.",ans:"thoroughly"},
+          {en:"Ask trusted people for ____ before big choices.",ans:"advice"},
+          {en:"He dropped pen and ink spread ____ over paper.",ans:"accidentally"},
+          {en:"Retirement news was ____ shared online.",ans:"widely"},
+        ]
+      },
+      {
+        box:["personal","get along with","design","suffer","noise","consist of","happiness","architect","hold","crowded"],
+        qs:[
+          {en:"Volunteering brings true ____ helping others.",ans:"happiness"},
+          {en:"The group ____ twelve different departments.",ans:"consists of"},
+          {en:"She wants to be an ____ for low-cost homes.",ans:"architect"},
+          {en:"My neighbour’s dog makes ____ sounds all night.",ans:"noisy"},
+          {en:"She is easy to ____ and never judges.",ans:"get along with"},
+          {en:"Many ____ headaches from screen time.",ans:"suffer"},
+          {en:"____ I prefer quiet mornings to write.",ans:"Personally"},
+          {en:"The little girl ____ her mom’s hand tightly.",ans:"held"},
+          {en:"The ____ simplified app for children.",ans:"designer"},
+          {en:"The subway was so ____ this morning that I could barely move.",ans:"crowded"},
+        ]
+      }
+    ]
+  },
+  {
+    id:"5.29刊",
+    sets:[
+      {
+        box:["interest","beautiful","speed up","bill","arrive","abroad","risk","schedule","irregular","contact"],
+        qs:[
+          {en:"My brother is ____ in space travel.",ans:"interested"},
+          {en:"The singer sang ____ and moved everyone.",ans:"beautifully"},
+          {en:"The traffic light turned yellow, so the driver had to ____ to pass the crossroads.",ans:"speed up"},
+          {en:"The bill was paid by my friend before I could take out my wallet.",ans:"bill"},
+          {en:"When we ____ at the party, the music was already playing loudly.",ans:"arrived"},
+          {en:"He has been living ____ for nearly a decade and rarely comes back home.",ans:"abroad"},
+          {en:"Entrepreneurs often have to take ____ if they want their businesses to succeed.",ans:"risks"},
+          {en:"Our travel ____ includes visits to three different cities in five days.",ans:"schedule"},
+          {en:"The bus service is ____; you might wait ten minutes or an hour.",ans:"irregular"},
+          {en:"Even though we live in different cities now, we still ____ each other through video calls.",ans:"keep in touch with"},
+        ]
+      },
+      {
+        box:["patient","come across","patient","unbelievable","breathe","keep a close eye on","lift","perfectly","outsider","still"],
+        qs:[
+          {en:"Your suggestion came at a ____ right time yesterday evening.",ans:"perfectly"},
+          {en:"Yesterday evening, she ____ a useful recipe online when she wasn’t even looking for one.",ans:"came across"},
+          {en:"The ____ lay still on the bed while the doctor listened to his heartbeat.",ans:"patient"},
+          {en:"In the hospital, the head nurse ____ the patient’s condition day and night.",ans:"keeps a close eye on"},
+          {en:"At the party last Friday, I felt like an ____ because I didn’t know anyone there.",ans:"outsider"},
+          {en:"The price of that used car was ____ — only 500 dollars!",ans:"unbelievable"},
+          {en:"It is important to keep a healthy balance between work and rest, or you may easily burn out.",ans:"healthy"},
+          {en:"____ your breath for ten seconds, then slowly let it out to calm your mind and body.",ans:"Hold"},
+          {en:"Learning a musical instrument requires a lot of ____, as progress often comes slowly over months or years of daily practice.",ans:"patience"},
+          {en:"Her spirits ____ at the sound of her child’s voice every evening after a long day at work.",ans:"lift"},
+        ]
+      }
+    ]
+  },
+  {
+    id:"6.5+6.12刊",
+    sets:[
+      {
+        box:["self-disciplined","label","beat","block","damage","embrace new challenges","simple","shocked","enable","lead"],
+        qs:[
+          {en:"The thick curtains in my bedroom ____ most of the morning sunlight.",ans:"block"},
+          {en:"He hates the ____ of “genius” because it puts too much pressure on him.",ans:"label"},
+          {en:"The heavy storm caused serious ____ to several houses in our neighborhood last night.",ans:"damage"},
+          {en:"I didn’t mean to offend you; I ____ wanted to share my honest opinion about your plan.",ans:"simply"},
+          {en:"Good communication skills ____ employees to express their ideas clearly and work well with others.",ans:"enable"},
+          {en:"____ regularly is the best way to step out of your comfort zone.",ans:"Embracing new challenges"},
+          {en:"To master a new language, you need to be ____ enough to practice every single day.",ans:"self-disciplined"},
+          {en:"Our basketball team ____ their longtime rivals by 10 points in the final match yesterday.",ans:"beat"},
+          {en:"The tour was ____ by a local guide who knew the area well.",ans:"led"},
+          {en:"My parents were truly ____ at my brother’s rude behavior during the family dinner last night.",ans:"shocked"},
+        ]
+      },
+      {
+        box:["handle","pay off","fierce","warm","alert","host","integrate","international","harvest","design"],
+        qs:[
+          {en:"Our new team member can ____ pressure and deliver when it matters most.",ans:"handle"},
+          {en:"After months of intense training, it all ____ on race day.",ans:"paid off"},
+          {en:"The competitions between tech companies are becoming increasingly ____.",ans:"fierce"},
+          {en:"The bread still held the ____ from the oven when I tore it open.",ans:"warmth"},
+          {en:"Drinking coffee helps me stay ____ through work.",ans:"alert"},
+          {en:"Our city ____ an international music festival every summer.",ans:"hosts"},
+          {en:"Their latest product ____ AI to deliver personalized experience.",ans:"integrates"},
+          {en:"The smartphone is ____ available worldwide.",ans:"internationally"},
+          {en:"Every autumn farmers ____ corn before heavy rain.",ans:"harvest"},
+          {en:"My brother ____ mobile apps for a tech company.",ans:"designs"},
+        ]
+      }
+    ]
+  }
+];
 
-const testType = document.getElementById('testType');
-const totalQInput = document.getElementById('totalQ');
-const startTestBtn = document.getElementById('startTestBtn');
-const artChecks = document.querySelectorAll('#artCheck input[type="checkbox"]');
-const qBox = document.getElementById('qBox');
-const allNum = document.getElementById('allNum');
-const doneNum = document.getElementById('rightNum');
-const rightNum = document.getElementById('rightNum');
-const wrongNum = document.getElementById('wrongNum');
-const rate = document.getElementById('rate');
+// ===================== 全局变量 =====================
+let currentWonderQs = [];
+let sspPool = [];
+let currentSspSet = null;
+let sspDoneCount = 0;
+let sspWrongTotal = 0;
+const showChineseKey = "wonderShowChinese";
+const showChineseCheckbox = document.getElementById("show-chinese");
+const nextSspBtn = document.getElementById("next-ssp");
 
-let testPool = [];
-let nowIndex = 0;
-let totalCount = 0;
-let rightCount = 0;
-let wrongCount = 0;
-let usedIndex = [];
+// 中文释义本地存储
+function loadChineseSetting(){
+  const saved = localStorage.getItem(showChineseKey);
+  showChineseCheckbox.checked = (saved === "true");
+}
+loadChineseSetting();
+showChineseCheckbox.addEventListener("change", function(){
+  localStorage.setItem(showChineseKey, this.checked);
+  if(currentWonderQs.length > 0) renderWonder();
+});
 
 // 标签切换
-tabBtns.forEach(btn => {
-    btn.onclick = function(){
-        tabBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        if(this.dataset.page === 'read'){
-            readPage.classList.remove('hide');
-            testPage.classList.add('hide');
-        }else{
-            readPage.classList.add('hide');
-            testPage.classList.remove('hide');
-        }
-    }
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.onclick = ()=>{
+    const tabId = btn.dataset.tab;
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("show"));
+    document.getElementById(tabId).classList.add("show");
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    if(tabId==="tab-ssp") renderJournalList();
+  }
 });
 
-// 选择篇目
-artSelect.onchange = function(){
-    const aid = Number(this.value);
-    if(!aid){
-        artMain.innerText = "请在上方选择对应篇目查看原文";
-        globalNote.classList.add('hide');
-        return;
+// Wonder渲染
+function renderWonder(){
+  const wrap = document.getElementById("wonder-qs");
+  wrap.innerHTML = "";
+  const showCn = showChineseCheckbox.checked;
+  currentWonderQs.forEach((item,idx)=>{
+    let sentence = item.en.replace(/_{4,}/g,"___");
+    let hint = showCn ? `(${item.cn})` : "";
+    let html = `
+      <div class="question-item" data-index="${idx}">
+        <p>${idx+1}. ${sentence} ${hint}</p>
+        <input class="blank-input wonder-in" data-ans="${item.ans}" placeholder="填写答案">
+        <span class="correct-ans hidden"></span>
+      </div>
+    `;
+    wrap.innerHTML += html;
+  });
+}
+document.getElementById("gen-wonder").onclick = ()=>{
+  const num = Number(document.getElementById("wonder-count").value);
+  const shuffled = [...wonderDB].sort(()=>Math.random()-0.5);
+  currentWonderQs = shuffled.slice(0, Math.min(num, wonderDB.length));
+  renderWonder();
+};
+document.getElementById("check-wonder").onclick = ()=>{
+  document.querySelectorAll(".wonder-in").forEach(input=>{
+    const wrap = input.closest(".question-item");
+    const ansSpan = wrap.querySelector(".correct-ans");
+    ansSpan.classList.remove("hidden");
+    ansSpan.textContent = `标准答案：${input.dataset.ans}`;
+    const user = input.value.trim().toLowerCase();
+    const cor = input.dataset.ans.toLowerCase();
+    if(user !== cor){
+      wrap.classList.add("wrong");
+      input.style.borderColor = "#ef4444";
+    }else{
+      wrap.classList.remove("wrong");
+      input.style.borderColor = "#16a34a";
     }
-    currentReadArt = articleData.find(d => d.id === aid);
-    renderReadArticle();
+  });
+};
+document.getElementById("reset-wonder").onclick = ()=>{
+  currentWonderQs = [];
+  document.getElementById("wonder-qs").innerHTML = "";
 };
 
-// 渲染原文
-function renderReadArticle(){
-    if(!currentReadArt) return;
-    let html = "";
-    const charMap = {};
-    currentReadArt.chars.forEach(c => charMap[c.char] = c);
-    for(let ch of currentReadArt.text){
-        if(charMap[ch]){
-            html += `<span class="char" data-char="${ch}">${ch}</span>`;
-        }else{
-            html += ch;
-        }
-    }
-    artMain.innerHTML = html;
-    bindCharClick();
-    if(showGlobal) renderGlobalNote();
-    else globalNote.classList.add('hide');
+// SSP期刊列表渲染
+function renderJournalList(){
+  const listWrap = document.getElementById("journal-list");
+  listWrap.innerHTML = "";
+  sspDB.forEach(j=>{
+    const div = document.createElement("div");
+    div.className = "journal-item";
+    const inputId = `j-${j.id}`;
+    div.innerHTML = `<input type="checkbox" value="${j.id}" id="${inputId}"> <label for="${inputId}">${j.id}</label>`;
+    listWrap.appendChild(div);
+  });
 }
-
-// 单字点击释义
-function bindCharClick(){
-    document.querySelectorAll('.char').forEach(el => {
-        el.onclick = function(e){
-            e.stopPropagation();
-            const ch = this.dataset.char;
-            const data = currentReadArt.chars.find(x => x.char === ch);
-            if(!data) return;
-            const rect = this.getBoundingClientRect();
-            floatTip.style.left = rect.left + "px";
-            floatTip.style.top = (rect.bottom + 10) + "px";
-            floatTip.classList.remove('hide');
-            let exp = data.explain.join("；");
-            floatTip.innerHTML = `
-                <p><strong>字：${ch}</strong>【${data.pinyin}】</p>
-                <p>本义/语境释义：${data.origin}</p>
-                <p>其他释义/语法：${exp}</p>
-            `;
-            this.classList.add('active');
-        };
-    });
-}
-
-// 关闭弹窗
-document.addEventListener('click', () => {
-    floatTip.classList.add('hide');
-    document.querySelectorAll('.char').forEach(el => el.classList.remove('active'));
-});
-
-// 全局注释切换
-switchNoteBtn.onclick = function(){
-    showGlobal = !showGlobal;
-    this.innerText = showGlobal ? "隐藏全局注释" : "全局显示注释";
-    showGlobal ? renderGlobalNote() : globalNote.classList.add('hide');
+document.getElementById("select-all-journals").onclick = ()=>{
+  document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=true);
 };
-function renderGlobalNote(){
-    if(!currentReadArt) return;
-    let html = "<h4>全文字词注释</h4>";
-    currentReadArt.chars.forEach(d => {
-        let exp = d.explain.join("；");
-        html += `<div class="note-item"><span>${d.char}</span>【${d.pinyin}】${d.origin} | 其他：${exp}</div>`;
-    });
-    globalNote.innerHTML = html;
-    globalNote.classList.remove('hide');
-}
-
-// 数组打乱
-function shuffle(arr){
-    for(let i = arr.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-}
 
 // 开始答题
-startTestBtn.onclick = function(){
-    const selectIds = [];
-    artChecks.forEach(cb => {
-        if(cb.checked) selectIds.push(Number(cb.value));
+document.getElementById("start-ssp").onclick = ()=>{
+  sspPool = [];
+  const checkedBoxes = document.querySelectorAll(".journal-item input:checked");
+  if(checkedBoxes.length === 0){
+    alert("请先勾选至少一套期刊再开始答题！");
+    return;
+  }
+  checkedBoxes.forEach(cb=>{
+    const jId = cb.value;
+    const journal = sspDB.find(item => item.id === jId);
+    journal.sets.forEach(setItem=>{
+      sspPool.push({journalId: jId, set: setItem});
     });
-    if(selectIds.length === 0){
-        alert("请至少选择一篇考察篇目！");
-        return;
-    }
-    testPool = [];
-    nowIndex = 0;
-    rightCount = 0;
-    wrongCount = 0;
-    usedIndex = [];
-    startTestBtn.disabled = true;
-    const type = testType.value;
-    selectIds.forEach(id => {
-        const art = articleData.find(d => d.id === id);
-        if(!art) return;
-        // 关键：绑定字词所属原句子，一一对应
-        art.chars.forEach(char => {
-            art.sentences.forEach(sen => {
-                if(sen.includes(char.char)){
-                    testPool.push({
-                        ...char,
-                        article: art,
-                        sourceSentence: sen // 记录该字真实所在句子
-                    });
-                }
-            });
-        });
-    });
-    if(testPool.length === 0){
-        alert("当前选择范围下无可用题目！");
-        startTestBtn.disabled = false;
-        return;
-    }
-    let wantNum = parseInt(totalQInput.value) || 1;
-    totalCount = Math.min(wantNum, testPool.length);
-    shuffle(testPool);
-    allNum.innerText = totalCount;
-    doneNum.innerText = 0;
-    rightNum.innerText = 0;
-    wrongNum.innerText = 0;
-    rate.innerText = "0%";
-    renderQuestion();
+  });
+  if(sspPool.length === 0){
+    alert("选中期刊内无可用题目！");
+    return;
+  }
+  sspDoneCount = 0;
+  sspWrongTotal = 0;
+  document.getElementById("ssp-stat").classList.add("hidden");
+  nextSspSet();
 };
 
-// 渲染题目（核心修复：使用绑定的原句，精准标记考察字）
-function renderQuestion(){
-    if(nowIndex >= totalCount){
-        qBox.innerHTML = `
-            <h3>✅ 答题完成！</h3>
-            <p>总计${totalCount}题，答对${rightCount}题，答错${wrongCount}题</p>
-            <p>正确率：${((rightCount/totalCount)*100).toFixed(1)}%</p>
-        `;
-        startTestBtn.disabled = false;
-        return;
-    }
-    let currentIdx;
-    do{
-        currentIdx = Math.floor(Math.random() * testPool.length);
-    }while(usedIndex.includes(currentIdx));
-    usedIndex.push(currentIdx);
-
-    const item = testPool[currentIdx];
-    // 直接使用预先绑定的、包含该字的原句，彻底解决不匹配问题
-    const targetSentence = item.sourceSentence;
-    const showSen = targetSentence.replace(item.char, `<span class="q-word">${item.char}</span>`);
-
-    let allMean = [item.origin, ...item.explain];
-    const uniqueMean = [...new Set(allMean)];
-    let options = [];
-    for(let text of uniqueMean){
-        options.push({
-            text: text,
-            isRight: text === item.origin
-        });
-    }
-    // 补充选项到4个
-    if(options.length < 4){
-        const extraPool = [];
-        testPool.forEach(cc => {
-            if(cc.char !== item.char){
-                extraPool.push(...cc.explain, cc.origin);
-            }
-        });
-        const existTxt = options.map(o => o.text);
-        const validExtra = [...new Set(extraPool)].filter(t => !existTxt.includes(t));
-        shuffle(validExtra);
-        while(options.length < 4 && validExtra.length > 0){
-            options.push({
-                text: validExtra.shift(),
-                isRight: false
-            });
-        }
-    }
-    shuffle(options);
-
-    let html = `
-        <p><strong>第${nowIndex+1}题</strong></p>
-        <p>请解释划线字词含义/语法作用：</p>
-        <div class="q-sentence">${showSen}</div>
-        <div class="opts">
-    `;
-    options.forEach((opt, idx) => {
-        html += `<div class="opt" data-right="${opt.isRight}">${idx+1}. ${opt.text}</div>`;
-    });
-    html += `</div><div class="tip-text"></div>`;
-    qBox.innerHTML = html;
-
-    // 绑定答题点击事件
-    document.querySelectorAll('.opt').forEach(el => {
-        el.onclick = selectAnswer;
-    });
+// 抽取下一套
+function nextSspSet(){
+  if(sspPool.length === 0){
+    document.getElementById("ssp-current-set").innerHTML = "<p>所有选中套题已完成！</p>";
+    showSspStat();
+    nextSspBtn.disabled = true;
+    return;
+  }
+  const randomIndex = Math.floor(Math.random() * sspPool.length);
+  currentSspSet = sspPool.splice(randomIndex, 1)[0];
+  renderSspSet();
 }
 
-// 答题逻辑
-function selectAnswer(e){
-    const el = e.target;
-    const isRight = el.dataset.right === "true";
-    const tip = document.querySelector('.tip-text');
-    const allOpts = document.querySelectorAll('.opt');
-    allOpts.forEach(o => o.style.pointerEvents = "none");
+// 渲染当前套：新题加载时自动禁用下一套按钮
+function renderSspSet(){
+  const wrap = document.getElementById("ssp-current-set");
+  const currentSet = currentSspSet.set;
+  let html = `<h3 class="ssp-title">当前期刊：${currentSspSet.journalId}</h3>`;
+  html += `<div class="word-box">词库：${currentSet.box.join(" / ")}</div>`;
+  
+  currentSet.qs.forEach((q,idx)=>{
+    html += `<div class="question-item">
+      <p>${idx+1}. ${q.en.replace("____","___")}
+        <input class="blank-input ssp-in" data-ans="${q.ans}" placeholder="填写答案">
+        <span class="correct-ans hidden"></span>
+      </p>
+    </div>`;
+  });
+  wrap.innerHTML = html;
+  nextSspBtn.disabled = true;
+}
 
-    if(isRight){
-        el.classList.add('correct');
-        tip.className = "tip-text right";
-        tip.innerText = "✅ 回答正确";
-        rightCount++;
+// 批改本套：批改完成后解锁下一套按钮
+document.getElementById("check-ssp").onclick = ()=>{
+  let wrongNum = 0;
+  const normalize = str => str.trim().toLowerCase().replace(/\s+/g, ' ');
+
+  document.querySelectorAll(".ssp-in").forEach(input=>{
+    const wrap = input.closest(".question-item");
+    const ansSpan = wrap.querySelector(".correct-ans");
+    ansSpan.classList.remove("hidden");
+    ansSpan.textContent = `标准答案：${input.dataset.ans}`;
+    
+    const userAns = normalize(input.value);
+    const realAns = normalize(input.dataset.ans);
+    
+    if(userAns !== realAns){
+      wrap.classList.add("wrong");
+      input.style.borderColor = "#ef4444";
+      wrongNum++;
     }else{
-        el.classList.add('error');
-        allOpts.forEach(o => {
-            if(o.dataset.right === "true"){
-                o.classList.add('correct');
-            }
-        });
-        tip.className = "tip-text wrong";
-        tip.innerText = "❌ 回答错误，上方绿色为正确答案";
-        wrongCount++;
+      wrap.classList.remove("wrong");
+      input.style.borderColor = "#16a34a";
     }
+  });
+  sspWrongTotal += wrongNum;
+  sspDoneCount++;
+  nextSspBtn.disabled = false;
+};
 
-    doneNum.innerText = nowIndex + 1;
-    rightNum.innerText = rightCount;
-    wrongNum.innerText = wrongCount;
-    let r = ((rightCount / (nowIndex+1)) * 100).toFixed(1);
-    rate.innerText = r + "%";
+document.getElementById("next-ssp").onclick = nextSspSet;
 
-    setTimeout(() => {
-        nowIndex++;
-        renderQuestion();
-    }, 1500);
+// 统计面板
+function showSspStat(){
+  const statBox = document.getElementById("ssp-stat");
+  statBox.classList.remove("hidden");
+  const totalQ = sspDoneCount * 10;
+  const right = totalQ - sspWrongTotal;
+  const rate = totalQ === 0 ? "0%" : ((right/totalQ)*100).toFixed(1)+"%";
+  statBox.innerHTML = `
+    <h3>刷题统计</h3>
+    <p>完成套数：${sspDoneCount} 套</p>
+    <p>总错题：${sspWrongTotal} 道</p>
+    <p>正确率：${rate}</p>
+  `;
 }
+
+// SSP重置：重置时禁用下一套按钮
+document.getElementById("reset-ssp").onclick = ()=>{
+  sspPool = [];
+  sspDoneCount=0;
+  sspWrongTotal=0;
+  document.getElementById("ssp-current-set").innerHTML = "";
+  document.getElementById("ssp-stat").classList.add("hidden");
+  document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=false);
+  nextSspBtn.disabled = true;
+};
 </script>
 </body>
 </html>

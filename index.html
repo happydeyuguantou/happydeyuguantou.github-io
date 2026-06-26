@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wonder & SSP 英语刷题工具</title>
+  <title>Wonder & SSP & 新概念刷题工具</title>
   <style>
     * {box-sizing: border-box; font-family: system-ui, sans-serif;}
     body {max-width: 1200px; margin: 0 auto; padding: 20px; background: #f7f9fc;}
@@ -31,21 +31,45 @@
     .journal-item {display: flex; align-items: center; gap: 4px; width: 180px;}
     .hidden {display: none;}
     .ssp-title {margin-top: 0;}
+    #range-inputs input {width: 80px;}
+
+    /* 新概念默写新增样式 */
+    .nce-sentence-list {max-height: 420px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 10px 0; background: #fafbfc;}
+    .nce-sentence-item {padding: 10px 0; border-bottom: 1px solid #eef2f7; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;}
+    .nce-sentence-item:last-child {border-bottom: none;}
+    .nce-sentence-item input {margin-top: 5px; flex-shrink: 0;}
+    .nce-sentence-item .sentence-text {flex: 1;}
+    .nce-sentence-item .en {color: #1e293b;}
+    .nce-sentence-item .cn {color: #64748b; font-size: 14px; margin-top: 4px;}
+    #nce-answer-input {width: 100%; padding: 10px 12px; font-size: 16px; margin: 12px 0;}
+    .wrong-item {padding: 10px; background: #fef2f2; border-radius: 6px; margin-bottom: 8px; font-size: 15px;}
+    .wrong-item .lesson-tag {display: inline-block; padding: 2px 8px; background: #ef4444; color: white; border-radius: 4px; font-size: 13px; margin-right: 8px;}
+    .nce-mode-panel {margin-bottom: 16px;}
   </style>
 </head>
 <body>
-  <h1>Wonder词汇 / SSP选词填空刷题器</h1>
+  <h1>Wonder词汇 / SSP选词 / 新概念默写</h1>
   <div class="tab-wrap">
     <button class="tab-btn active" data-tab="tab-wonder">Wonder词汇填空</button>
     <button class="tab-btn" data-tab="tab-ssp">SSP语法选词</button>
+    <button class="tab-btn" data-tab="tab-nce">新概念课文默写</button>
   </div>
 
   <!-- Wonder页面 -->
   <div id="tab-wonder" class="panel show">
     <div class="control-row">
+      <label><input type="radio" name="wonder-mode" value="random" checked> 全题库随机</label>
+      <label><input type="radio" name="wonder-mode" value="range"> 指定题号范围</label>
+      <span id="range-inputs" class="hidden">
+        <label>起始：</label>
+        <input id="wonder-start" type="number" min="1" max="102" value="1">
+        <label>结束：</label>
+        <input id="wonder-end" type="number" min="1" max="102" value="20">
+      </span>
       <label>出题数量：</label>
       <input id="wonder-count" type="number" min="1" max="102" value="10">
       <label><input type="checkbox" id="show-chinese"> 显示中文释义括号</label>
+      <label><input type="checkbox" id="show-first-letter"> 显示首字母提示</label>
       <button class="blue" id="gen-wonder">生成题目</button>
       <button class="secondary" id="check-wonder">批改全部</button>
       <button class="danger" id="reset-wonder">重置</button>
@@ -66,6 +90,76 @@
     </div>
     <div id="ssp-current-set"></div>
     <div class="stat-box hidden" id="ssp-stat"></div>
+  </div>
+
+  <!-- 新概念默写页面 -->
+  <div id="tab-nce" class="panel">
+    <div class="control-row">
+      <label><input type="radio" name="nce-mode" value="random" checked> 全范围随机抽题</label>
+      <label><input type="radio" name="nce-mode" value="lesson"> 指定课文抽题</label>
+      <label><input type="radio" name="nce-mode" value="select"> 自选句子答题</label>
+    </div>
+
+    <!-- 随机抽题模式 -->
+    <div id="nce-random-panel" class="nce-mode-panel">
+      <div class="control-row">
+        <label>出题数量：</label>
+        <input id="nce-random-count" type="number" min="1" value="10">
+        <button class="blue" id="nce-start-random">开始答题</button>
+      </div>
+    </div>
+
+    <!-- 指定课文模式 -->
+    <div id="nce-lesson-panel" class="nce-mode-panel hidden">
+      <div class="control-row">
+        <label>选择课文：</label>
+        <select id="nce-lesson-select"></select>
+        <label>出题数量：</label>
+        <input id="nce-lesson-count" type="number" min="1" value="5">
+        <button class="blue" id="nce-start-lesson">开始答题</button>
+      </div>
+    </div>
+
+    <!-- 自选句子模式 -->
+    <div id="nce-select-panel" class="nce-mode-panel hidden">
+      <div class="control-row">
+        <label>选择课文：</label>
+        <select id="nce-select-lesson"></select>
+        <button class="secondary" id="nce-load-sentences">加载句子列表</button>
+        <button class="blue" id="nce-start-select" disabled>开始答题</button>
+        <button class="danger" id="nce-clear-select">清空勾选</button>
+      </div>
+      <div id="nce-sentence-list" class="nce-sentence-list hidden"></div>
+    </div>
+
+    <!-- 答题区 -->
+    <div id="nce-quiz-area" class="hidden">
+      <div class="control-row">
+        <span>当前第 <strong id="nce-current-num">1</strong> / <span id="nce-total-num">10</span> 题</span>
+        <button class="secondary" id="nce-show-stat">查看统计与错题</button>
+        <button class="danger" id="nce-quit-quiz">退出答题</button>
+      </div>
+      <div class="question-item" id="nce-quiz-item">
+        <p><strong>中文译文：</strong></p>
+        <p id="nce-cn-text" style="font-size: 17px; line-height: 1.7;"></p>
+        <input class="blank-input" id="nce-answer-input" placeholder="请输入英文原句">
+        <div style="margin-top: 8px;">
+          <button class="blue" id="nce-check-btn">批改</button>
+          <button class="success" id="nce-next-btn" disabled>下一题</button>
+        </div>
+        <p id="nce-correct-ans" class="correct-ans hidden" style="margin-top: 10px;"></p>
+      </div>
+    </div>
+
+    <!-- 统计与错题区 -->
+    <div id="nce-stat-area" class="stat-box hidden">
+      <h3 style="margin-top: 0;">本次答题统计</h3>
+      <p>总题数：<span id="nce-stat-total">0</span></p>
+      <p>正确数：<span id="nce-stat-right">0</span></p>
+      <p>正确率：<span id="nce-stat-rate">0%</span></p>
+      <h4 style="margin-bottom: 8px;">错题列表</h4>
+      <div id="nce-wrong-list"></div>
+    </div>
   </div>
 
 <script>
@@ -175,7 +269,7 @@ const wonderDB = [
   {en:"Since it was dark, we used our flashlights to _________________ the artifacts while we were talking.", ans:"illuminate", cn:"照亮"}
 ];
 
-// ===================== 修正后SSP完整题库（词框与答案一一对应，所有题干均带填空横线） =====================
+// ===================== SSP完整题库 =====================
 const sspDB = [
   {
     id:"3.13增刊+4.10刊",
@@ -424,6 +518,119 @@ const sspDB = [
   }
 ];
 
+// ===================== 新概念课文题库 Lesson 40-46（人名地名标注英文） =====================
+const nceDB = [
+  {
+    id: 40,
+    title: "Lesson 40 Food and talk 进餐与交谈",
+    sentences: [
+      {en:"Last week at a dinner party, the hostess asked me to sit next to Mrs. Rumbold.", cn:"在上星期的一次宴会上，女主人安排我坐在兰伯尔德夫人（Mrs. Rumbold）的身旁。"},
+      {en:"Mrs. Rumbold was a large, unsmiling lady in a tight black dress.", cn:"兰伯尔德夫人（Mrs. Rumbold）是一位身材高大、表情严肃的女人，穿一件紧身的黑衣服。"},
+      {en:"She did not even look up when I took my seat beside her.", cn:"当我在她身旁坐下来的时候，她甚至连头都没有抬一下。"},
+      {en:"Her eyes were fixed on her plate and in a short time, she was busy eating.", cn:"她的眼睛盯着自己的盘子，不一会儿就忙着吃起来了。"},
+      {en:"I tried to make conversation.", cn:"我试图找个话题和她聊聊。"},
+      {en:"'A new play is coming to \"The Globe\" soon,' I said. 'Will you be seeing it?'", cn:"“一出新剧要来‘环球剧场（The Globe）’上演了，”我说，“您去看吗？”"},
+      {en:"'No,' she answered.", cn:"“不，”她回答。"},
+      {en:"'Will you be spending your holidays abroad this year?' I asked.", cn:"“您今年去国外度假吗？”我又问。"},
+      {en:"'No,' she answered.", cn:"“不，”她回答。"},
+      {en:"'Will you be staying in England?' I asked.", cn:"“您就呆在英国吗？”我问。"},
+      {en:"'No,' she answered.", cn:"“不，”她回答。"},
+      {en:"In despair, I asked her whether she was enjoying her dinner.", cn:"失望之中我问她饭是否吃得满意。"},
+      {en:"'Young man,' she answered, 'if you ate more and talked less, we would both enjoy our dinner!'", cn:"“年轻人，”她回答说，“如果你多吃点，少说点，我们两个都会吃得好的！”"}
+    ]
+  },
+  {
+    id: 41,
+    title: "Lesson 41 Do you call that a hat? 你把那个叫帽子吗？",
+    sentences: [
+      {en:"'Do you call that a hat?' I said to my wife.", cn:"“你把那个叫帽子吗？”我对妻子说。"},
+      {en:"'You needn't be so rude about it,' my wife answered as she looked at herself in the mirror.", cn:"“你说话没必要这样不客气，”我的妻子边回答边照着镜子。"},
+      {en:"I sat down on one of those modern chairs with holes in it and waited.", cn:"我坐在一个新式的满是网眼儿的椅子上，等待着。"},
+      {en:"We had been in the hat shop for half an hour and my wife was still in front of the mirror.", cn:"我们在这家帽店已经呆了半个小时了，而我的妻子仍在镜子面前。"},
+      {en:"'We mustn't buy things we don't need,' I remarked suddenly.", cn:"“我们不应该买我们不需要的东西，”我突然发表意见说。"},
+      {en:"I regretted saying it almost at once.", cn:"但马上又后悔说了这话。"},
+      {en:"'You needn't have said that,' my wife answered.", cn:"“你没必要这么说，”我妻子回答说。"},
+      {en:"'I needn't remind you of that terrible tie you bought yesterday.'", cn:"“我也不必提醒你昨天买的那条糟糕透了的领带。”"},
+      {en:"'I find it beautiful,' I said. 'A man can never have too many ties.'", cn:"“我觉得它好看，”我说，“男人有多少领带也不会嫌多。”"},
+      {en:"'And a woman can't have too many hats,' she answered.", cn:"“女人有多少帽子也不嫌多。”她回答。"},
+      {en:"Ten minutes later we walked out of the shop together.", cn:"十分钟以后，我们一道走出了商店。"},
+      {en:"My wife was wearing a hat that looked like a lighthouse!", cn:"我妻子戴着一顶像灯塔一样的帽子！"}
+    ]
+  },
+  {
+    id: 42,
+    title: "Lesson 42 Not very musical 并非很懂音乐",
+    sentences: [
+      {en:"As we had had a long walk through one of the markets of old Delhi, we stopped at a square to have a rest.", cn:"当我们穿过旧德里（Old Delhi）的市场时走了很长一段路，我们在一个广场上停下来休息。"},
+      {en:"After a time, we noticed a snake charmer with two large baskets at the other side of the square, so we went to have a look at him.", cn:"过了一会儿，我们注意到广场的那一边有一个带着两个大筐的耍蛇人，于是就走过去看看。"},
+      {en:"As soon as he saw us, he picked up a long pipe which was covered with coins and opened one of the baskets.", cn:"他一见我们，就拿起了一个长长的上面镶有硬币的管乐器，并掀开了一个筐的盖子。"},
+      {en:"When he began to play a tune, we had our first glimpse of the snake.", cn:"当他开始吹奏一支曲子时，我们才第一次看到那条蛇。"},
+      {en:"It rose out of the basket and began to follow the movements of the pipe.", cn:"它从筐里探出身子，随着乐器的摆动而扭动。"},
+      {en:"We were very much surprised when the snake charmer suddenly began to play jazz and modern pop songs.", cn:"当耍蛇人突然又吹奏起爵士乐和现代流行乐曲时，我们感到非常惊奇。"},
+      {en:"The snake, however, continued to 'dance' slowly.", cn:"然而那蛇却还是缓慢地“舞动”着。"},
+      {en:"It obviously could not tell the difference between Indian music and jazz!", cn:"显然，它分辨不出印度音乐和爵士乐！"}
+    ]
+  },
+  {
+    id: 43,
+    title: "Lesson 43 Over the South Pole 飞越南极",
+    sentences: [
+      {en:"In 1929, three years after his flight over the North Pole, the American explorer, R.E. Byrd, successfully flew over the South Pole for the first time.", cn:"美国探险家 R.E. 伯德（R.E. Byrd）在飞越北极（North Pole）3年之后，于1929年第一次飞越了南极（South Pole）。"},
+      {en:"Though, at first, Byrd and his men were able to take a great many photographs of the mountains that lay below, they soon ran into serious trouble.", cn:"虽然开始时伯德（Byrd）和他的助手们拍下了飞机下面连绵群山的大量照片，但他们很快就陷入了困境。"},
+      {en:"At one point, it seemed certain that their plane would crash.", cn:"在有个地方，飞机似乎肯定要坠毁了。"},
+      {en:"It could only get over the mountains if it rose to 10,000 feet.", cn:"只有在飞至10,000英尺的高度时，它才能飞过这些山头。"},
+      {en:"Byrd at once ordered his men to throw out two heavy food sacks.", cn:"伯德（Byrd）马上命令他的助手们把两个沉重的食物袋扔掉。"},
+      {en:"The plane was then able to rise and it cleared the mountains by 400 feet.", cn:"于是飞机可以上升了，它在离山头400英尺的高度飞越了过去。"},
+      {en:"Byrd now knew that he would be able to reach the South Pole which was 300 miles away, for there were no more mountains in sight.", cn:"伯德（Byrd）这时知道他能够顺利飞抵300英里以外的南极（South Pole）了，因为前面再没有山了。"},
+      {en:"The aircraft was able to fly over the endless white plains without difficulty.", cn:"飞机可以毫无困难地飞过这片茫茫无际的白色原野！"}
+    ]
+  },
+  {
+    id: 44,
+    title: "Lesson 44 Through the forest 穿过森林",
+    sentences: [
+      {en:"Mrs. Anne Sterling did not think of the risk she was taking when she ran through a forest after two men.", cn:"安·斯特林夫人（Mrs. Anne Sterling）在穿过森林追赶两个男人时，她并没有考虑到所冒的风险。"},
+      {en:"They had rushed up to her while she was having a picnic at the edge of a forest with her children and tried to steal her handbag.", cn:"刚才，当她和孩子们正在森林边上野餐的时候，这两个人冲到她跟前，企图抢走她的手提包。"},
+      {en:"In the struggle, the strap broke and, with the bag in their possession, both men started running through the trees.", cn:"在争抢中，手提包的带断了，包落入这两个人手里，他们拔腿跑进了树林。"},
+      {en:"Mrs. Sterling got so angry that she ran after them.", cn:"斯特林夫人（Mrs. Sterling）非常气愤，向着他们追了过去。"},
+      {en:"She was soon out of breath, but she continued to run.", cn:"只追了一会儿便上气不接下气了，但她还是继续追赶。"},
+      {en:"When she caught up with them, she saw that they had sat down and were going through the contents of the bag, so she ran straight at them.", cn:"当她赶上他们时，发现他们已经坐了下来，正翻着包里的东西，于是她直冲过去。"},
+      {en:"The men got such a fright that they dropped the bag and ran away.", cn:"这两个人吓了一跳，扔下提包逃跑了。"},
+      {en:"'The strap needs mending,' said Mrs. Sterling later, 'but they did not steal anything.'", cn:"“这提包带需要修理，”斯特林夫人（Mrs. Sterling）事后说道，“不过他们什么也没偷走。”"}
+    ]
+  },
+  {
+    id: 45,
+    title: "Lesson 45 A clear conscience 问心无愧",
+    sentences: [
+      {en:"The whole village soon learnt that a large sum of money had been lost.", cn:"整个村子很快知道，有一大笔钱丢失了。"},
+      {en:"Sam Benton, the local butcher, had lost his wallet while taking his savings to the post office.", cn:"当地的屠户萨姆·本顿（Sam Benton）在把存款送往邮局的途中把钱包丢了。"},
+      {en:"Sam was sure that the wallet must have been found by one of the villagers, but it was not returned to him.", cn:"萨姆（Sam）确信那钱包一定是被某个村民捡到了，可是却不见有人来送还给他。"},
+      {en:"Three months passed, and then one morning, Sam found his wallet outside his front door.", cn:"3个月过去了，后来在一天早晨，萨姆（Sam）在自己的大门外发现了他的钱包。"},
+      {en:"It had been wrapped up in newspaper and it contained half the money he had lost, together with a note which said: 'A thief, yes, but only 50 per cent a thief!'", cn:"钱包是用报纸包着的，里面有他丢失的钱的一半，而且还附着一张纸条，上面写着：“一个小偷，是的，但只是一个50%的小偷！”"},
+      {en:"Two months later, some more money was sent to Sam with another note: 'Only 25 per cent a thief now!'", cn:"又过了两个月，又有一些钱送还给了萨姆（Sam），又附了一张字条：“这回只是25%的小偷了！”"},
+      {en:"In time, all Sam's money was paid back in this way.", cn:"很快，萨姆（Sam）全部的钱都用同样的方式还了回来。"},
+      {en:"The last note said: 'I am 100 per cent honest now!'", cn:"最后的那张字条上写道：“我现在是一个100%的诚实人了！”"}
+    ]
+  },
+  {
+    id: 46,
+    title: "Lesson 46 Expensive and uncomfortable 既昂贵又受罪",
+    sentences: [
+      {en:"When a plane from London arrived at Sydney airport, workers began to unload a number of wooden boxes which contained clothing.", cn:"当一架来自伦敦（London）的飞机抵达悉尼（Sydney）机场时，工人们开始卸下装有服装的一批木箱。"},
+      {en:"No one could account for the fact that one of the boxes was extremely heavy.", cn:"其中有只箱子特别重，可谁也弄不清是怎么回事。"},
+      {en:"It suddenly occurred to one of the workers to open up the box.", cn:"突然一个工人想到打开箱子看看。"},
+      {en:"He was astonished at what he found.", cn:"看到的情景使他吃惊。"},
+      {en:"A man was lying in the box on top of a pile of woolen goods.", cn:"箱内有一个人正躺在一堆毛织品之上。"},
+      {en:"He was so surprised at being discovered that he did not even try to run away.", cn:"他由于被人发现而感到非常吃惊，甚至都没有企图逃跑。"},
+      {en:"After he was arrested, the man admitted hiding in the box before the plane left London.", cn:"此人被逮捕后，承认他是在飞机离开伦敦（London）前躲进箱里的。"},
+      {en:"He had had a long and uncomfortable trip, for he had been confined to the wooden box for over eighteen hours.", cn:"他经历了一次漫长而又难受的旅程，因为他在那木箱里闷了18个多小时。"},
+      {en:"The man was ordered to pay $3,500 for the cost of the trip.", cn:"此人被责令交付旅费3,500英镑。"},
+      {en:"The normal price of a ticket is $2,000!", cn:"而正常票价是2,000英镑！"}
+    ]
+  }
+];
+
 // ===================== 全局变量 =====================
 let currentWonderQs = [];
 let sspPool = [];
@@ -431,21 +638,50 @@ let currentSspSet = null;
 let sspDoneCount = 0;
 let sspWrongTotal = 0;
 const showChineseKey = "wonderShowChinese";
+const showFirstLetterKey = "wonderShowFirstLetter";
 const showChineseCheckbox = document.getElementById("show-chinese");
+const showFirstLetterCheckbox = document.getElementById("show-first-letter");
 const nextSspBtn = document.getElementById("next-ssp");
+const modeRadios = document.querySelectorAll('input[name="wonder-mode"]');
+const rangeInputs = document.getElementById("range-inputs");
+const wonderStartInput = document.getElementById("wonder-start");
+const wonderEndInput = document.getElementById("wonder-end");
 
-// 中文释义本地存储
-function loadChineseSetting(){
-  const saved = localStorage.getItem(showChineseKey);
-  showChineseCheckbox.checked = (saved === "true");
+// 新概念全局变量
+let nceQuizList = [];
+let nceCurrentIndex = 0;
+let nceRightCount = 0;
+let nceWrongList = [];
+
+// ===================== Wonder 逻辑 =====================
+function loadWonderSettings(){
+  const savedCn = localStorage.getItem(showChineseKey);
+  showChineseCheckbox.checked = (savedCn === "true");
+  const savedFl = localStorage.getItem(showFirstLetterKey);
+  showFirstLetterCheckbox.checked = (savedFl === "true");
 }
-loadChineseSetting();
+loadWonderSettings();
+
 showChineseCheckbox.addEventListener("change", function(){
   localStorage.setItem(showChineseKey, this.checked);
   if(currentWonderQs.length > 0) renderWonder();
 });
 
-// 标签切换
+showFirstLetterCheckbox.addEventListener("change", function(){
+  localStorage.setItem(showFirstLetterKey, this.checked);
+  if(currentWonderQs.length > 0) renderWonder();
+});
+
+modeRadios.forEach(radio=>{
+  radio.addEventListener("change", function(){
+    if(this.value === "range"){
+      rangeInputs.classList.remove("hidden");
+    }else{
+      rangeInputs.classList.add("hidden");
+    }
+  });
+});
+
 document.querySelectorAll(".tab-btn").forEach(btn=>{
   btn.onclick = ()=>{
     const tabId = btn.dataset.tab;
@@ -454,33 +690,63 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     if(tabId==="tab-ssp") renderJournalList();
+    if(tabId==="tab-nce") initNceSelects();
   }
 });
 
-// Wonder渲染
 function renderWonder(){
   const wrap = document.getElementById("wonder-qs");
   wrap.innerHTML = "";
   const showCn = showChineseCheckbox.checked;
+  const showFl = showFirstLetterCheckbox.checked;
+
+  const getFirstLetter = (ans) => {
+    return ans.split(";").map(part => part.trim().charAt(0)).join(";");
+  };
+
   currentWonderQs.forEach((item,idx)=>{
     let sentence = item.en.replace(/_{2,}/g,"___");
     let hint = showCn ? `(${item.cn})` : "";
+    let placeholder = showFl ? `首字母: ${getFirstLetter(item.ans)}` : "填写答案";
+    
     let html = `
       <div class="question-item" data-index="${idx}">
         <p>${idx+1}. ${sentence} ${hint}</p>
-        <input class="blank-input wonder-in" data-ans="${item.ans}" placeholder="填写答案">
+        <input class="blank-input wonder-in" data-ans="${item.ans}" placeholder="${placeholder}">
         <span class="correct-ans hidden"></span>
       </div>
     `;
     wrap.innerHTML += html;
   });
 }
+
 document.getElementById("gen-wonder").onclick = ()=>{
   const num = Number(document.getElementById("wonder-count").value);
-  const shuffled = [...wonderDB].sort(()=>Math.random()-0.5);
-  currentWonderQs = shuffled.slice(0, Math.min(num, wonderDB.length));
+  const mode = document.querySelector('input[name="wonder-mode"]:checked').value;
+  let pool = [];
+
+  if(mode === "range"){
+    const start = Number(wonderStartInput.value);
+    const end = Number(wonderEndInput.value);
+    if(start < 1 || end > wonderDB.length || start > end){
+      alert(`请输入合法的题号范围，有效范围为 1 - ${wonderDB.length}`);
+      return;
+    }
+    const rangeCount = end - start + 1;
+    if(num > rangeCount){
+      alert(`该范围内共 ${rangeCount} 道题，出题数量不能超过总数`);
+      return;
+    }
+    pool = wonderDB.slice(start - 1, end);
+  }else{
+    pool = [...wonderDB];
+  }
+
+  const shuffled = pool.sort(()=>Math.random()-0.5);
+  currentWonderQs = shuffled.slice(0, Math.min(num, pool.length));
   renderWonder();
 };
+
 document.getElementById("check-wonder").onclick = ()=>{
   document.querySelectorAll(".wonder-in").forEach(input=>{
     const wrap = input.closest(".question-item");
@@ -498,12 +764,13 @@ document.getElementById("check-wonder").onclick = ()=>{
     }
   });
 };
+
 document.getElementById("reset-wonder").onclick = ()=>{
   currentWonderQs = [];
   document.getElementById("wonder-qs").innerHTML = "";
 };
 
-// SSP期刊列表渲染
+// ===================== SSP 逻辑 =====================
 function renderJournalList(){
   const listWrap = document.getElementById("journal-list");
   listWrap.innerHTML = "";
@@ -519,7 +786,6 @@ document.getElementById("select-all-journals").onclick = ()=>{
   document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=true);
 };
 
-// 开始答题
 document.getElementById("start-ssp").onclick = ()=>{
   sspPool = [];
   const checkedBoxes = document.querySelectorAll(".journal-item input:checked");
@@ -544,7 +810,6 @@ document.getElementById("start-ssp").onclick = ()=>{
   nextSspSet();
 };
 
-// 抽取下一套
 function nextSspSet(){
   if(sspPool.length === 0){
     document.getElementById("ssp-current-set").innerHTML = "<p>所有选中套题已完成！</p>";
@@ -557,7 +822,6 @@ function nextSspSet(){
   renderSspSet();
 }
 
-// 渲染当前套：新题加载时自动禁用下一套按钮
 function renderSspSet(){
   const wrap = document.getElementById("ssp-current-set");
   const currentSet = currentSspSet.set;
@@ -576,7 +840,6 @@ function renderSspSet(){
   nextSspBtn.disabled = true;
 }
 
-// 批改本套：批改完成后解锁下一套按钮
 document.getElementById("check-ssp").onclick = ()=>{
   let wrongNum = 0;
   const normalize = str => str.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -606,7 +869,6 @@ document.getElementById("check-ssp").onclick = ()=>{
 
 document.getElementById("next-ssp").onclick = nextSspSet;
 
-// 统计面板
 function showSspStat(){
   const statBox = document.getElementById("ssp-stat");
   statBox.classList.remove("hidden");
@@ -621,7 +883,6 @@ function showSspStat(){
   `;
 }
 
-// SSP重置：重置时禁用下一套按钮
 document.getElementById("reset-ssp").onclick = ()=>{
   sspPool = [];
   sspDoneCount=0;
@@ -631,6 +892,245 @@ document.getElementById("reset-ssp").onclick = ()=>{
   document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=false);
   nextSspBtn.disabled = true;
 };
+
+// ===================== 新概念默写逻辑 =====================
+// 初始化课文下拉选项
+function initNceSelects(){
+  const selects = ["nce-lesson-select", "nce-select-lesson"];
+  selects.forEach(id=>{
+    const sel = document.getElementById(id);
+    if(sel.options.length > 0) return;
+    nceDB.forEach(lesson=>{
+      const opt = document.createElement("option");
+      opt.value = lesson.id;
+      opt.textContent = lesson.title;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+// 模式切换
+document.querySelectorAll('input[name="nce-mode"]').forEach(radio=>{
+  radio.addEventListener("change", function(){
+    document.querySelectorAll(".nce-mode-panel").forEach(p=>p.classList.add("hidden"));
+    document.getElementById(`nce-${this.value}-panel`).classList.remove("hidden");
+  });
+});
+
+// 句子归一化：忽略大小写、空格、所有标点符号
+function normalizeSentence(str){
+  return str.trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')        // 合并所有连续空格
+    .replace(/[^\w\s]/g, '');     // 移除所有标点、特殊符号，只保留字母、数字、空格
+}
+
+// 开始答题通用初始化
+function startNceQuiz(list){
+  nceQuizList = list.sort(()=>Math.random()-0.5);
+  nceCurrentIndex = 0;
+  nceRightCount = 0;
+  nceWrongList = [];
+  document.getElementById("nce-total-num").textContent = nceQuizList.length;
+  document.getElementById("nce-quiz-area").classList.remove("hidden");
+  document.getElementById("nce-stat-area").classList.add("hidden");
+  renderNceQuestion();
+}
+
+// 渲染当前题目
+function renderNceQuestion(){
+  const item = nceQuizList[nceCurrentIndex];
+  document.getElementById("nce-current-num").textContent = nceCurrentIndex + 1;
+  document.getElementById("nce-cn-text").textContent = item.cn;
+  document.getElementById("nce-answer-input").value = "";
+  document.getElementById("nce-correct-ans").classList.add("hidden");
+  document.getElementById("nce-quiz-item").classList.remove("wrong");
+  document.getElementById("nce-check-btn").disabled = false;
+  document.getElementById("nce-next-btn").disabled = true;
+  document.getElementById("nce-answer-input").focus();
+}
+
+// 批改
+document.getElementById("nce-check-btn").onclick = ()=>{
+  const item = nceQuizList[nceCurrentIndex];
+  const userInput = document.getElementById("nce-answer-input").value;
+  const correctAns = item.en;
+  const ansEl = document.getElementById("nce-correct-ans");
+  const quizItem = document.getElementById("nce-quiz-item");
+
+  ansEl.classList.remove("hidden");
+  ansEl.textContent = `正确答案：${correctAns}`;
+  document.getElementById("nce-check-btn").disabled = true;
+  document.getElementById("nce-next-btn").disabled = false;
+
+  if(normalizeSentence(userInput) === normalizeSentence(correctAns)){
+    nceRightCount++;
+    quizItem.classList.remove("wrong");
+    ansEl.style.color = "#16a34a";
+  }else{
+    quizItem.classList.add("wrong");
+    ansEl.style.color = "#dc2626";
+    nceWrongList.push({
+      lessonId: item.lessonId,
+      lessonTitle: item.lessonTitle,
+      cn: item.cn,
+      en: item.en,
+      userAns: userInput
+    });
+  }
+};
+
+// 下一题
+document.getElementById("nce-next-btn").onclick = ()=>{
+  nceCurrentIndex++;
+  if(nceCurrentIndex >= nceQuizList.length){
+    alert("本次答题已完成！");
+    showNceStat();
+    return;
+  }
+  renderNceQuestion();
+};
+
+// 显示统计
+function showNceStat(){
+  const total = nceQuizList.length;
+  const rate = total === 0 ? "0%" : ((nceRightCount / total) * 100).toFixed(1) + "%";
+  document.getElementById("nce-stat-total").textContent = total;
+  document.getElementById("nce-stat-right").textContent = nceRightCount;
+  document.getElementById("nce-stat-rate").textContent = rate;
+
+  const wrongListEl = document.getElementById("nce-wrong-list");
+  wrongListEl.innerHTML = "";
+  if(nceWrongList.length === 0){
+    wrongListEl.innerHTML = "<p style='color:#16a34a;'>太棒了，全部正确！</p>";
+  }else{
+    nceWrongList.forEach(item=>{
+      const div = document.createElement("div");
+      div.className = "wrong-item";
+      div.innerHTML = `
+        <span class="lesson-tag">Lesson ${item.lessonId}</span>
+        <p><strong>译文：</strong>${item.cn}</p>
+        <p><strong>你的答案：</strong>${item.userAns || "(空)"}</p>
+        <p><strong>正确答案：</strong>${item.en}</p>
+      `;
+      wrongListEl.appendChild(div);
+    });
+  }
+  document.getElementById("nce-stat-area").classList.remove("hidden");
+}
+
+document.getElementById("nce-show-stat").onclick = showNceStat;
+
+// 退出答题
+document.getElementById("nce-quit-quiz").onclick = ()=>{
+  if(confirm("确定退出本次答题吗？进度将不会保存。")){
+    document.getElementById("nce-quiz-area").classList.add("hidden");
+    document.getElementById("nce-stat-area").classList.add("hidden");
+  }
+};
+
+// 随机模式开始
+document.getElementById("nce-start-random").onclick = ()=>{
+  const count = Number(document.getElementById("nce-random-count").value);
+  const allSentences = [];
+  nceDB.forEach(lesson=>{
+    lesson.sentences.forEach(s=>{
+      allSentences.push({
+        ...s,
+        lessonId: lesson.id,
+        lessonTitle: lesson.title
+      });
+    });
+  });
+  if(count > allSentences.length){
+    alert(`全范围共 ${allSentences.length} 个句子，出题数量不能超过总数`);
+    return;
+  }
+  const shuffled = allSentences.sort(()=>Math.random()-0.5);
+  startNceQuiz(shuffled.slice(0, count));
+};
+
+// 指定课文模式开始
+document.getElementById("nce-start-lesson").onclick = ()=>{
+  const lessonId = Number(document.getElementById("nce-lesson-select").value);
+  const count = Number(document.getElementById("nce-lesson-count").value);
+  const lesson = nceDB.find(l=>l.id === lessonId);
+  if(count > lesson.sentences.length){
+    alert(`本课共 ${lesson.sentences.length} 个句子，出题数量不能超过总数`);
+    return;
+  }
+  const list = lesson.sentences.map(s=>({
+    ...s,
+    lessonId: lesson.id,
+    lessonTitle: lesson.title
+  }));
+  startNceQuiz(list.slice(0, count));
+};
+
+// 自选句子模式：加载句子列表
+document.getElementById("nce-load-sentences").onclick = ()=>{
+  const lessonId = Number(document.getElementById("nce-select-lesson").value);
+  const lesson = nceDB.find(l=>l.id === lessonId);
+  const listEl = document.getElementById("nce-sentence-list");
+  listEl.innerHTML = "";
+  lesson.sentences.forEach((s, idx)=>{
+    const div = document.createElement("div");
+    div.className = "nce-sentence-item";
+    div.innerHTML = `
+      <input type="checkbox" class="nce-sentence-check" value="${idx}">
+      <div class="sentence-text">
+        <div class="en">${s.en}</div>
+        <div class="cn">${s.cn}</div>
+      </div>
+    `;
+    listEl.appendChild(div);
+  });
+  listEl.classList.remove("hidden");
+  document.getElementById("nce-start-select").disabled = true;
+
+  // 监听勾选状态
+  document.querySelectorAll(".nce-sentence-check").forEach(cb=>{
+    cb.addEventListener("change", updateSelectStartBtn);
+  });
+};
+
+function updateSelectStartBtn(){
+  const checked = document.querySelectorAll(".nce-sentence-check:checked").length;
+  document.getElementById("nce-start-select").disabled = checked === 0;
+}
+
+// 清空勾选
+document.getElementById("nce-clear-select").onclick = ()=>{
+  document.querySelectorAll(".nce-sentence-check").forEach(cb=>cb.checked = false);
+  updateSelectStartBtn();
+};
+
+// 自选句子开始答题（新增：点击后隐藏句子列表）
+document.getElementById("nce-start-select").onclick = ()=>{
+  const lessonId = Number(document.getElementById("nce-select-lesson").value);
+  const lesson = nceDB.find(l=>l.id === lessonId);
+  const checkedIndexes = Array.from(document.querySelectorAll(".nce-sentence-check:checked")).map(cb=>Number(cb.value));
+  const list = checkedIndexes.map(idx=>({
+    ...lesson.sentences[idx],
+    lessonId: lesson.id,
+    lessonTitle: lesson.title
+  }));
+  // 点击开始后隐藏句子列表，避免原文干扰
+  document.getElementById("nce-sentence-list").classList.add("hidden");
+  startNceQuiz(list);
+};
+
+// 回车快捷批改
+document.getElementById("nce-answer-input").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    if(!document.getElementById("nce-check-btn").disabled){
+      document.getElementById("nce-check-btn").click();
+    }else if(!document.getElementById("nce-next-btn").disabled){
+      document.getElementById("nce-next-btn").click();
+    }
+  }
+});
+
 </script>
 </body>
 </html>

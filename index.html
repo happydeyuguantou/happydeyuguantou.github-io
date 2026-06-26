@@ -27,11 +27,12 @@
     .chinese-hint {color: #6b7280; font-size: 14px;}
     .word-box {background: #f1f5f9; padding: 10px; border-radius: 6px; margin: 8px 0;}
     .stat-box {margin-top: 20px; padding: 16px; background: #dbeafe; border-radius: 8px; font-size: 18px;}
-    .journal-checklist {display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;}
-    .journal-item {display: flex; align-items: center; gap: 4px; width: 180px;}
+    .journal-checklist, .word-checklist {display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;}
+    .journal-item, .word-item {display: flex; align-items: center; gap: 4px; width: 180px; font-size: 14px;}
     .hidden {display: none;}
     .ssp-title {margin-top: 0;}
     #range-inputs input {width: 80px;}
+    .sub-setting {margin-left: 20px; padding-left: 12px; border-left: 2px solid #e2e8f0;}
 
     /* 默写/翻译通用样式 */
     .sentence-list {max-height: 420px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 10px 0; background: #fafbfc;}
@@ -84,17 +85,47 @@
       <label>出题模式：</label>
       <label><input type="radio" name="ssp-mode" value="original" checked> 期刊原组（10题/组）</label>
       <label><input type="radio" name="ssp-mode" value="custom"> 自定义组</label>
-      <span id="custom-ssp-settings" class="hidden">
+      <label><input type="radio" name="ssp-mode" value="word"> 词语选择模式</label>
+    </div>
+
+    <!-- 自定义组设置 -->
+    <div id="custom-ssp-settings" class="sub-setting hidden">
+      <div class="control-row">
+        <label>题目来源：</label>
+        <label><input type="radio" name="ssp-source" value="original" checked> 仅原题</label>
+        <label><input type="radio" name="ssp-source" value="new"> 仅新题</label>
+        <label><input type="radio" name="ssp-source" value="mix"> 原题+新题</label>
+      </div>
+      <div class="control-row">
         <label>每组题数：</label>
         <input id="ssp-custom-per" type="number" min="1" value="10">
         <label>组数：</label>
         <input id="ssp-custom-groups" type="number" min="1" value="2">
-      </span>
+      </div>
+      <div id="custom-journal-range" class="control-row">
+        <label>原题考察范围：</label>
+        <div class="journal-checklist" id="journal-list"></div>
+        <button class="secondary" id="select-all-journals">一键全选</button>
+      </div>
     </div>
+
+    <!-- 词语选择模式设置 -->
+    <div id="word-ssp-settings" class="sub-setting hidden">
+      <div class="control-row">
+        <label>选择考察词语：</label>
+        <button class="secondary" id="select-all-words">一键全选</button>
+        <button class="danger" id="clear-all-words">清空</button>
+      </div>
+      <div class="word-checklist" id="word-list"></div>
+      <div class="control-row">
+        <label>每组题数：</label>
+        <input id="ssp-word-per" type="number" min="1" value="10">
+        <label>组数：</label>
+        <input id="ssp-word-groups" type="number" min="1" value="2">
+      </div>
+    </div>
+
     <div class="control-row">
-      <label>选择期刊：</label>
-      <div class="journal-checklist" id="journal-list"></div>
-      <button class="blue" id="select-all-journals">一键全选</button>
       <button class="success" id="start-ssp">开始答题</button>
       <button class="secondary" id="check-ssp">批改本套</button>
       <button class="blue" id="next-ssp" disabled>下一套</button>
@@ -341,8 +372,8 @@ const wonderDB = [
   {en:"Since it was dark, we used our flashlights to _________________ the artifacts while we were talking.", ans:"illuminate", cn:"照亮"}
 ];
 
-// ===================== SSP官方题库（单题独立存储） =====================
-const sspQuestions = [
+// ===================== SSP官方原题库 =====================
+const sspOriginalQuestions = [
   // 3.13增刊+4.10刊 第1组
   {journalId:"3.13增刊+4.10刊", setId:0, en:"It was a choice between pain now or pain later, so I ____ pain later.", ans:"chose", root:"choose"},
   {journalId:"3.13增刊+4.10刊", setId:0, en:"Remote work has been ____, giving people more time with their families.", ans:"a game changer", root:"a game changer"},
@@ -504,6 +535,541 @@ const sspQuestions = [
   {journalId:"6.5+6.12刊", setId:1, en:"Every autumn, the farmers ____ the corn before the heavy rains arrive.", ans:"harvest", root:"harvest"},
   {journalId:"6.5+6.12刊", setId:1, en:"My brother is a software engineer who ____ mobile apps for a well-known tech company.", ans:"designs", root:"design"}
 ];
+
+// ===================== SSP扩充新题库 =====================
+const sspNewQuestions = [
+  // choose
+  {root:"choose", en:"She ____ to join the reading club instead of the football team last term.", ans:"chose", isNew:true},
+  {root:"choose", en:"There are many different ____ on the menu, so you can pick whatever you like.", ans:"choices", isNew:true},
+  {root:"choose", en:"It is not easy ____ a right gift for your best friend’s birthday.", ans:"to choose", isNew:true},
+  // a game changer
+  {root:"a game changer", en:"The new app turned out to be ____ for small business owners.", ans:"a game changer", isNew:true},
+  {root:"a game changer", en:"Many experts think that solar energy will be ____ in the global energy market.", ans:"a game changer", isNew:true},
+  {root:"a game changer", en:"This new teaching method has been ____ for students with learning difficulties.", ans:"a game changer", isNew:true},
+  // important
+  {root:"important", en:"It is ____ to protect the environment for the next generation.", ans:"important", isNew:true},
+  {root:"important", en:"Everyone in the team plays an ____ role in completing the project.", ans:"important", isNew:true},
+  {root:"important", en:"____, regular exercise is more important than losing weight quickly.", ans:"Importantly", isNew:true},
+  // be accused of
+  {root:"be accused of", en:"The man ____ stealing money from the shop by the police last week.", ans:"was accused of", isNew:true},
+  {root:"be accused of", en:"She might ____ cheating in the exam if the teacher finds her notes.", ans:"be accused of", isNew:true},
+  {root:"be accused of", en:"The company ____ polluting the river near its factory last month.", ans:"was accused of", isNew:true},
+  // electric
+  {root:"electric", en:"We should save ____ by turning off lights when we leave the room.", ans:"electricity", isNew:true},
+  {root:"electric", en:"More and more people choose to buy ____ cars to protect the environment.", ans:"electric", isNew:true},
+  {root:"electric", en:"The ____ fan in the bedroom stopped working suddenly last night.", ans:"electric", isNew:true},
+  // on the same page
+  {root:"on the same page", en:"After the meeting, all team members were finally ____ about the new plan.", ans:"on the same page", isNew:true},
+  {root:"on the same page", en:"It is hard for us to be ____ because we have totally different opinions.", ans:"on the same page", isNew:true},
+  {root:"on the same page", en:"Parents and teachers should be ____ when educating children.", ans:"on the same page", isNew:true},
+  // curiosity
+  {root:"curiosity", en:"Children are full of ____ about everything around them.", ans:"curiosity", isNew:true},
+  {root:"curiosity", en:"His ____ about the world led him to become a great scientist.", ans:"curiosity", isNew:true},
+  {root:"curiosity", en:"The little boy looked at the strange animal with ____ in his eyes.", ans:"curiosity", isNew:true},
+  // missing
+  {root:"missing", en:"The ____ boy was found by the police in the park yesterday.", ans:"missing", isNew:true},
+  {root:"missing", en:"My keys have been ____ for three days, but I still can’t find them.", ans:"missing", isNew:true},
+  {root:"missing", en:"There is a ____ child in the shopping mall; please help us find his parents.", ans:"missing", isNew:true},
+  // memorise
+  {root:"memorise", en:"It took her two hours ____ all the new words for the English test.", ans:"to memorise", isNew:true},
+  {root:"memorise", en:"He is good at ____ long poems in a very short time.", ans:"memorising", isNew:true},
+  {root:"memorise", en:"You don’t need ____ every sentence; just understand the main idea.", ans:"to memorise", isNew:true},
+  // apologise
+  {root:"apologise", en:"You should ____ to your deskmate for breaking his pencil box.", ans:"apologise", isNew:true},
+  {root:"apologise", en:"He ____ to his teacher for being late for class this morning.", ans:"apologised", isNew:true},
+  {root:"apologise", en:"It is polite to ____ when you make a mistake to others.", ans:"apologise", isNew:true},
+  // create
+  {root:"create", en:"The designer ____ many wonderful clothes for the fashion show last year.", ans:"created", isNew:true},
+  {root:"create", en:"We should encourage students to be more ____ in their daily study.", ans:"creative", isNew:true},
+  {root:"create", en:"The artist’s ____ has surprised all the visitors in the museum.", ans:"creation", isNew:true},
+  // argument
+  {root:"argument", en:"They had a big ____ about where to spend their summer holiday.", ans:"argument", isNew:true},
+  {root:"argument", en:"The couple often ____ about small things like housework.", ans:"argue", isNew:true},
+  {root:"argument", en:"There is no need for ____; we can talk about it calmly.", ans:"argument", isNew:true},
+  // entertain
+  {root:"entertain", en:"The famous star came to the city to ____ his fans last weekend.", ans:"entertain", isNew:true},
+  {root:"entertain", en:"There are many ____ programs on TV to relax people after work.", ans:"entertainment", isNew:true},
+  {root:"entertain", en:"The clown tried his best to ____ the children at the party.", ans:"entertain", isNew:true},
+  // talent
+  {root:"talent", en:"The ____ young pianist gave a wonderful concert last night.", ans:"talented", isNew:true},
+  {root:"talent", en:"She has a great ____ for painting and drawing since she was little.", ans:"talent", isNew:true},
+  {root:"talent", en:"It is clear that the boy has a ____ for playing the guitar.", ans:"talent", isNew:true},
+  // impression
+  {root:"impression", en:"The beautiful city left a deep ____ on all the tourists.", ans:"impression", isNew:true},
+  {root:"impression", en:"What he said at the meeting ____ all of us greatly.", ans:"impressed", isNew:true},
+  {root:"impression", en:"First ____ are very important when you meet someone for the first time.", ans:"impressions", isNew:true},
+  // properly
+  {root:"properly", en:"You should learn to dress ____ for different occasions.", ans:"properly", isNew:true},
+  {root:"properly", en:"It is important to use the machine ____ to avoid danger.", ans:"properly", isNew:true},
+  {root:"properly", en:"If you don’t store the food ____, it will go bad easily in summer.", ans:"properly", isNew:true},
+  // right around the corner
+  {root:"right around the corner", en:"The final exam is ____, so you’d better start reviewing your lessons.", ans:"right around the corner", isNew:true},
+  {root:"right around the corner", en:"The Spring Festival is ____, and people are busy preparing for it.", ans:"right around the corner", isNew:true},
+  {root:"right around the corner", en:"Don’t worry; the bus stop is ____, just a two-minute walk.", ans:"right around the corner", isNew:true},
+  // compete
+  {root:"compete", en:"Over 200 teams will ____ in the national sports meeting next month.", ans:"compete", isNew:true},
+  {root:"compete", en:"The ____ between the two companies is becoming more and more serious.", ans:"competition", isNew:true},
+  {root:"compete", en:"He is a strong ____ in the 100-metre race this year.", ans:"competitor", isNew:true},
+  // pretend
+  {root:"pretend", en:"He didn’t know the answer, but he ____ that he understood everything.", ans:"pretended", isNew:true},
+  {root:"pretend", en:"Don’t ____ to be busy; I know you have nothing to do now.", ans:"pretend", isNew:true},
+  {root:"pretend", en:"The little girl liked to ____ that she was a princess when she played games.", ans:"pretend", isNew:true},
+  // jump out of the box
+  {root:"jump out of the box", en:"To solve this difficult problem, you need to ____ and think differently.", ans:"jump out of the box", isNew:true},
+  {root:"jump out of the box", en:"Good designers always ____ and come up with new ideas.", ans:"jump out of the box", isNew:true},
+  {root:"jump out of the box", en:"If you want to make progress, you should learn to ____ sometimes.", ans:"jump out of the box", isNew:true},
+  // expand
+  {root:"expand", en:"The small company ____ its business to other countries in just five years.", ans:"expanded", isNew:true},
+  {root:"expand", en:"The city has ____ quickly in the past ten years with more and more buildings.", ans:"expanded", isNew:true},
+  {root:"expand", en:"The manager plans to ____ the product market next year.", ans:"expand", isNew:true},
+  // victory
+  {root:"victory", en:"The Chinese women’s volleyball team won a great ____ in the world match.", ans:"victory", isNew:true},
+  {root:"victory", en:"All the people celebrated the ____ of the final game in the street.", ans:"victory", isNew:true},
+  {root:"victory", en:"It was a hard match, but we got the final ____ in the end.", ans:"victory", isNew:true},
+  // invisible
+  {root:"invisible", en:"Air is ____, but we can feel it when the wind blows.", ans:"invisible", isNew:true},
+  {root:"invisible", en:"The small germs are ____ to our eyes, so we need a microscope to see them.", ans:"invisible", isNew:true},
+  {root:"invisible", en:"Many people don’t know that there are ____ dangers in the old house.", ans:"invisible", isNew:true},
+  // accident
+  {root:"accident", en:"I ____ met my old classmate in the supermarket yesterday.", ans:"accidentally", isNew:true},
+  {root:"accident", en:"A car ____ happened on the highway because of the heavy fog.", ans:"accident", isNew:true},
+  {root:"accident", en:"He broke the glass by ____, not on purpose.", ans:"accident", isNew:true},
+  // belief
+  {root:"belief", en:"Many people ____ that hard work can lead to success in the end.", ans:"believe", isNew:true},
+  {root:"belief", en:"It is my strong ____ that we can finish the task on time.", ans:"belief", isNew:true},
+  {root:"belief", en:"She ____ that her son will become a great doctor one day.", ans:"believes", isNew:true},
+  // a helping hand
+  {root:"a helping hand", en:"Whenever I am in trouble, my best friend always gives me ____.", ans:"a helping hand", isNew:true},
+  {root:"a helping hand", en:"It is a good tradition to give ____ to people who need help.", ans:"a helping hand", isNew:true},
+  {root:"a helping hand", en:"The kind man gave ____ to the old lady who carried heavy bags.", ans:"a helping hand", isNew:true},
+  // honour
+  {root:"honour", en:"We should ____ the heroes who lost their lives for our country.", ans:"honour", isNew:true},
+  {root:"honour", en:"It is a great ____ for me to give a speech here today.", ans:"honour", isNew:true},
+  {root:"honour", en:"People hold many activities to ____ the great scientist every year.", ans:"honour", isNew:true},
+  // appear
+  {root:"appear", en:"The sun ____ from behind the clouds after the rain stopped.", ans:"appeared", isNew:true},
+  {root:"appear", en:"She didn’t ____ at the party last night because she was ill.", ans:"appear", isNew:true},
+  {root:"appear", en:"The little star ____ in the sky when it got dark.", ans:"appeared", isNew:true},
+  // sort
+  {root:"sort", en:"There are all ____ of books in the new library near our school.", ans:"sorts", isNew:true},
+  {root:"sort", en:"Please ____ out the books you want to keep and throw away the rest.", ans:"sort", isNew:true},
+  {root:"sort", en:"This kind of fruit has many different ____ in the market.", ans:"sorts", isNew:true},
+  // imagine
+  {root:"imagine", en:"You can’t ____ how surprised I was when I heard the news.", ans:"imagine", isNew:true},
+  {root:"imagine", en:"Children have rich ____ and can always come up with new ideas.", ans:"imagination", isNew:true},
+  {root:"imagine", en:"It is hard to ____ life without mobile phones in modern society.", ans:"imagine", isNew:true},
+  // come into view
+  {root:"come into view", en:"When we climbed to the top of the mountain, the whole city ____.", ans:"came into view", isNew:true},
+  {root:"come into view", en:"The old temple slowly ____ as we walked along the path.", ans:"came into view", isNew:true},
+  {root:"come into view", en:"The beautiful lake will ____ after you walk past the forest.", ans:"come into view", isNew:true},
+  // freeze
+  {root:"freeze", en:"The water in the river ____ into ice last night because of the cold weather.", ans:"froze", isNew:true},
+  {root:"freeze", en:"It is so cold that the temperature is below ____ point today.", ans:"freezing", isNew:true},
+  {root:"freeze", en:"Don’t leave the food outside, or it will ____ in such cold weather.", ans:"freeze", isNew:true},
+  // perform
+  {root:"perform", en:"The dancer will ____ on the stage for the first time tomorrow.", ans:"perform", isNew:true},
+  {root:"perform", en:"His ____ in the competition was much better than we expected.", ans:"performance", isNew:true},
+  {root:"perform", en:"The band ____ many famous songs at the concert last week.", ans:"performed", isNew:true},
+  // safe
+  {root:"safe", en:"Wearing a seat belt can improve your ____ when you drive a car.", ans:"safety", isNew:true},
+  {root:"safe", en:"It is not ____ to swim in the deep river alone in summer.", ans:"safe", isNew:true},
+  {root:"safe", en:"Parents always worry about their children’s ____ when they go out.", ans:"safety", isNew:true},
+  // perfect
+  {root:"perfect", en:"No one is ____; everyone may make mistakes in daily life.", ans:"perfect", isNew:true},
+  {root:"perfect", en:"She can speak French ____ after years of hard practice.", ans:"perfectly", isNew:true},
+  {root:"perfect", en:"Practice makes ____, so you should keep trying every day.", ans:"perfect", isNew:true},
+  // challenge
+  {root:"challenge", en:"We should be brave enough to face different ____ in our life.", ans:"challenges", isNew:true},
+  {root:"challenge", en:"The task ____ all of us because it is much harder than we thought.", ans:"challenges", isNew:true},
+  {root:"challenge", en:"It is a big ____ for me to finish the work in such a short time.", ans:"challenge", isNew:true},
+  // amaze
+  {root:"amaze", en:"We were all ____ at the beautiful scenery on the top of the mountain.", ans:"amazed", isNew:true},
+  {root:"amaze", en:"It is ____ how fast technology has developed in recent years.", ans:"amazing", isNew:true},
+  {root:"amaze", en:"To everyone’s ____, the little boy could play the piano so well.", ans:"amazement", isNew:true},
+  // rebuild
+  {root:"rebuild", en:"Workers tried their best to ____ the houses after the big earthquake.", ans:"rebuild", isNew:true},
+  {root:"rebuild", en:"They decided to ____ the old bridge that was broken by the flood.", ans:"rebuild", isNew:true},
+  {root:"rebuild", en:"It took a long time ____ the city after the terrible storm.", ans:"to rebuild", isNew:true},
+  // rewarding
+  {root:"rewarding", en:"Volunteering in the community is a ____ experience for young people.", ans:"rewarding", isNew:true},
+  {root:"rewarding", en:"Teaching children in the village is a ____ job though it is not easy.", ans:"rewarding", isNew:true},
+  {root:"rewarding", en:"It is ____ to see your hard work bring good results in the end.", ans:"rewarding", isNew:true},
+  // trend
+  {root:"trend", en:"Short video is a new ____ in young people’s daily entertainment.", ans:"trend", isNew:true},
+  {root:"trend", en:"This kind of clothes is popular because it follows the latest ____.", ans:"trend", isNew:true},
+  {root:"trend", en:"Many people like to follow the latest ____ in fashion online.", ans:"trends", isNew:true},
+  // pay off
+  {root:"pay off", en:"All your hard work will ____ one day if you keep on trying.", ans:"pay off", isNew:true},
+  {root:"pay off", en:"His efforts finally ____ when he got the first prize in the contest.", ans:"paid off", isNew:true},
+  {root:"pay off", en:"Don’t give up; your patience will ____ in the near future.", ans:"pay off", isNew:true},
+  // attention
+  {root:"attention", en:"The loud noise outside drew everyone’s ____ in the classroom.", ans:"attention", isNew:true},
+  {root:"attention", en:"You should pay more ____ to your pronunciation when you speak English.", ans:"attention", isNew:true},
+  {root:"attention", en:"The little boy tried to catch his mother’s ____ with the toy.", ans:"attention", isNew:true},
+  // forget
+  {root:"forget", en:"I ____ to take my umbrella with me, so I got wet in the rain.", ans:"forgot", isNew:true},
+  {root:"forget", en:"Don’t ____ to turn off the light before you leave the room.", ans:"forget", isNew:true},
+  {root:"forget", en:"She ____ meeting the man before, but he remembered her clearly.", ans:"forgot", isNew:true},
+  // afford
+  {root:"afford", en:"The new house is too expensive, so I can’t ____ to buy it now.", ans:"afford", isNew:true},
+  {root:"afford", en:"He couldn’t ____ a new bike, so he bought a second-hand one.", ans:"afford", isNew:true},
+  {root:"afford", en:"We can’t ____ to waste any more time on this useless plan.", ans:"afford", isNew:true},
+  // stress over
+  {root:"stress over", en:"There is no need to ____ small things that won’t matter in the future.", ans:"stress over", isNew:true},
+  {root:"stress over", en:"She always ____ her grades, which makes her feel tired all the time.", ans:"stresses over", isNew:true},
+  {root:"stress over", en:"Don’t ____ the result; just try your best in the exam.", ans:"stress over", isNew:true},
+  // personal
+  {root:"personal", en:"The manager ____ thanked every worker for their hard work at the meeting.", ans:"personally", isNew:true},
+  {root:"personal", en:"You should not ask others too many ____ questions in public.", ans:"personal", isNew:true},
+  {root:"personal", en:"In my ____ opinion, this plan is not suitable for our team.", ans:"personal", isNew:true},
+  // popularity
+  {root:"popularity", en:"The new song has grown in ____ quickly since it came out last month.", ans:"popularity", isNew:true},
+  {root:"popularity", en:"The ____ of online shopping has changed people’s lives a lot.", ans:"popularity", isNew:true},
+  {root:"popularity", en:"The young writer won great ____ with his first novel.", ans:"popularity", isNew:true},
+  // success
+  {root:"success", en:"If you work hard, you will ____ in passing the final exam.", ans:"succeed", isNew:true},
+  {root:"success", en:"The project was a great ____ with the support of all team members.", ans:"success", isNew:true},
+  {root:"success", en:"She is a ____ businesswoman who has her own company.", ans:"successful", isNew:true},
+  // music
+  {root:"music", en:"The street ____ played the violin beautifully and many people stopped to listen.", ans:"musician", isNew:true},
+  {root:"music", en:"She likes all kinds of ____, from pop music to classical music.", ans:"music", isNew:true},
+  {root:"music", en:"The ____ club in our school holds many activities every term.", ans:"music", isNew:true},
+  // describe
+  {root:"describe", en:"The beautiful scenery in the mountain is beyond ____; you have to see it yourself.", ans:"description", isNew:true},
+  {root:"describe", en:"Can you ____ what the thief looked like to the police?", ans:"describe", isNew:true},
+  {root:"describe", en:"It is hard to ____ how happy I was when I heard the good news.", ans:"describe", isNew:true},
+  // reliable
+  {root:"reliable", en:"You can ask John for help; he is a ____ person.", ans:"reliable", isNew:true},
+  {root:"reliable", en:"The old machine is not ____; it may break down anytime.", ans:"reliable", isNew:true},
+  {root:"reliable", en:"To make sure the result is ____, we did the experiment three times.", ans:"reliable", isNew:true},
+  // attitude
+  {root:"attitude", en:"His positive ____ towards life helps him get through hard times.", ans:"attitude", isNew:true},
+  {root:"attitude", en:"You should change your ____ towards study if you want to make progress.", ans:"attitude", isNew:true},
+  {root:"attitude", en:"A good learning ____ is more important than cleverness sometimes.", ans:"attitude", isNew:true},
+  // confident
+  {root:"confident", en:"If you want to win the match, you should be ____ of yourself first.", ans:"confident", isNew:true},
+  {root:"confident", en:"She has great ____ in her ability to solve the problem.", ans:"confidence", isNew:true},
+  {root:"confident", en:"He answered the question ____ in front of the whole class.", ans:"confidently", isNew:true},
+  // manage
+  {root:"manage", en:"It is not easy to ____ a big team with so many different people.", ans:"manage", isNew:true},
+  {root:"manage", en:"The ____ of the restaurant is a friendly young lady.", ans:"manager", isNew:true},
+  {root:"manage", en:"He ____ to finish all the work before the deadline with his team.", ans:"managed", isNew:true},
+  // fail
+  {root:"fail", en:"If you don’t work hard, you may ____ in the final exam.", ans:"fail", isNew:true},
+  {root:"fail", en:"The plan ____ because we didn’t prepare well enough for it.", ans:"failed", isNew:true},
+  {root:"fail", en:"He tried many times but ____ to pass the driving test.", ans:"failed", isNew:true},
+  // mistake
+  {root:"mistake", en:"Everyone makes ____ in life, so don’t be too hard on yourself.", ans:"mistakes", isNew:true},
+  {root:"mistake", en:"I’m sorry I ____ your umbrella for mine yesterday.", ans:"mistook", isNew:true},
+  {root:"mistake", en:"It is common to make ____ when you learn a new language.", ans:"mistakes", isNew:true},
+  // give up
+  {root:"give up", en:"You should never ____ your dream even if you meet difficulties.", ans:"give up", isNew:true},
+  {root:"give up", en:"He ____ smoking last year and became much healthier.", ans:"gave up", isNew:true},
+  {root:"give up", en:"Don’t ____ easily; you are close to success.", ans:"give up", isNew:true},
+  // clear one’s mind
+  {root:"clear one’s mind", en:"Taking a walk outside can help you ____ and relax yourself.", ans:"clear your mind", isNew:true},
+  {root:"clear one’s mind", en:"She closed her eyes to ____ before the important speech.", ans:"clear her mind", isNew:true},
+  {root:"clear one’s mind", en:"Doing exercise is a good way to ____ after a long day of work.", ans:"clear your mind", isNew:true},
+  // remove
+  {root:"remove", en:"Please ____ your things from the table so that I can clean it.", ans:"remove", isNew:true},
+  {root:"remove", en:"The workers ____ all the stones from the road after the rainstorm.", ans:"removed", isNew:true},
+  {root:"remove", en:"It is not easy ____ the stain from your white shirt.", ans:"to remove", isNew:true},
+  // die
+  {root:"die", en:"The doctors tried their best to save the ____ man, but they failed.", ans:"dying", isNew:true},
+  {root:"die", en:"The old man ____ of a serious illness at the age of 80 last year.", ans:"died", isNew:true},
+  {root:"die", en:"Many animals are in danger of ____ because of losing their homes.", ans:"dying", isNew:true},
+  // surprise
+  {root:"surprise", en:"The birthday gift ____ her a lot, for she never expected it.", ans:"surprised", isNew:true},
+  {root:"surprise", en:"To my great ____, my old friend came to see me from another city.", ans:"surprise", isNew:true},
+  {root:"surprise", en:"The result was ____; no one could believe it at first.", ans:"surprising", isNew:true},
+  // groundbreaking
+  {root:"groundbreaking", en:"The scientist made a ____ discovery in the field of medicine.", ans:"groundbreaking", isNew:true},
+  {root:"groundbreaking", en:"This ____ technology will change people’s lives in many ways.", ans:"groundbreaking", isNew:true},
+  {root:"groundbreaking", en:"It is a ____ research that has won many prizes around the world.", ans:"groundbreaking", isNew:true},
+  // volunteer
+  {root:"volunteer", en:"Many students ____ to help in the old people’s home every weekend.", ans:"volunteer", isNew:true},
+  {root:"volunteer", en:"She has been ____ at the animal shelter for three years.", ans:"volunteering", isNew:true},
+  {root:"volunteer", en:"The ____ spent the whole day cleaning up the park.", ans:"volunteers", isNew:true},
+  // experience
+  {root:"experience", en:"He is an ____ teacher with over 20 years of teaching experience.", ans:"experienced", isNew:true},
+  {root:"experience", en:"Travelling to different countries can give you wonderful ____.", ans:"experiences", isNew:true},
+  {root:"experience", en:"It was a special ____ for me to live in the village for a month.", ans:"experience", isNew:true},
+  // move
+  {root:"move", en:"The ____ movie made all the people in the cinema cry.", ans:"moving", isNew:true},
+  {root:"move", en:"She was deeply ____ by the kind help from the strangers.", ans:"moved", isNew:true},
+  {root:"move", en:"The story about the little girl ____ many people’s hearts.", ans:"moved", isNew:true},
+  // promote
+  {root:"promote", en:"The company spent a lot of money ____ its new product online.", ans:"promoting", isNew:true},
+  {root:"promote", en:"Many stars come to the city to ____ their new films.", ans:"promote", isNew:true},
+  {root:"promote", en:"The activity is held to ____ people’s awareness of environmental protection.", ans:"promote", isNew:true},
+  // mix
+  {root:"mix", en:"You should ____ the flour and water together to make bread.", ans:"mix", isNew:true},
+  {root:"mix", en:"The city is a ____ of old and modern buildings.", ans:"mixture", isNew:true},
+  {root:"mix", en:"If you ____ blue and yellow, you will get green.", ans:"mix", isNew:true},
+  // patience
+  {root:"patience", en:"You should have more ____ with little kids, for they learn things slowly.", ans:"patience", isNew:true},
+  {root:"patience", en:"The teacher explained the problem ____ to every student in the class.", ans:"patiently", isNew:true},
+  {root:"patience", en:"It takes a lot of ____ to look after a little baby every day.", ans:"patience", isNew:true},
+  // approach
+  {root:"approach", en:"When the teacher ____ the classroom, all the students became quiet.", ans:"approached", isNew:true},
+  {root:"approach", en:"The winter holiday is ____, and many students are making plans.", ans:"approaching", isNew:true},
+  {root:"approach", en:"We need a new ____ to solve this difficult problem.", ans:"approach", isNew:true},
+  // suggest
+  {root:"suggest", en:"The doctor ____ that he should take more exercise to keep healthy.", ans:"suggests", isNew:true},
+  {root:"suggest", en:"I ____ going to the cinema tonight; there is a new movie on.", ans:"suggest", isNew:true},
+  {root:"suggest", en:"Her ____ that we start early was accepted by all of us.", ans:"suggestion", isNew:true},
+  // behave
+  {root:"behave", en:"You should learn to ____ properly in public places.", ans:"behave", isNew:true},
+  {root:"behave", en:"Good ____ is very important when you communicate with others.", ans:"behavior", isNew:true},
+  {root:"behave", en:"The child ____ badly at the party and made his parents angry.", ans:"behaved", isNew:true},
+  // certain
+  {root:"certain", en:"I am ____ that we can finish the work on time with your help.", ans:"certain", isNew:true},
+  {root:"certain", en:"____, we should try our best to help people in need.", ans:"Certainly", isNew:true},
+  {root:"certain", en:"No one knows for ____ what will happen in the future.", ans:"certain", isNew:true},
+  // generation
+  {root:"generation", en:"The younger ____ has more chances to learn new things than before.", ans:"generation", isNew:true},
+  {root:"generation", en:"There are often different ideas between different ____ in a family.", ans:"generations", isNew:true},
+  {root:"generation", en:"The old story has been passed down from one ____ to another.", ans:"generation", isNew:true},
+  // responsible
+  {root:"responsible", en:"Everyone should be ____ for their own actions.", ans:"responsible", isNew:true},
+  {root:"responsible", en:"Parents should take ____ for their children’s growth.", ans:"responsibility", isNew:true},
+  {root:"responsible", en:"He is a ____ person; you can leave the work to him.", ans:"responsible", isNew:true},
+  // live in harmony with
+  {root:"live in harmony with", en:"Humans should learn to ____ nature instead of destroying it.", ans:"live in harmony with", isNew:true},
+  {root:"live in harmony with", en:"People in the village ____ all kinds of animals around them.", ans:"live in harmony with", isNew:true},
+  {root:"live in harmony with", en:"It is important for us to ____ the environment to build a better world.", ans:"live in harmony with", isNew:true},
+  // neighbouring
+  {root:"neighbouring", en:"We often visit our ____ villages on weekends.", ans:"neighbouring", isNew:true},
+  {root:"neighbouring", en:"The two ____ countries have been good friends for many years.", ans:"neighbouring", isNew:true},
+  {root:"neighbouring", en:"There is a big park in the ____ town, just 10 minutes’ drive.", ans:"neighbouring", isNew:true},
+  // serve
+  {root:"serve", en:"The restaurant ____ delicious Chinese food to customers every day.", ans:"serves", isNew:true},
+  {root:"serve", en:"He ____ in the army for three years when he was young.", ans:"served", isNew:true},
+  {root:"serve", en:"The waiters in this hotel ____ every customer warmly and patiently.", ans:"serve", isNew:true},
+  // wisdom
+  {root:"wisdom", en:"It is true that ____ comes with age and experience.", ans:"wisdom", isNew:true},
+  {root:"wisdom", en:"The book is full of ____ and can teach you a lot about life.", ans:"wisdom", isNew:true},
+  {root:"wisdom", en:"It is important to use your ____ to solve problems in life.", ans:"wisdom", isNew:true},
+  // reflective
+  {root:"reflective", en:"You should wear ____ clothes when you run at night for safety.", ans:"reflective", isNew:true},
+  {root:"reflective", en:"The ____ glass on the building shines brightly in the sun.", ans:"reflective", isNew:true},
+  {root:"reflective", en:"____ strips on the road can help drivers see clearly at night.", ans:"Reflective", isNew:true},
+  // impress
+  {root:"impress", en:"The young man ____ the manager with his excellent work ability.", ans:"impressed", isNew:true},
+  {root:"impress", en:"What he did at the meeting left a deep ____ on all of us.", ans:"impression", isNew:true},
+  {root:"impress", en:"I want to ____ the interviewer with my good performance.", ans:"impress", isNew:true},
+  // disturb
+  {root:"disturb", en:"Please don’t ____ me when I am doing my homework in my room.", ans:"disturb", isNew:true},
+  {root:"disturb", en:"The loud noise from the construction site ____ the people living nearby.", ans:"disturbs", isNew:true},
+  {root:"disturb", en:"It is impolite to ____ others when they are talking.", ans:"disturb", isNew:true},
+  // out of place
+  {root:"out of place", en:"The modern building looks ____ among the old houses in the town.", ans:"out of place", isNew:true},
+  {root:"out of place", en:"He felt ____ at the party because he knew nobody there.", ans:"out of place", isNew:true},
+  {root:"out of place", en:"Your words were ____ on such a serious occasion.", ans:"out of place", isNew:true},
+  // thoroughly
+  {root:"thoroughly", en:"You should check your paper ____ before you hand it in.", ans:"thoroughly", isNew:true},
+  {root:"thoroughly", en:"The doctor examined the patient ____ to find out the problem.", ans:"thoroughly", isNew:true},
+  {root:"thoroughly", en:"I have ____ thought about your suggestion and decided to accept it.", ans:"thoroughly", isNew:true},
+  // advice
+  {root:"advice", en:"You should ask your teacher for ____ if you have problems with study.", ans:"advice", isNew:true},
+  {root:"advice", en:"The doctor ____ me to take more rest and drink more water.", ans:"advised", isNew:true},
+  {root:"advice", en:"His useful ____ helped me solve the problem successfully.", ans:"advice", isNew:true},
+  // wide
+  {root:"wide", en:"English is ____ used all over the world in many fields.", ans:"widely", isNew:true},
+  {root:"wide", en:"The river is so ____ that you can’t see the other side clearly.", ans:"wide", isNew:true},
+  {root:"wide", en:"The new policy has received ____ support from the public.", ans:"wide", isNew:true},
+  // happy
+  {root:"happy", en:"Money can’t always bring ____ to people’s lives.", ans:"happiness", isNew:true},
+  {root:"happy", en:"The children looked ____ when they got the lovely gifts.", ans:"happy", isNew:true},
+  {root:"happy", en:"We should try to live a ____ and healthy life every day.", ans:"happy", isNew:true},
+  // consist of
+  {root:"consist of", en:"The team ____ ten members from different cities of the country.", ans:"consists of", isNew:true},
+  {root:"consist of", en:"The class ____ 30 students, 15 boys and 15 girls.", ans:"consists of", isNew:true},
+  {root:"consist of", en:"The research group ____ three scientists and two engineers.", ans:"consists of", isNew:true},
+  // architect
+  {root:"architect", en:"The famous ____ designed many beautiful buildings in the city.", ans:"architect", isNew:true},
+  {root:"architect", en:"He wants to become an ____ when he grows up.", ans:"architect", isNew:true},
+  {root:"architect", en:"The ____ spent three years designing this new museum.", ans:"architect", isNew:true},
+  // noise
+  {root:"noise", en:"It is too ____ outside; I can’t focus on my reading.", ans:"noisy", isNew:true},
+  {root:"noise", en:"The ____ from the street makes it hard to sleep at night.", ans:"noise", isNew:true},
+  {root:"noise", en:"Don’t make so much ____; the baby is sleeping in the next room.", ans:"noise", isNew:true},
+  // get along with
+  {root:"get along with", en:"She is easy to ____ because she is kind and friendly to everyone.", ans:"get along with", isNew:true},
+  {root:"get along with", en:"It is important to learn to ____ your classmates at school.", ans:"get along with", isNew:true},
+  {root:"get along with", en:"I ____ well with my neighbours and we often help each other.", ans:"get along with", isNew:true},
+  // suffer
+  {root:"suffer", en:"Many people ____ from all kinds of illnesses because of heavy pressure.", ans:"suffer", isNew:true},
+  {root:"suffer", en:"The city ____ great losses from the terrible flood last summer.", ans:"suffered", isNew:true},
+  {root:"suffer", en:"He ____ from a bad cold for a week and couldn’t go to work.", ans:"suffered", isNew:true},
+  // hold
+  {root:"hold", en:"The little girl ____ her mother’s hand tightly when they crossed the street.", ans:"held", isNew:true},
+  {root:"hold", en:"Please ____ the book for me while I open the door.", ans:"hold", isNew:true},
+  {root:"hold", en:"The meeting will be ____ in the school hall next Friday afternoon.", ans:"held", isNew:true},
+  // design
+  {root:"design", en:"The young ____ won an international prize for his creative works.", ans:"designer", isNew:true},
+  {root:"design", en:"She ____ many beautiful clothes for the fashion show last year.", ans:"designed", isNew:true},
+  {root:"design", en:"This new car ____ by a famous German company.", ans:"is designed", isNew:true},
+  // crowded
+  {root:"crowded", en:"The supermarket is always ____ on weekends with many shoppers.", ans:"crowded", isNew:true},
+  {root:"crowded", en:"The subway was so ____ that I could hardly move my body.", ans:"crowded", isNew:true},
+  {root:"crowded", en:"There is a big ____ in the square waiting for the famous star.", ans:"crowd", isNew:true},
+  // interest
+  {root:"interest", en:"I am very ____ in painting and drawing in my free time.", ans:"interested", isNew:true},
+  {root:"interest", en:"The book is so ____ that I read it the whole night.", ans:"interesting", isNew:true},
+  {root:"interest", en:"She shows great ____ in playing the piano since she was little.", ans:"interest", isNew:true},
+  // beautiful
+  {root:"beautiful", en:"The singer sang the song ____ at the concert last night.", ans:"beautifully", isNew:true},
+  {root:"beautiful", en:"We watched the ____ sunset at the beach yesterday evening.", ans:"beautiful", isNew:true},
+  {root:"beautiful", en:"All the visitors were attracted by the ____ scenery of the mountain.", ans:"beautiful", isNew:true},
+  // speed up
+  {root:"speed up", en:"You should not ____ when you drive in the busy street.", ans:"speed up", isNew:true},
+  {root:"speed up", en:"The car ____ and soon disappeared in the distance.", ans:"sped up", isNew:true},
+  {root:"speed up", en:"We need to ____ if we want to finish the work on time.", ans:"speed up", isNew:true},
+  // pay
+  {root:"pay", en:"The bill was already ____ by my friend before I took out my wallet.", ans:"paid", isNew:true},
+  {root:"pay", en:"You should ____ more attention to your pronunciation in English study.", ans:"pay", isNew:true},
+  {root:"pay", en:"I ____ 200 yuan for the new book I bought last week.", ans:"paid", isNew:true},
+  // arrive
+  {root:"arrive", en:"We ____ at the train station half an hour early yesterday morning.", ans:"arrived", isNew:true},
+  {root:"arrive", en:"He will ____ in Beijing tomorrow morning for an important meeting.", ans:"arrive", isNew:true},
+  {root:"arrive", en:"On the day he ____, all his friends came to pick him up at the airport.", ans:"arrived", isNew:true},
+  // abroad
+  {root:"abroad", en:"He has been studying ____ for three years and will come back next month.", ans:"abroad", isNew:true},
+  {root:"abroad", en:"Many people choose to go ____ for their holidays in summer.", ans:"abroad", isNew:true},
+  {root:"abroad", en:"She went ____ to further her study after graduating from college.", ans:"abroad", isNew:true},
+  // risk
+  {root:"risk", en:"You should not take the ____ of driving after drinking wine.", ans:"risk", isNew:true},
+  {root:"risk", en:"Starting a new business always has many ____ for young people.", ans:"risks", isNew:true},
+  {root:"risk", en:"It is a big ____ to invest all your money in one company.", ans:"risk", isNew:true},
+  // schedule
+  {root:"schedule", en:"Our travel ____ includes three different cities in five days.", ans:"schedule", isNew:true},
+  {root:"schedule", en:"The meeting is ____ to start at 9 o’clock tomorrow morning.", ans:"scheduled", isNew:true},
+  {root:"schedule", en:"You should make a ____ for your study to improve your efficiency.", ans:"schedule", isNew:true},
+  // regular
+  {root:"regular", en:"If you take ____ exercise, you will become much healthier soon.", ans:"regular", isNew:true},
+  {root:"regular", en:"The bus service is not ____; sometimes it comes early and sometimes late.", ans:"irregular", isNew:true},
+  {root:"regular", en:"You should visit your grandparents ____ on weekends.", ans:"regularly", isNew:true},
+  // keep in touch with
+  {root:"keep in touch with", en:"We still ____ each other by WeChat after graduating from school.", ans:"keep in touch with", isNew:true},
+  {root:"keep in touch with", en:"It is easy to ____ your friends with the help of the Internet.", ans:"keep in touch with", isNew:true},
+  {root:"keep in touch with", en:"I have ____ my primary school classmates for over ten years.", ans:"kept in touch with", isNew:true},
+  // perfectly
+  {root:"perfectly", en:"She can play the piano ____ after years of hard practice.", ans:"perfectly", isNew:true},
+  {root:"perfectly", en:"The plan worked ____ and we finished the task ahead of time.", ans:"perfectly", isNew:true},
+  {root:"perfectly", en:"The little girl danced ____ at the party and won big applause.", ans:"perfectly", isNew:true},
+  // come across
+  {root:"come across", en:"I ____ an old friend of mine in the street yesterday.", ans:"came across", isNew:true},
+  {root:"come across", en:"You may ____ many difficulties when you learn a new language.", ans:"come across", isNew:true},
+  {root:"come across", en:"She ____ a useful book when she was tidying up the shelf.", ans:"came across", isNew:true},
+  // still
+  {root:"still", en:"Please stand ____ while I take a photo of you.", ans:"still", isNew:true},
+  {root:"still", en:"The lake is as ____ as a mirror on such a calm day.", ans:"still", isNew:true},
+  {root:"still", en:"He sat ____ in the room and thought about his future plan.", ans:"still", isNew:true},
+  // keep a close eye on
+  {root:"keep a close eye on", en:"The mother ____ her little baby all the time when they were in the park.", ans:"kept a close eye on", isNew:true},
+  {root:"keep a close eye on", en:"You should ____ your luggage when you are at the train station.", ans:"keep a close eye on", isNew:true},
+  {root:"keep a close eye on", en:"The teacher ____ the students during the exam to prevent cheating.", ans:"keeps a close eye on", isNew:true},
+  // outsider
+  {root:"outsider", en:"He felt like an ____ in the new class at the very beginning.", ans:"outsider", isNew:true},
+  {root:"outsider", en:"As an ____, he didn’t know much about the company’s rules.", ans:"outsider", isNew:true},
+  {root:"outsider", en:"Don’t treat him as an ____; he is one of our team members now.", ans:"outsider", isNew:true},
+  // unbelievable
+  {root:"unbelievable", en:"It is ____ that the little boy can speak three foreign languages.", ans:"unbelievable", isNew:true},
+  {root:"unbelievable", en:"The result of the match was ____; no one expected it.", ans:"unbelievable", isNew:true},
+  {root:"unbelievable", en:"She made ____ progress in English in just one month.", ans:"unbelievable", isNew:true},
+  // health
+  {root:"health", en:"It is important to keep a ____ diet and take regular exercise.", ans:"healthy", isNew:true},
+  {root:"health", en:"We should care more about our mental ____ besides physical health.", ans:"health", isNew:true},
+  {root:"health", en:"Smoking is bad for your ____, so you’d better give it up.", ans:"health", isNew:true},
+  // breathe
+  {root:"breathe", en:"Take a deep ____ and you will feel much calmer and more relaxed.", ans:"breath", isNew:true},
+  {root:"breathe", en:"It is hard to ____ on the top of the high mountain.", ans:"breathe", isNew:true},
+  {root:"breathe", en:"He ____ heavily after running for a long distance.", ans:"breathed", isNew:true},
+  // patient
+  {root:"patient", en:"You should be more ____ with children when they make mistakes.", ans:"patient", isNew:true},
+  {root:"patient", en:"The teacher explained the problem ____ to every student in the class.", ans:"patiently", isNew:true},
+  {root:"patient", en:"It takes a lot of ____ to teach little kids to read and write.", ans:"patience", isNew:true},
+  // lift
+  {root:"lift", en:"The good news ____ everyone’s spirits after the long difficult time.", ans:"lifted", isNew:true},
+  {root:"lift", en:"He tried to ____ the heavy box, but he failed because it was too heavy.", ans:"lift", isNew:true},
+  {root:"lift", en:"Taking a walk in nature can really ____ your mood when you are sad.", ans:"lift", isNew:true},
+  // block
+  {root:"block", en:"The tall tree ____ most of the sunlight in the small yard.", ans:"blocks", isNew:true},
+  {root:"block", en:"The heavy snow ____ the road and people couldn’t go out.", ans:"blocked", isNew:true},
+  {root:"block", en:"You should not ____ the way with your bike in the hallway.", ans:"block", isNew:true},
+  // label
+  {root:"label", en:"There is a ____ on the bottle that tells you how to use the medicine.", ans:"label", isNew:true},
+  {root:"label", en:"You should not ____ others easily before you know them well.", ans:"label", isNew:true},
+  {root:"label", en:"The product has a special ____ that shows it is environmentally friendly.", ans:"label", isNew:true},
+  // damage
+  {root:"damage", en:"The big storm caused serious ____ to the houses in the village.", ans:"damage", isNew:true},
+  {root:"damage", en:"Smoking can ____ your lungs seriously over a long time.", ans:"damage", isNew:true},
+  {root:"damage", en:"The car was badly ____ in the accident, but no one got hurt.", ans:"damaged", isNew:true},
+  // simple
+  {root:"simple", en:"The question is so ____ that even a little kid can answer it.", ans:"simple", isNew:true},
+  {root:"simple", en:"You can ____ solve the problem if you follow my steps.", ans:"simply", isNew:true},
+  {root:"simple", en:"He lives a ____ life though he has a lot of money.", ans:"simple", isNew:true},
+  // enable
+  {root:"enable", en:"The new technology ____ us to work more efficiently than before.", ans:"enables", isNew:true},
+  {root:"enable", en:"The training course will ____ you to find a better job in the future.", ans:"enable", isNew:true},
+  {root:"enable", en:"The Internet ____ people to get information easily and quickly.", ans:"enables", isNew:true},
+  // embrace new challenges
+  {root:"embrace new challenges", en:"You should be brave enough to ____ and step out of your comfort zone.", ans:"embrace new challenges", isNew:true},
+  {root:"embrace new challenges", en:"Successful people are always ready to ____ in their work and life.", ans:"embrace new challenges", isNew:true},
+  {root:"embrace new challenges", en:"Learning to ____ is important for your personal growth.", ans:"embrace new challenges", isNew:true},
+  // self-disciplined
+  {root:"self-disciplined", en:"If you want to achieve your goal, you need to be ____ enough.", ans:"self-disciplined", isNew:true},
+  {root:"self-disciplined", en:"____ people can always manage their time well and finish tasks on time.", ans:"Self-disciplined", isNew:true},
+  {root:"self-disciplined", en:"It is not easy to stay ____ when you study at home alone.", ans:"self-disciplined", isNew:true},
+  // beat
+  {root:"beat", en:"Our team ____ the strongest team in the league and won the match.", ans:"beat", isNew:true},
+  {root:"beat", en:"If you practice more, you can ____ him in the next competition.", ans:"beat", isNew:true},
+  {root:"beat", en:"The heavy rain ____ against the window all night long.", ans:"beat", isNew:true},
+  // lead
+  {root:"lead", en:"The experienced guide ____ us through the forest safely yesterday.", ans:"led", isNew:true},
+  {root:"lead", en:"He was chosen to ____ the team because of his excellent ability.", ans:"lead", isNew:true},
+  {root:"lead", en:"The new policy will ____ to great changes in people’s lives.", ans:"lead", isNew:true},
+  // shocked
+  {root:"shocked", en:"All of us were ____ at the terrible news that happened last night.", ans:"shocked", isNew:true},
+  {root:"shocked", en:"The bad result ____ everyone in the team, for we never expected it.", ans:"shocked", isNew:true},
+  {root:"shocked", en:"I was ____ to hear that he failed the easy exam.", ans:"shocked", isNew:true},
+  // handle
+  {root:"handle", en:"She is able to ____ different kinds of difficult situations calmly.", ans:"handle", isNew:true},
+  {root:"handle", en:"It is not easy to ____ so much work in such a short time.", ans:"handle", isNew:true},
+  {root:"handle", en:"He ____ the problem perfectly and won praise from his boss.", ans:"handled", isNew:true},
+  // fierce
+  {root:"fierce", en:"The ____ competition made it hard for small companies to survive.", ans:"fierce", isNew:true},
+  {root:"fierce", en:"There was a ____ storm last night and many trees fell down.", ans:"fierce", isNew:true},
+  {root:"fierce", en:"The two companies are in ____ competition for the market.", ans:"fierce", isNew:true},
+  // warm
+  {root:"warm", en:"We sat around the ____ fire and talked about our old days happily.", ans:"warm", isNew:true},
+  {root:"warm", en:"I could feel the ____ of the sun on my face when I walked outside.", ans:"warmth", isNew:true},
+  {root:"warm", en:"Her ____ words made me feel much better when I was sad.", ans:"warm", isNew:true},
+  // alert
+  {root:"alert", en:"You should stay ____ when you walk alone at night in the street.", ans:"alert", isNew:true},
+  {root:"alert", en:"The guard kept ____ all night to make sure the building was safe.", ans:"alert", isNew:true},
+  {root:"alert", en:"Drinking coffee can help you stay ____ when you feel sleepy at work.", ans:"alert", isNew:true},
+  // host
+  {root:"host", en:"The city will ____ the international sports meeting next summer.", ans:"host", isNew:true},
+  {root:"host", en:"The ____ of the party welcomed every guest warmly and politely.", ans:"host", isNew:true},
+  {root:"host", en:"Our school ____ a big art festival every year in December.", ans:"hosts", isNew:true},
+  // integrate
+  {root:"integrate", en:"The new system ____ AI technology to provide better service.", ans:"integrates", isNew:true},
+  {root:"integrate", en:"We should try to ____ different ideas to make a better plan.", ans:"integrate", isNew:true},
+  {root:"integrate", en:"The new product ____ many new functions that users like.", ans:"integrates", isNew:true},
+  // international
+  {root:"international", en:"English is an ____ language and is widely used in the world.", ans:"international", isNew:true},
+  {root:"international", en:"The company has developed its ____ business in over 30 countries.", ans:"international", isNew:true},
+  {root:"international", en:"The ____ conference will be held in our city next month.", ans:"international", isNew:true},
+  // harvest
+  {root:"harvest", en:"Farmers are busy ____ the crops in the field in autumn.", ans:"harvesting", isNew:true},
+  {root:"harvest", en:"This year’s rice ____ is much better than that of last year.", ans:"harvest", isNew:true},
+  {root:"harvest", en:"They worked hard and finally got a good ____ at the end of the year.", ans:"harvest", isNew:true}
+];
+
+// 合并完整SSP题库
+const sspQuestions = [...sspOriginalQuestions, ...sspNewQuestions];
 
 // ===================== 新概念课文题库 =====================
 const nceDB = [
@@ -744,7 +1310,10 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
     document.getElementById(tabId).classList.add("show");
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    if(tabId==="tab-ssp") renderJournalList();
+    if(tabId==="tab-ssp") {
+      renderJournalList();
+      renderWordList();
+    }
     if(tabId==="tab-nce") initNceSelects();
     if(tabId==="tab-unit") initUnitSelects();
   }
@@ -856,10 +1425,11 @@ document.getElementById("reset-wonder").onclick = ()=>{
 };
 
 // ===================== SSP 逻辑 =====================
+// 渲染期刊列表
 function renderJournalList(){
   const listWrap = document.getElementById("journal-list");
   listWrap.innerHTML = "";
-  const journalIds = [...new Set(sspQuestions.map(q=>q.journalId))];
+  const journalIds = [...new Set(sspOriginalQuestions.map(q=>q.journalId))];
   journalIds.forEach(jId=>{
     const div = document.createElement("div");
     div.className = "journal-item";
@@ -869,17 +1439,58 @@ function renderJournalList(){
   });
 }
 
+// 渲染词语列表
+function renderWordList(){
+  const listWrap = document.getElementById("word-list");
+  if(listWrap.children.length > 0) return;
+  const wordList = [...new Set(sspQuestions.map(q=>q.root))].sort();
+  wordList.forEach(word=>{
+    const div = document.createElement("div");
+    div.className = "word-item";
+    const inputId = `w-${word}`;
+    div.innerHTML = `<input type="checkbox" value="${word}" id="${inputId}"> <label for="${inputId}">${word}</label>`;
+    listWrap.appendChild(div);
+  });
+}
+
+// 出题模式切换
 document.querySelectorAll('input[name="ssp-mode"]').forEach(radio=>{
   radio.addEventListener("change", function(){
-    const customSettings = document.getElementById("custom-ssp-settings");
-    customSettings.classList.toggle("hidden", this.value !== "custom");
+    document.getElementById("custom-ssp-settings").classList.toggle("hidden", this.value !== "custom");
+    document.getElementById("word-ssp-settings").classList.toggle("hidden", this.value !== "word");
+    updateJournalRangeVisibility();
   });
 });
 
+// 题目来源切换，控制期刊范围显示
+document.querySelectorAll('input[name="ssp-source"]').forEach(radio=>{
+  radio.addEventListener("change", updateJournalRangeVisibility);
+});
+
+function updateJournalRangeVisibility(){
+  const mode = document.querySelector('input[name="ssp-mode"]:checked').value;
+  const source = document.querySelector('input[name="ssp-source"]:checked').value;
+  const journalRange = document.getElementById("custom-journal-range");
+  if(mode === "custom" && (source === "original" || source === "mix")){
+    journalRange.classList.remove("hidden");
+  }else{
+    journalRange.classList.add("hidden");
+  }
+}
+
 document.getElementById("select-all-journals").onclick = ()=>{
-  document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=true);
+  document.querySelectorAll("#journal-list input").forEach(cb=>cb.checked=true);
 };
 
+document.getElementById("select-all-words").onclick = ()=>{
+  document.querySelectorAll("#word-list input").forEach(cb=>cb.checked=true);
+};
+
+document.getElementById("clear-all-words").onclick = ()=>{
+  document.querySelectorAll("#word-list input").forEach(cb=>cb.checked=false);
+};
+
+// 开始答题
 document.getElementById("start-ssp").onclick = ()=>{
   sspPool = [];
   sspDoneCount = 0;
@@ -887,17 +1498,18 @@ document.getElementById("start-ssp").onclick = ()=>{
   sspTotalQ = 0;
   document.getElementById("ssp-stat").classList.add("hidden");
 
-  const checkedBoxes = document.querySelectorAll(".journal-item input:checked");
-  if(checkedBoxes.length === 0){
-    alert("请先勾选至少一套期刊再开始答题！");
-    return;
-  }
-  const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
   const mode = document.querySelector('input[name="ssp-mode"]:checked').value;
 
   if(mode === "original"){
+    // 期刊原组模式：仅原题，按原组划分
+    const checkedBoxes = document.querySelectorAll("#journal-list input:checked");
+    if(checkedBoxes.length === 0){
+      alert("请先勾选至少一套期刊再开始答题！");
+      return;
+    }
+    const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
     selectedJournals.forEach(jId=>{
-      const journalQs = sspQuestions.filter(q=>q.journalId === jId);
+      const journalQs = sspOriginalQuestions.filter(q=>q.journalId === jId);
       const set0 = journalQs.filter(q=>q.setId === 0);
       const set1 = journalQs.filter(q=>q.setId === 1);
       
@@ -916,23 +1528,78 @@ document.getElementById("start-ssp").onclick = ()=>{
         });
       }
     });
-  }else{
+  }
+  else if(mode === "custom"){
+    // 自定义组模式：按题目来源过滤
+    const source = document.querySelector('input[name="ssp-source"]:checked').value;
     const perGroup = Number(document.getElementById("ssp-custom-per").value);
     const groupCount = Number(document.getElementById("ssp-custom-groups").value);
-    const allAvailable = sspQuestions.filter(q=>selectedJournals.includes(q.journalId));
-    const totalNeed = perGroup * groupCount;
+    
+    let questionPool = [];
+    if(source === "original"){
+      const checkedBoxes = document.querySelectorAll("#journal-list input:checked");
+      if(checkedBoxes.length === 0){
+        alert("请先勾选原题考察的期刊范围！");
+        return;
+      }
+      const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
+      questionPool = sspOriginalQuestions.filter(q=>selectedJournals.includes(q.journalId));
+    }else if(source === "new"){
+      questionPool = [...sspNewQuestions];
+    }else{
+      // 混合模式
+      const checkedBoxes = document.querySelectorAll("#journal-list input:checked");
+      if(checkedBoxes.length === 0){
+        alert("请先勾选原题考察的期刊范围！");
+        return;
+      }
+      const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
+      const originalPart = sspOriginalQuestions.filter(q=>selectedJournals.includes(q.journalId));
+      questionPool = [...originalPart, ...sspNewQuestions];
+    }
 
-    if(totalNeed > allAvailable.length){
-      alert(`选中期刊共 ${allAvailable.length} 道题，无法生成 ${groupCount} 组、每组 ${perGroup} 题（共需 ${totalNeed} 题）。请减少组数或每组题数。`);
+    const totalNeed = perGroup * groupCount;
+    if(totalNeed > questionPool.length){
+      alert(`符合条件的题目共 ${questionPool.length} 道，无法生成 ${groupCount} 组、每组 ${perGroup} 题。请减少组数或每组题数。`);
       return;
     }
 
-    const shuffled = [...allAvailable].sort(()=>Math.random()-0.5);
+    const shuffled = [...questionPool].sort(()=>Math.random()-0.5);
     for(let i=0; i<groupCount; i++){
       const start = i * perGroup;
       const groupQs = shuffled.slice(start, start + perGroup);
       sspPool.push({
         journalId: `自定义第${i+1}组`,
+        questions: groupQs,
+        box: groupQs.map(q=>q.root)
+      });
+    }
+  }
+  else if(mode === "word"){
+    // 词语选择模式
+    const checkedWords = document.querySelectorAll("#word-list input:checked");
+    if(checkedWords.length === 0){
+      alert("请先勾选至少一个考察词语！");
+      return;
+    }
+    const selectedWords = Array.from(checkedWords).map(cb=>cb.value);
+    const perGroup = Number(document.getElementById("ssp-word-per").value);
+    const groupCount = Number(document.getElementById("ssp-word-groups").value);
+    
+    // 筛选选中词语的所有题目（原题+新题）
+    const questionPool = sspQuestions.filter(q=>selectedWords.includes(q.root));
+    const totalNeed = perGroup * groupCount;
+    if(totalNeed > questionPool.length){
+      alert(`选中词语共 ${questionPool.length} 道题，无法生成 ${groupCount} 组、每组 ${perGroup} 题。请减少组数或每组题数。`);
+      return;
+    }
+
+    const shuffled = [...questionPool].sort(()=>Math.random()-0.5);
+    for(let i=0; i<groupCount; i++){
+      const start = i * perGroup;
+      const groupQs = shuffled.slice(start, start + perGroup);
+      sspPool.push({
+        journalId: `词语练习第${i+1}组`,
         questions: groupQs,
         box: groupQs.map(q=>q.root)
       });
@@ -963,7 +1630,7 @@ function nextSspSet(){
 
 function renderSspSet(){
   const wrap = document.getElementById("ssp-current-set");
-  const shuffledBox = [...currentSspSet.box].sort(() => Math.random() - 0.5);
+  const shuffledBox = [...new Set(currentSspSet.box)].sort(() => Math.random() - 0.5);
 
   let html = `<h3 class="ssp-title">当前：${currentSspSet.journalId}</h3>`;
   html += `<div class="word-box">词库：${shuffledBox.join(" / ")}</div>`;
@@ -1047,7 +1714,7 @@ document.getElementById("reset-ssp").onclick = ()=>{
   sspTotalQ=0;
   document.getElementById("ssp-current-set").innerHTML = "";
   document.getElementById("ssp-stat").classList.add("hidden");
-  document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=false);
+  document.querySelectorAll("#journal-list input").forEach(cb=>cb.checked=false);
   nextSspBtn.disabled = true;
   checkSspBtn.disabled = false;
 };

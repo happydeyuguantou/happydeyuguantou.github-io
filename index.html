@@ -80,7 +80,18 @@
   <!-- SSP页面 -->
   <div id="tab-ssp" class="panel">
     <div class="control-row">
-      <label>选择期刊套题：</label>
+      <label>出题模式：</label>
+      <label><input type="radio" name="ssp-mode" value="original" checked> 期刊原组（10题/组）</label>
+      <label><input type="radio" name="ssp-mode" value="custom"> 自定义组</label>
+      <span id="custom-ssp-settings" class="hidden">
+        <label>每组题数：</label>
+        <input id="ssp-custom-per" type="number" min="1" value="10">
+        <label>组数：</label>
+        <input id="ssp-custom-groups" type="number" min="1" value="2">
+      </span>
+    </div>
+    <div class="control-row">
+      <label>选择期刊：</label>
       <div class="journal-checklist" id="journal-list"></div>
       <button class="blue" id="select-all-journals">一键全选</button>
       <button class="success" id="start-ssp">开始答题</button>
@@ -269,256 +280,171 @@ const wonderDB = [
   {en:"Since it was dark, we used our flashlights to _________________ the artifacts while we were talking.", ans:"illuminate", cn:"照亮"}
 ];
 
-// ===================== SSP完整题库 =====================
-const sspDB = [
-  {
-    id:"3.13增刊+4.10刊",
-    sets:[
-      {
-        box:["on the same page","curiosity","be accused of","choose","important","electric","memorise","a game changer","missing","apologise"],
-        qs:[
-          {en:"It was a choice between pain now or pain later, so I ____ pain later.",ans:"chose"},
-          {en:"Remote work has been ____, giving people more time with their families.",ans:"a game changer"},
-          {en:"You should eat well and, more ____, get enough sleep.",ans:"importantly"},
-          {en:"The journalists ____ spreading false information last month.",ans:"were accused of"},
-          {en:"We should save ____ by turning off lights when we leave a room.",ans:"electricity"},
-          {en:"After a long discussion, the two departments are finally ____ regarding the deadline.",ans:"on the same page"},
-          {en:"Out of ____, I opened the old box to see what was inside.",ans:"curiosity"},
-          {en:"The painting had been ____ for over twenty years before it was discovered in an attic.",ans:"missing"},
-          {en:"It took me an hour to ____ all the new words for the test.",ans:"memorise"},
-          {en:"You should ____ to your sister for breaking her toy.",ans:"apologise"},
-        ]
-      },
-      {
-        box:["jump out of the box","impression","create","talent","compete","pretend","argument","entertain","right around the corner","properly"],
-        qs:[
-          {en:"The teacher encouraged students to find ____ solutions to the problem.",ans:"creative"},
-          {en:"They had several ____ about money last month.",ans:"arguments"},
-          {en:"He understood the power of music — not just to ____, but to inspire and change the world.",ans:"entertain"},
-          {en:"The ____ young artist won first prize in the school art contest.",ans:"talented"},
-          {en:"His speech made a strong ____ on the audience.",ans:"impression"},
-          {en:"You need to warm up ____ before exercising to avoid injury.",ans:"properly"},
-          {en:"A big opportunity might be ____, so don’t give up yet.",ans:"right around the corner"},
-          {en:"We’re going to have a ____ to see who can swim the fastest.",ans:"competition"},
-          {en:"He ____ that nothing had happened and went back to work.",ans:"pretended"},
-          {en:"Jackson was the kind of person who would ____ without fear.",ans:"jump out of the box"},
-        ]
-      }
-    ]
-  },
-  {
-    id:"4.3刊+5.8刊",
-    sets:[
-      {
-        box:["imagine","appear","honour","invisible","accident","sort","expand","a helping hand","belief","victory"],
-        qs:[
-          {en:"The small bookstore has ____ into a large chain with stores in over twenty cities.",ans:"expanded"},
-          {en:"The team worked together and finally won a ____ in the final match.",ans:"victory"},
-          {en:"Air is ____, but without it, no one can survive for more than a few minutes.",ans:"invisible"},
-          {en:"We ____ took the wrong bus and ended up in the next town.",ans:"accidentally"},
-          {en:"Many people ____ that a positive attitude can overcome hard challenges.",ans:"believe"},
-          {en:"He is always ready to give ____ to anyone who needs support.",ans:"a helping hand"},
-          {en:"Every Qingming Festival, we sweep tombs and ____ the dead.",ans:"honour"},
-          {en:"He always tries to ____ confident in front of his team.",ans:"appear"},
-          {en:"The library offers all ____ of books, from science to poetry.",ans:"sorts"},
-          {en:"Children have great ____; they can turn a box into a spaceship.",ans:"imagination"},
-        ]
-      },
-      {
-        box:["perfect","perform","come into view","amaze","rebuild","challenge","freeze","trend","safe","rewarding"],
-        qs:[
-          {en:"As fog lifted, the old stone bridge began to ____ over the river.",ans:"come into view"},
-          {en:"When temperature dropped below zero, the lake ____ solid.",ans:"froze"},
-          {en:"The singer will ____ new songs on stage tonight.",ans:"perform"},
-          {en:"Wearing a helmet increases ____ while riding a bike.",ans:"safety"},
-          {en:"The vase is beautiful though its surface is ____ with small cracks.",ans:"imperfect"},
-          {en:"He faced numerous ____ with courage all his career.",ans:"challenges"},
-          {en:"Kids were ____ at how fast the seed grew into a sunflower.",ans:"amazed"},
-          {en:"After earthquake, people worked together to ____ homes.",ans:"rebuild"},
-          {en:"Learning piano takes patience but it is truly a ____ journey.",ans:"rewarding"},
-          {en:"Young people follow fashion ____ to show personal style.",ans:"trends"},
-        ]
-      }
-    ]
-  },
-  {
-    id:"4.17刊",
-    sets:[
-      {
-        box:["pay off","afford","personal","perform","attention","stress over","success","popularity","forget","music"],
-        qs:[
-          {en:"The athlete’s ____ at the Olympics was the best of her career.",ans:"performance"},
-          {en:"Their patience ____ when the business started to boom.",ans:"paid off"},
-          {en:"The bright yellow poster drew my ____ as soon as I entered the room.",ans:"attention"},
-          {en:"She was so tired after work that she ____ to reply to her boss’s email.",ans:"forgot"},
-          {en:"No one in this fast-paced industry ____ to waste time on unimportant meetings.",ans:"affords"},
-          {en:"He tends to ____ every little detail before a presentation.",ans:"stress over"},
-          {en:"The manager ____ thanked each employee for their hard work.",ans:"personally"},
-          {en:"The singer’s ____ has grown rapidly since releasing her first album.",ans:"popularity"},
-          {en:"She practices daily to ____ in mastering the piano piece.",ans:"succeed"},
-          {en:"The street ____ played his guitar so beautifully that a small crowd gathered.",ans:"musician"},
-        ]
-      },
-      {
-        box:["clear one’s mind","fail","manage","reliable","attitude","describe","confident","remove","give up","mistake"],
-        qs:[
-          {en:"The beauty of the sunset was beyond ____.",ans:"description"},
-          {en:"He’s nice but totally ____ when it comes to showing up on time.",ans:"unreliable"},
-          {en:"His negative ____ toward teamwork makes it difficult for others to work with him.",ans:"attitude"},
-          {en:"Many fans have lost ____ in the team after several consecutive losses.",ans:"confidence"},
-          {en:"It’s not easy to ____ a large department with so many different personalities.",ans:"manage"},
-          {en:"The movie ____ to live up to my expectations; it was quite boring.",ans:"failed"},
-          {en:"We all make ____, but the important thing is to fix them and move on.",ans:"mistakes"},
-          {en:"If a student ____ too soon, he or she will never know what could have been achieved.",ans:"gives up"},
-          {en:"Taking a few deep breaths helped her ____ and focus on the problem.",ans:"clear her mind"},
-          {en:"The new software can ____ background noise from your recordings automatically.",ans:"remove"},
-        ]
-      }
-    ]
-  },
-  {
-    id:"5.15刊",
-    sets:[
-      {
-        box:["die","surprise","groundbreaking","volunteer","experience","move","promote","mix","patience","confident"],
-        qs:[
-          {en:"The doctors tried everything to save the ____ patient.",ans:"dying"},
-          {en:"She always ____ her friends with handmade gifts on their birthdays.",ans:"surprises"},
-          {en:"The young scientist’s ____ discovery made the headlines around the world last week.",ans:"groundbreaking"},
-          {en:"She has been ____ at a charity that provides free meals to elderly people every weekend.",ans:"volunteering"},
-          {en:"An ____ traveler knows how to pack light and stay safe.",ans:"experienced"},
-          {en:"My sister gave a ____ speech at my wedding.",ans:"moving"},
-          {en:"Many celebrities use social media to connect with their fans and ____ their latest projects.",ans:"promote"},
-          {en:"To raise a child well, you need to ____ together love, patience, and a sense of humor.",ans:"mix"},
-          {en:"After waiting for 30 minutes in the rain, she completely lost ____ with her late friend.",ans:"patience"},
-          {en:"I am ____ that everything will work out in the end.",ans:"confident"},
-        ]
-      },
-      {
-        box:["behave","attention","live in harmony with","responsible","generation","neighbouring","serve","approach","suggest","certain"],
-        qs:[
-          {en:"The storm is ____ the coast, so all the ships have been called back to the port.",ans:"approaching"},
-          {en:"If you shout in the library, you will draw ____ from everyone around you.",ans:"attention"},
-          {en:"The way he keeps checking his phone ____ that he is waiting for an important message.",ans:"suggests"},
-          {en:"If you want people to trust you, your ____ should match your words.",ans:"behaviour"},
-          {en:"We ____ can’t change the past, but we can learn from it.",ans:"certainly"},
-          {en:"The younger ____ is more comfortable with technology than their parents ever were.",ans:"generation"},
-          {en:"It is ____ to leave a young child alone at home for the entire day.",ans:"irresponsible"},
-          {en:"If humans want to survive on this planet, we must find a way to ____ all other living creatures.",ans:"live in harmony with"},
-          {en:"The earthquake caused serious damage to the city and several ____ villages.",ans:"neighbouring"},
-          {en:"Our dedicated team ____ the local community faithfully throughout last summer.",ans:"served"},
-        ]
-      }
-    ]
-  },
-  {
-    id:"5.22刊",
-    sets:[
-      {
-        box:["wisdom","appear","reflective","impress","disturb","out of place","thoroughly","advice","accident","wide"],
-        qs:[
-          {en:"True ____ is knowing how much you don’t know, for it keeps the mind open and curious.",ans:"wisdom"},
-          {en:"The two paintings ____ identical at first glance, but there are small differences.",ans:"appear"},
-          {en:"Wearing bright or ____ clothing goes a long way toward staying safe when cycling at night.",ans:"reflective"},
-          {en:"She managed to ____ the hiring manager with her confident answers and relevant experience.",ans:"impress"},
-          {en:"My favourite programme comes on at 9 o’clock, so please don’t ____ me then.",ans:"disturb"},
-          {en:"The modern glass building feels ____ among the old stone houses in the village.",ans:"out of place"},
-          {en:"She felt stressed before her final exam, even though she had studied ____.",ans:"thoroughly"},
-          {en:"Before making a big decision, seek ____ from people you trust.",ans:"advice"},
-          {en:"The ink spread through the wet paper immediately after he ____ dropped the pen.",ans:"accidentally"},
-          {en:"When the celebrity announced his retirement, the news was ____ discussed on social media.",ans:"widely"},
-        ]
-      },
-      {
-        box:["personal","get along with","design","suffer","noise","consist of","happy","architect","hold","crowded"],
-        qs:[
-          {en:"Through volunteering at the local shelter, we found true ____ in helping others.",ans:"happiness"},
-          {en:"The committee ____ twelve members, each representing a different department.",ans:"consists of"},
-          {en:"She dreams of becoming an ____ who builds affordable homes for low-income families.",ans:"architect"},
-          {en:"My neighbour’s dog is very ____ at night, barking for hours and making it hard for me to sleep.",ans:"noisy"},
-          {en:"She is easy to ____ because she is always patient and never judges others.",ans:"get along with"},
-          {en:"Many people ____ from headaches when they spend too much time in front of a screen.",ans:"suffer"},
-          {en:"____, I find that early morning is the best time to focus and write, when the world is still quiet.",ans:"Personally"},
-          {en:"The little girl ____ her mother’s dress tightly and refused to walk into the doctor’s office alone.",ans:"held"},
-          {en:"To reach a younger audience, the ____ made his app simple enough for children to use.",ans:"designer"},
-          {en:"The subway was so ____ this morning that I could barely breathe or move my arms.",ans:"crowded"},
-        ]
-      }
-    ]
-  },
-  {
-    id:"5.29刊",
-    sets:[
-      {
-        box:["pay","arrive","speed up","regular","keep in touch with","beautiful","abroad","interest","schedule","risk"],
-        qs:[
-          {en:"My brother is very ____ in space exploration and wants to be an astronaut one day.",ans:"interested"},
-          {en:"The singer performed the song so ____ that everyone in the audience was moved to tears.",ans:"beautifully"},
-          {en:"The traffic light turned yellow, so the driver had to ____ to pass the crossroads.",ans:"speed up"},
-          {en:"The bill was ____ by my friend before I could take out my wallet.",ans:"paid"},
-          {en:"When we ____ at the party, the music was already playing loudly and almost everyone was dancing.",ans:"arrived"},
-          {en:"He has been living ____ for nearly a decade and rarely comes back home.",ans:"abroad"},
-          {en:"Entrepreneurs often have to take ____ if they want their businesses to succeed.",ans:"risks"},
-          {en:"Our travel ____ includes visits to three different cities in five days.",ans:"schedule"},
-          {en:"The bus service is ____; you might wait ten minutes or an hour.",ans:"irregular"},
-          {en:"Even though we live in different cities now, we still ____ each other through video calls.",ans:"keep in touch with"},
-        ]
-      },
-      {
-        box:["patient","come across","health","unbelievable","breathe","keep a close eye on","lift","perfectly","outsider","still"],
-        qs:[
-          {en:"Your suggestion came at a ____ right time yesterday evening.",ans:"perfectly"},
-          {en:"Yesterday evening, she ____ a useful recipe online when she wasn’t even looking for one.",ans:"came across"},
-          {en:"The patient lay ____ on the bed while the doctor listened to his heartbeat.",ans:"still"},
-          {en:"In the hospital, the head nurse ____ the patient’s condition day and night.",ans:"keeps a close eye on"},
-          {en:"At the party last Friday, I felt like an ____ because I didn’t know anyone there.",ans:"outsider"},
-          {en:"The price of that used car was ____ — only 500 dollars!",ans:"unbelievable"},
-          {en:"It is important to keep a ____ balance between work and rest, or you may easily burn out.",ans:"healthy"},
-          {en:"Hold your ____ for ten seconds, then slowly let it out to calm your mind and body.",ans:"breath"},
-          {en:"Learning a musical instrument requires a lot of ____, as progress often comes slowly over months or years of daily practice.",ans:"patience"},
-          {en:"Her spirits ____ at the sound of her child’s voice every evening after a long day at work.",ans:"lift"},
-        ]
-      }
-    ]
-  },
-  {
-    id:"6.5+6.12刊",
-    sets:[
-      {
-        box:["self-disciplined","label","beat","block","damage","embrace new challenges","simple","shocked","enable","lead"],
-        qs:[
-          {en:"The thick curtains in my bedroom ____ most of the morning sunlight.",ans:"block"},
-          {en:"He hates the ____ of “genius” because it puts too much pressure on him.",ans:"label"},
-          {en:"The heavy storm caused serious ____ to several houses in our neighborhood last night.",ans:"damage"},
-          {en:"I didn’t mean to offend you; I ____ wanted to share my honest opinion about your plan.",ans:"simply"},
-          {en:"Good communication skills ____ employees to express their ideas clearly and work well with others.",ans:"enable"},
-          {en:"____ regularly is the best way to step out of your comfort zone.",ans:"Embracing new challenges"},
-          {en:"To master a new language, you need to be ____ enough to practice every single day.",ans:"self-disciplined"},
-          {en:"Our basketball team ____ their longtime rivals by 10 points in the final match yesterday.",ans:"beat"},
-          {en:"The tour was ____ by a local guide who knew the area well.",ans:"led"},
-          {en:"My parents were truly ____ at my brother’s rude behavior during the family dinner last night.",ans:"shocked"},
-        ]
-      },
-      {
-        box:["handle","pay off","fierce","warm","alert","host","integrate","international","harvest","design"],
-        qs:[
-          {en:"Our new team member can ____ pressure and deliver when it matters most.",ans:"handle"},
-          {en:"After months of intense training, it all ____ on race day.",ans:"paid off"},
-          {en:"The competitions between tech companies are becoming increasingly ____.",ans:"fierce"},
-          {en:"The bread still held the ____ from the oven when I tore it open.",ans:"warmth"},
-          {en:"Drinking coffee helps me stay ____ through the rest of the workday.",ans:"alert"},
-          {en:"Our city ____ an international music festival every summer in the central park.",ans:"hosts"},
-          {en:"Their latest product ____ AI technology to deliver a truly personalized user experience.",ans:"integrates"},
-          {en:"The smartphone is ____ available, so you can buy it almost anywhere in the world.",ans:"internationally"},
-          {en:"Every autumn, the farmers ____ the corn before the heavy rains arrive.",ans:"harvest"},
-          {en:"My brother is a software engineer who ____ mobile apps for a well-known tech company.",ans:"designs"},
-        ]
-      }
-    ]
-  }
+// ===================== SSP官方题库（单题独立存储，含原型与归属） =====================
+const sspQuestions = [
+  // 3.13增刊+4.10刊 第1组
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"It was a choice between pain now or pain later, so I ____ pain later.", ans:"chose", root:"choose"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"Remote work has been ____, giving people more time with their families.", ans:"a game changer", root:"a game changer"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"You should eat well and, more ____, get enough sleep.", ans:"importantly", root:"important"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"The journalists ____ spreading false information last month.", ans:"were accused of", root:"be accused of"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"We should save ____ by turning off lights when we leave a room.", ans:"electricity", root:"electric"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"After a long discussion, the two departments are finally ____ regarding the deadline.", ans:"on the same page", root:"on the same page"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"Out of ____, I opened the old box to see what was inside.", ans:"curiosity", root:"curiosity"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"The painting had been ____ for over twenty years before it was discovered in an attic.", ans:"missing", root:"missing"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"It took me an hour to ____ all the new words for the test.", ans:"memorise", root:"memorise"},
+  {journalId:"3.13增刊+4.10刊", setId:0, en:"You should ____ to your sister for breaking her toy.", ans:"apologise", root:"apologise"},
+  // 3.13增刊+4.10刊 第2组
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"The teacher encouraged students to find ____ solutions to the problem.", ans:"creative", root:"create"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"They had several ____ about money last month.", ans:"arguments", root:"argument"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"He understood the power of music - not just to ____, but to inspire and change the world.", ans:"entertain", root:"entertain"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"The ____ young artist won first prize in the school art contest.", ans:"talented", root:"talent"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"His speech made a strong ____ on the audience.", ans:"impression", root:"impression"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"You need to warm up ____ before exercising to avoid injury.", ans:"properly", root:"properly"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"A big opportunity might be ____, so don’t give up yet.", ans:"right around the corner", root:"right around the corner"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"We’re going to have a ____ to see who can swim the fastest.", ans:"competition", root:"compete"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"He ____ that nothing had happened and went back to work.", ans:"pretended", root:"pretend"},
+  {journalId:"3.13增刊+4.10刊", setId:1, en:"Jackson was the kind of person who would ____ without fear.", ans:"jump out of the box", root:"jump out of the box"},
+
+  // 4.3刊+5.8刊 第1组
+  {journalId:"4.3刊+5.8刊", setId:0, en:"The small bookstore has ____ into a large chain with stores in over twenty cities across the country.", ans:"expanded", root:"expand"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"The team worked together and finally won a ____ in the final match after a long season.", ans:"victory", root:"victory"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"Air is ____, but without it, no one can survive for more than a few minutes.", ans:"invisible", root:"invisible"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"We ____ took the wrong bus and ended up in the next town.", ans:"accidentally", root:"accident"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"Many people ____ that a positive attitude can help overcome the most difficult challenges in life.", ans:"believe", root:"belief"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"He is always ready to give ____ to anyone who needs support or comfort.", ans:"a helping hand", root:"a helping hand"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"Every Qingming Festival, we visit the family graves to sweep the tombs and ____ the dead.", ans:"honour", root:"honour"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"He always tries to ____ confident and relaxed in front of his team, even when he feels quite nervous and uncertain inside.", ans:"appear", root:"appear"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"The library offers all ____ of books, from science and history to art and poetry.", ans:"sorts", root:"sort"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"Children have great ____; they can turn a cardboard box into a spaceship.", ans:"imagination", root:"imagine"},
+  // 4.3刊+5.8刊 第2组
+  {journalId:"4.3刊+5.8刊", setId:1, en:"As the thick morning fog slowly lifted, the old stone bridge began to ____ over the calm river.", ans:"come into view", root:"come into view"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"When the temperature dropped below zero, the small lake ____ into a thick sheet of ice.", ans:"froze", root:"freeze"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"The singer will ____ her new songs on stage tonight.", ans:"perform", root:"perform"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"Wearing a helmet increases ____ while riding a bike.", ans:"safety", root:"safe"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"The old vase is beautiful even though its surface is ____ and has several small cracks.", ans:"imperfect", root:"perfect"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"Throughout his career, he has had to confront numerous ____ with courage and determination.", ans:"challenges", root:"challenge"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"The children were ____ at how the tiny seed grew into a tall sunflower so quickly.", ans:"amazed", root:"amaze"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"After the earthquake, people worked together to ____ their homes.", ans:"rebuild", root:"rebuild"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"Learning to play the piano takes patience and practice, yet it is a truly ____ journey.", ans:"rewarding", root:"rewarding"},
+  {journalId:"4.3刊+5.8刊", setId:1, en:"Many young people like to follow the latest ____ in fashion to express their personal style.", ans:"trend", root:"trend"},
+
+  // 4.17刊 第1组
+  {journalId:"4.17刊", setId:0, en:"The athlete’s ____ at the Olympics was the best of her career.", ans:"performance", root:"perform"},
+  {journalId:"4.17刊", setId:0, en:"Their patience ____ when the business started to boom.", ans:"paid off", root:"pay off"},
+  {journalId:"4.17刊", setId:0, en:"The bright yellow poster on the wall drew my ____ as soon as I entered the room.", ans:"attention", root:"attention"},
+  {journalId:"4.17刊", setId:0, en:"She was so tired after work last Thursday that she ____ to reply to her boss’s email.", ans:"forgot", root:"forget"},
+  {journalId:"4.17刊", setId:0, en:"No one in this fast-paced industry ____ to waste time on unimportant meetings.", ans:"affords", root:"afford"},
+  {journalId:"4.17刊", setId:0, en:"He tends to ____ every little detail before a big presentation.", ans:"stress over", root:"stress over"},
+  {journalId:"4.17刊", setId:0, en:"The manager ____ thanked each employee for their hard work.", ans:"personally", root:"personal"},
+  {journalId:"4.17刊", setId:0, en:"The singer’s ____ has grown rapidly since she released her first album.", ans:"popularity", root:"popularity"},
+  {journalId:"4.17刊", setId:0, en:"She practices every day so that she can ____ in mastering the piano piece.", ans:"succeed", root:"success"},
+  {journalId:"4.17刊", setId:0, en:"The street ____ played his guitar so beautifully that a small crowd gathered around to listen.", ans:"musician", root:"music"},
+  // 4.17刊 第2组
+  {journalId:"4.17刊", setId:1, en:"The beauty of the sunset over the ocean was beyond ____.", ans:"description", root:"describe"},
+  {journalId:"4.17刊", setId:1, en:"He’s a nice guy, but he’s completely ____ when it comes to showing up on time.", ans:"unreliable", root:"reliable"},
+  {journalId:"4.17刊", setId:1, en:"His negative ____ toward teamwork makes it difficult for others to work with him.", ans:"attitude", root:"attitude"},
+  {journalId:"4.17刊", setId:1, en:"Many fans have lost ____ in the team after several consecutive losses.", ans:"confidence", root:"confident"},
+  {journalId:"4.17刊", setId:1, en:"It’s not easy to ____ a large department with so many different personalities.", ans:"manage", root:"manage"},
+  {journalId:"4.17刊", setId:1, en:"The movie ____ to live up to my expectations; it was quite boring.", ans:"failed", root:"fail"},
+  {journalId:"4.17刊", setId:1, en:"We all make ____, but the important thing is to fix them and move on.", ans:"mistakes", root:"mistake"},
+  {journalId:"4.17刊", setId:1, en:"If a student ____ too soon, he or she will never know what could have been achieved.", ans:"gives up", root:"give up"},
+  {journalId:"4.17刊", setId:1, en:"Taking a few deep breaths helped her ____ and focus on the problem.", ans:"clear her mind", root:"clear one’s mind"},
+  {journalId:"4.17刊", setId:1, en:"The new software can ____ background noise from your recordings automatically.", ans:"remove", root:"remove"},
+
+  // 5.15刊 第1组
+  {journalId:"5.15刊", setId:0, en:"The doctors tried everything to save the ____ patient.", ans:"dying", root:"die"},
+  {journalId:"5.15刊", setId:0, en:"She always ____ her friends with handmade gifts on their birthdays.", ans:"surprises", root:"surprise"},
+  {journalId:"5.15刊", setId:0, en:"The young scientist’s ____ discovery made the headlines around the world last week.", ans:"groundbreaking", root:"groundbreaking"},
+  {journalId:"5.15刊", setId:0, en:"She has been ____ at a charity that provides free meals to elderly people every weekend.", ans:"volunteering", root:"volunteer"},
+  {journalId:"5.15刊", setId:0, en:"An ____ traveler knows how to pack light and stay safe.", ans:"experienced", root:"experience"},
+  {journalId:"5.15刊", setId:0, en:"My sister gave a ____ speech at my wedding.", ans:"moving", root:"move"},
+  {journalId:"5.15刊", setId:0, en:"Many celebrities use social media to connect with their fans and ____ their latest projects.", ans:"promote", root:"promote"},
+  {journalId:"5.15刊", setId:0, en:"To raise a child well, you need to ____ together love, patience, and a sense of humor.", ans:"mix", root:"mix"},
+  {journalId:"5.15刊", setId:0, en:"After waiting for 30 minutes in the rain, she completely lost ____ with her late friend.", ans:"patience", root:"patience"},
+  {journalId:"5.15刊", setId:0, en:"I am ____ that everything will work out in the end.", ans:"confident", root:"confident"},
+  // 5.15刊 第2组
+  {journalId:"5.15刊", setId:1, en:"The storm is ____ the coast, so all the ships have been called back to the port.", ans:"approaching", root:"approach"},
+  {journalId:"5.15刊", setId:1, en:"If you shout in the library, you will draw ____ from everyone around you.", ans:"attention", root:"attention"},
+  {journalId:"5.15刊", setId:1, en:"The way he keeps checking his phone ____ that he is waiting for an important message.", ans:"suggests", root:"suggest"},
+  {journalId:"5.15刊", setId:1, en:"If you want people to trust you, your ____ should match your words.", ans:"behavior", root:"behave"},
+  {journalId:"5.15刊", setId:1, en:"We ____ can’t change the past, but we can learn from it.", ans:"certainly", root:"certain"},
+  {journalId:"5.15刊", setId:1, en:"The younger ____ is more comfortable with technology than their parents ever were.", ans:"generation", root:"generation"},
+  {journalId:"5.15刊", setId:1, en:"It is ____ to leave a young child alone at home for the entire day.", ans:"irresponsible", root:"responsible"},
+  {journalId:"5.15刊", setId:1, en:"If humans want to survive on this planet, we must find a way to ____ all other living creatures.", ans:"live in harmony with", root:"live in harmony with"},
+  {journalId:"5.15刊", setId:1, en:"The earthquake caused serious damage to the city and several ____ villages.", ans:"neighbouring", root:"neighbouring"},
+  {journalId:"5.15刊", setId:1, en:"Our dedicated team ____ the local community faithfully throughout last summer.", ans:"served", root:"serve"},
+
+  // 5.22刊 第1组
+  {journalId:"5.22刊", setId:0, en:"True ____ is knowing how much you don’t know, for it keeps the mind open and curious.", ans:"wisdom", root:"wisdom"},
+  {journalId:"5.22刊", setId:0, en:"The two paintings ____ identical at first glance, but there are small differences.", ans:"appear", root:"appear"},
+  {journalId:"5.22刊", setId:0, en:"Wearing bright or ____ clothing goes a long way toward staying safe when cycling at night.", ans:"reflective", root:"reflective"},
+  {journalId:"5.22刊", setId:0, en:"She managed to ____ the hiring manager with her confident answers and relevant experience.", ans:"impress", root:"impress"},
+  {journalId:"5.22刊", setId:0, en:"My favourite programme comes on at 9 o’clock, so please don’t ____ me then.", ans:"disturb", root:"disturb"},
+  {journalId:"5.22刊", setId:0, en:"The modern glass building feels ____ among the old stone houses in the village.", ans:"out of place", root:"out of place"},
+  {journalId:"5.22刊", setId:0, en:"She felt stressed before her final exam, even though she had studied ____.", ans:"thoroughly", root:"thoroughly"},
+  {journalId:"5.22刊", setId:0, en:"Before making a big decision, seek ____ from people you trust.", ans:"advice", root:"advice"},
+  {journalId:"5.22刊", setId:0, en:"The ink spread through the wet paper immediately after he ____ dropped the pen.", ans:"accidentally", root:"accident"},
+  {journalId:"5.22刊", setId:0, en:"When the celebrity announced his retirement, the news was ____ discussed on social media.", ans:"widely", root:"wide"},
+  // 5.22刊 第2组
+  {journalId:"5.22刊", setId:1, en:"Through volunteering at the local shelter, we found true ____ in helping others.", ans:"happiness", root:"happy"},
+  {journalId:"5.22刊", setId:1, en:"The committee ____ twelve members, each representing a different department.", ans:"consists of", root:"consist of"},
+  {journalId:"5.22刊", setId:1, en:"She dreams of becoming an ____ who builds affordable homes for low-income families.", ans:"architect", root:"architect"},
+  {journalId:"5.22刊", setId:1, en:"My neighbour’s dog is very ____ at night, barking for hours and making it hard for me to sleep.", ans:"noisy", root:"noise"},
+  {journalId:"5.22刊", setId:1, en:"She is easy to ____ because she is always patient and never judges others.", ans:"get along with", root:"get along with"},
+  {journalId:"5.22刊", setId:1, en:"Many people ____ from headaches when they spend too much time in front of a screen.", ans:"suffer", root:"suffer"},
+  {journalId:"5.22刊", setId:1, en:"____, I find that early morning is the best time to focus and write, when the world is still quiet.", ans:"Personally", root:"personal"},
+  {journalId:"5.22刊", setId:1, en:"The little girl ____ her mother’s dress tightly and refused to walk into the doctor’s office alone.", ans:"held", root:"hold"},
+  {journalId:"5.22刊", setId:1, en:"To reach a younger audience, the ____ made his app simple enough for children to use.", ans:"designer", root:"design"},
+  {journalId:"5.22刊", setId:1, en:"The subway was so ____ this morning that I could barely breathe or move my arms.", ans:"crowded", root:"crowded"},
+
+  // 5.29刊 第1组
+  {journalId:"5.29刊", setId:0, en:"My brother is very ____ in space exploration and wants to be an astronaut one day.", ans:"interested", root:"interest"},
+  {journalId:"5.29刊", setId:0, en:"The singer performed the song so ____ that everyone in the audience was moved to tears.", ans:"beautifully", root:"beautiful"},
+  {journalId:"5.29刊", setId:0, en:"The traffic light turned yellow, so the driver had to ____ to pass the crossroads.", ans:"speed up", root:"speed up"},
+  {journalId:"5.29刊", setId:0, en:"The bill was ____ by my friend before I could take out my wallet.", ans:"paid", root:"pay"},
+  {journalId:"5.29刊", setId:0, en:"When we ____ at the party, the music was already playing loudly and almost everyone was dancing.", ans:"arrived", root:"arrive"},
+  {journalId:"5.29刊", setId:0, en:"He has been living ____ for nearly a decade and rarely comes back home.", ans:"abroad", root:"abroad"},
+  {journalId:"5.29刊", setId:0, en:"Entrepreneurs often have to take ____ if they want their businesses to succeed.", ans:"risks", root:"risk"},
+  {journalId:"5.29刊", setId:0, en:"Our travel ____ includes visits to three different cities in five days.", ans:"schedule", root:"schedule"},
+  {journalId:"5.29刊", setId:0, en:"The bus service is ____; you might wait ten minutes or an hour.", ans:"irregular", root:"regular"},
+  {journalId:"5.29刊", setId:0, en:"Even though we live in different cities now, we still ____ each other through video calls.", ans:"keep in touch with", root:"keep in touch with"},
+  // 5.29刊 第2组
+  {journalId:"5.29刊", setId:1, en:"Your suggestion came at a ____ right time yesterday evening.", ans:"perfectly", root:"perfectly"},
+  {journalId:"5.29刊", setId:1, en:"Yesterday evening, she ____ a useful recipe online when she wasn’t even looking for one.", ans:"came across", root:"come across"},
+  {journalId:"5.29刊", setId:1, en:"The patient lay ____ on the bed while the doctor listened to his heartbeat.", ans:"still", root:"still"},
+  {journalId:"5.29刊", setId:1, en:"In the hospital, the head nurse ____ the patient’s condition day and night.", ans:"keeps a close eye on", root:"keep a close eye on"},
+  {journalId:"5.29刊", setId:1, en:"At the party last Friday, I felt like an ____ because I didn’t know anyone there.", ans:"outsider", root:"outsider"},
+  {journalId:"5.29刊", setId:1, en:"The price of that used car was ____ - only 500 dollars!", ans:"unbelievable", root:"unbelievable"},
+  {journalId:"5.29刊", setId:1, en:"It is important to keep a ____ balance between work and rest, or you may easily burn out.", ans:"healthy", root:"health"},
+  {journalId:"5.29刊", setId:1, en:"Hold your ____ for ten seconds, then slowly let it out to calm your mind and body.", ans:"breath", root:"breathe"},
+  {journalId:"5.29刊", setId:1, en:"Learning a musical instrument requires a lot of ____, as progress often comes slowly over months or years of daily practice.", ans:"patience", root:"patient"},
+  {journalId:"5.29刊", setId:1, en:"Her spirits ____ at the sound of her child’s voice every evening after a long day at work.", ans:"lift", root:"lift"},
+
+  // 6.5+6.12刊 第1组
+  {journalId:"6.5+6.12刊", setId:0, en:"The thick curtains in my bedroom ____ most of the morning sunlight.", ans:"block", root:"block"},
+  {journalId:"6.5+6.12刊", setId:0, en:"He hates the ____ of “genius” because it puts too much pressure on him.", ans:"label", root:"label"},
+  {journalId:"6.5+6.12刊", setId:0, en:"The heavy storm caused serious ____ to several houses in our neighborhood last night.", ans:"damage", root:"damage"},
+  {journalId:"6.5+6.12刊", setId:0, en:"I didn’t mean to offend you; I ____ wanted to share my honest opinion about your plan.", ans:"simply", root:"simple"},
+  {journalId:"6.5+6.12刊", setId:0, en:"Good communication skills ____ employees to express their ideas clearly and work well with others.", ans:"enable", root:"enable"},
+  {journalId:"6.5+6.12刊", setId:0, en:"____ regularly is the best way to step out of your comfort zone.", ans:"Embracing new challenges", root:"embrace new challenges"},
+  {journalId:"6.5+6.12刊", setId:0, en:"To master a new language, you need to be ____ enough to practice every single day.", ans:"self-disciplined", root:"self-disciplined"},
+  {journalId:"6.5+6.12刊", setId:0, en:"Our basketball team ____ their longtime rivals by 10 points in the final match yesterday.", ans:"beat", root:"beat"},
+  {journalId:"6.5+6.12刊", setId:0, en:"The tour was ____ by a local guide who knew the area well.", ans:"led", root:"lead"},
+  {journalId:"6.5+6.12刊", setId:0, en:"My parents were truly ____ at my brother’s rude behavior during the family dinner last night.", ans:"shocked", root:"shocked"},
+  // 6.5+6.12刊 第2组
+  {journalId:"6.5+6.12刊", setId:1, en:"Our new team member is a fantastic player who can ____ pressure and deliver when it matters most.", ans:"handle", root:"handle"},
+  {journalId:"6.5+6.12刊", setId:1, en:"I was exhausted after months of intense training, but it all ____ on race day.", ans:"paid off", root:"pay off"},
+  {journalId:"6.5+6.12刊", setId:1, en:"The competitions between tech companies are becoming increasingly ____.", ans:"fierce", root:"fierce"},
+  {journalId:"6.5+6.12刊", setId:1, en:"The bread still held the ____ from the oven when I tore it open.", ans:"warmth", root:"warm"},
+  {journalId:"6.5+6.12刊", setId:1, en:"Drinking a cup of coffee in the afternoon helps me stay ____ and get through the rest of the workday.", ans:"alert", root:"alert"},
+  {journalId:"6.5+6.12刊", setId:1, en:"Our city ____ an international music festival every summer in the central park.", ans:"hosts", root:"host"},
+  {journalId:"6.5+6.12刊", setId:1, en:"Their latest product ____ AI technology to deliver a truly personalized user experience.", ans:"integrates", root:"integrate"},
+  {journalId:"6.5+6.12刊", setId:1, en:"The smartphone is ____ available, so you can buy it almost anywhere in the world.", ans:"internationally", root:"international"},
+  {journalId:"6.5+6.12刊", setId:1, en:"Every autumn, the farmers ____ the corn before the heavy rains arrive.", ans:"harvest", root:"harvest"},
+  {journalId:"6.5+6.12刊", setId:1, en:"My brother is a software engineer who ____ mobile apps for a well-known tech company.", ans:"designs", root:"design"}
 ];
 
-// ===================== 新概念课文题库 Lesson 40-46（人名地名标注英文） =====================
+// ===================== 新概念课文题库 Lesson 40-46 =====================
 const nceDB = [
   {
     id: 40,
@@ -633,10 +559,11 @@ const nceDB = [
 
 // ===================== 全局变量 =====================
 let currentWonderQs = [];
-let sspPool = [];
+let sspPool = []; // 每套题格式：{journalId, questions:[], box:[]}
 let currentSspSet = null;
 let sspDoneCount = 0;
 let sspWrongTotal = 0;
+let sspTotalQ = 0; // 累计完成总题数
 const showChineseKey = "wonderShowChinese";
 const showFirstLetterKey = "wonderShowFirstLetter";
 const showChineseCheckbox = document.getElementById("show-chinese");
@@ -771,42 +698,103 @@ document.getElementById("reset-wonder").onclick = ()=>{
 };
 
 // ===================== SSP 逻辑 =====================
+// 渲染期刊列表
 function renderJournalList(){
   const listWrap = document.getElementById("journal-list");
   listWrap.innerHTML = "";
-  sspDB.forEach(j=>{
+  // 提取去重后的期刊ID
+  const journalIds = [...new Set(sspQuestions.map(q=>q.journalId))];
+  journalIds.forEach(jId=>{
     const div = document.createElement("div");
     div.className = "journal-item";
-    const inputId = `j-${j.id}`;
-    div.innerHTML = `<input type="checkbox" value="${j.id}" id="${inputId}"> <label for="${inputId}">${j.id}</label>`;
+    const inputId = `j-${jId}`;
+    div.innerHTML = `<input type="checkbox" value="${jId}" id="${inputId}"> <label for="${inputId}">${jId}</label>`;
     listWrap.appendChild(div);
   });
 }
+
+// 模式切换显示自定义设置
+document.querySelectorAll('input[name="ssp-mode"]').forEach(radio=>{
+  radio.addEventListener("change", function(){
+    const customSettings = document.getElementById("custom-ssp-settings");
+    customSettings.classList.toggle("hidden", this.value !== "custom");
+  });
+});
+
 document.getElementById("select-all-journals").onclick = ()=>{
   document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=true);
 };
 
+// 开始答题
 document.getElementById("start-ssp").onclick = ()=>{
   sspPool = [];
+  sspDoneCount = 0;
+  sspWrongTotal = 0;
+  sspTotalQ = 0;
+  document.getElementById("ssp-stat").classList.add("hidden");
+
   const checkedBoxes = document.querySelectorAll(".journal-item input:checked");
   if(checkedBoxes.length === 0){
     alert("请先勾选至少一套期刊再开始答题！");
     return;
   }
-  checkedBoxes.forEach(cb=>{
-    const jId = cb.value;
-    const journal = sspDB.find(item => item.id === jId);
-    journal.sets.forEach(setItem=>{
-      sspPool.push({journalId: jId, set: setItem});
+  const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
+  const mode = document.querySelector('input[name="ssp-mode"]:checked').value;
+
+  if(mode === "original"){
+    // 期刊原组模式：按原PDF分组，10题/组
+    selectedJournals.forEach(jId=>{
+      const journalQs = sspQuestions.filter(q=>q.journalId === jId);
+      const set0 = journalQs.filter(q=>q.setId === 0);
+      const set1 = journalQs.filter(q=>q.setId === 1);
+      
+      if(set0.length > 0){
+        sspPool.push({
+          journalId: `${jId} 第1组`,
+          questions: set0,
+          box: set0.map(q=>q.root)
+        });
+      }
+      if(set1.length > 0){
+        sspPool.push({
+          journalId: `${jId} 第2组`,
+          questions: set1,
+          box: set1.map(q=>q.root)
+        });
+      }
     });
-  });
+  }else{
+    // 自定义组模式：随机抽题分组
+    const perGroup = Number(document.getElementById("ssp-custom-per").value);
+    const groupCount = Number(document.getElementById("ssp-custom-groups").value);
+    const allAvailable = sspQuestions.filter(q=>selectedJournals.includes(q.journalId));
+    const totalNeed = perGroup * groupCount;
+
+    if(totalNeed > allAvailable.length){
+      alert(`选中期刊共 ${allAvailable.length} 道题，无法生成 ${groupCount} 组、每组 ${perGroup} 题（共需 ${totalNeed} 题）。请减少组数或每组题数。`);
+      return;
+    }
+
+    // 打乱并分组
+    const shuffled = [...allAvailable].sort(()=>Math.random()-0.5);
+    for(let i=0; i<groupCount; i++){
+      const start = i * perGroup;
+      const groupQs = shuffled.slice(start, start + perGroup);
+      sspPool.push({
+        journalId: `自定义第${i+1}组`,
+        questions: groupQs,
+        box: groupQs.map(q=>q.root)
+      });
+    }
+  }
+
   if(sspPool.length === 0){
-    alert("选中期刊内无可用题目！");
+    alert("未生成可用套题！");
     return;
   }
-  sspDoneCount = 0;
-  sspWrongTotal = 0;
-  document.getElementById("ssp-stat").classList.add("hidden");
+
+  // 打乱套题顺序
+  sspPool.sort(()=>Math.random()-0.5);
   nextSspSet();
 };
 
@@ -824,11 +812,13 @@ function nextSspSet(){
 
 function renderSspSet(){
   const wrap = document.getElementById("ssp-current-set");
-  const currentSet = currentSspSet.set;
-  let html = `<h3 class="ssp-title">当前期刊：${currentSspSet.journalId}</h3>`;
-  html += `<div class="word-box">词库：${currentSet.box.join(" / ")}</div>`;
+  // 词库随机打乱
+  const shuffledBox = [...currentSspSet.box].sort(() => Math.random() - 0.5);
+
+  let html = `<h3 class="ssp-title">当前：${currentSspSet.journalId}</h3>`;
+  html += `<div class="word-box">词库：${shuffledBox.join(" / ")}</div>`;
   
-  currentSet.qs.forEach((q,idx)=>{
+  currentSspSet.questions.forEach((q,idx)=>{
     html += `<div class="question-item">
       <p>${idx+1}. ${q.en.replace("____","___")}
         <input class="blank-input ssp-in" data-ans="${q.ans}" placeholder="填写答案">
@@ -864,6 +854,7 @@ document.getElementById("check-ssp").onclick = ()=>{
   });
   sspWrongTotal += wrongNum;
   sspDoneCount++;
+  sspTotalQ += currentSspSet.questions.length;
   nextSspBtn.disabled = false;
 };
 
@@ -872,12 +863,12 @@ document.getElementById("next-ssp").onclick = nextSspSet;
 function showSspStat(){
   const statBox = document.getElementById("ssp-stat");
   statBox.classList.remove("hidden");
-  const totalQ = sspDoneCount * 10;
-  const right = totalQ - sspWrongTotal;
-  const rate = totalQ === 0 ? "0%" : ((right/totalQ)*100).toFixed(1)+"%";
+  const right = sspTotalQ - sspWrongTotal;
+  const rate = sspTotalQ === 0 ? "0%" : ((right/sspTotalQ)*100).toFixed(1)+"%";
   statBox.innerHTML = `
     <h3>刷题统计</h3>
     <p>完成套数：${sspDoneCount} 套</p>
+    <p>总题数：${sspTotalQ} 道</p>
     <p>总错题：${sspWrongTotal} 道</p>
     <p>正确率：${rate}</p>
   `;
@@ -887,6 +878,7 @@ document.getElementById("reset-ssp").onclick = ()=>{
   sspPool = [];
   sspDoneCount=0;
   sspWrongTotal=0;
+  sspTotalQ=0;
   document.getElementById("ssp-current-set").innerHTML = "";
   document.getElementById("ssp-stat").classList.add("hidden");
   document.querySelectorAll(".journal-item input").forEach(cb=>cb.checked=false);
@@ -921,8 +913,8 @@ document.querySelectorAll('input[name="nce-mode"]').forEach(radio=>{
 function normalizeSentence(str){
   return str.trim()
     .toLowerCase()
-    .replace(/\s+/g, ' ')        // 合并所有连续空格
-    .replace(/[^\w\s]/g, '');     // 移除所有标点、特殊符号，只保留字母、数字、空格
+    .replace(/\s+/g, ' ')
+    .replace(/[^\w\s]/g, '');
 }
 
 // 开始答题通用初始化
@@ -1088,7 +1080,6 @@ document.getElementById("nce-load-sentences").onclick = ()=>{
   listEl.classList.remove("hidden");
   document.getElementById("nce-start-select").disabled = true;
 
-  // 监听勾选状态
   document.querySelectorAll(".nce-sentence-check").forEach(cb=>{
     cb.addEventListener("change", updateSelectStartBtn);
   });
@@ -1105,7 +1096,7 @@ document.getElementById("nce-clear-select").onclick = ()=>{
   updateSelectStartBtn();
 };
 
-// 自选句子开始答题（新增：点击后隐藏句子列表）
+// 自选句子开始答题（点击后隐藏句子列表）
 document.getElementById("nce-start-select").onclick = ()=>{
   const lessonId = Number(document.getElementById("nce-select-lesson").value);
   const lesson = nceDB.find(l=>l.id === lessonId);
@@ -1115,7 +1106,6 @@ document.getElementById("nce-start-select").onclick = ()=>{
     lessonId: lesson.id,
     lessonTitle: lesson.title
   }));
-  // 点击开始后隐藏句子列表，避免原文干扰
   document.getElementById("nce-sentence-list").classList.add("hidden");
   startNceQuiz(list);
 };

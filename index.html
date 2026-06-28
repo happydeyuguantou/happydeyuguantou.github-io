@@ -52,9 +52,10 @@
     .extra-word { color: #dc2626; text-decoration: line-through; cursor: help; }
     .order-error { color: #b45309; border-bottom: 2px solid #b45309; cursor: help; }
     .missing-hint { color: #dc2626; background: #fee2e2; padding: 0 4px; border-radius: 3px; font-size: 0.9em; margin: 0 2px; cursor: help; }
-    .error-detail { margin-top: 8px; font-size: 13px; color: #64748b; font-weight: normal; }
+    .error-detail { margin-top: 8px; font-size: 13px; color: #64748b; font-weight: normal; line-height: 1.5; }
     .ans-block { margin: 4px 0; line-height: 1.8; }
     .ans-label { display: inline-block; width: 70px; font-weight: bold; color: #475569; }
+    .total-hint { color: #64748b; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -79,6 +80,7 @@
       </span>
       <label>出题数量：</label>
       <input id="wonder-count" type="number" min="1" max="102" value="10">
+      <span class="total-hint">（共 <span id="wonder-total-num">102</span> 题）</span>
       <label><input type="checkbox" id="show-chinese"> 显示中文释义括号</label>
       <label><input type="checkbox" id="show-first-letter"> 显示首字母提示</label>
       <button class="blue" id="gen-wonder">生成题目</button>
@@ -114,6 +116,7 @@
       <div class="control-row">
         <label>每组题数：</label>
         <input id="ssp-custom-per" type="number" min="1" value="10">
+        <span class="total-hint">（可用共 <span id="ssp-custom-total">0</span> 题）</span>
         <label>组数：</label>
         <input id="ssp-custom-groups" type="number" min="1" value="2">
       </div>
@@ -129,6 +132,7 @@
       <div class="control-row">
         <label>每组题数：</label>
         <input id="ssp-word-per" type="number" min="1" value="10">
+        <span class="total-hint">（可用共 <span id="ssp-word-total">0</span> 题）</span>
         <label>组数：</label>
         <input id="ssp-word-groups" type="number" min="1" value="2">
       </div>
@@ -156,6 +160,7 @@
       <div class="control-row">
         <label>出题数量：</label>
         <input id="nce-random-count" type="number" min="1" value="10">
+        <span class="total-hint">（全库共 <span id="nce-random-total">0</span> 句）</span>
         <button class="blue" id="nce-start-random">开始答题</button>
       </div>
     </div>
@@ -164,8 +169,14 @@
       <div class="control-row">
         <label>选择课文：</label>
         <select id="nce-lesson-select"></select>
+        <label>出题顺序：</label>
+        <label><input type="radio" name="nce-lesson-order" value="random" checked> 随机抽题</label>
+        <label><input type="radio" name="nce-lesson-order" value="order"> 按原文顺序</label>
+      </div>
+      <div class="control-row">
         <label>出题数量：</label>
         <input id="nce-lesson-count" type="number" min="1" value="5">
+        <span class="total-hint">（本课共 <span id="nce-lesson-total">0</span> 句）</span>
         <button class="blue" id="nce-start-lesson">开始答题</button>
       </div>
     </div>
@@ -221,6 +232,7 @@
       <div class="control-row">
         <label>出题数量：</label>
         <input id="unit-random-count" type="number" min="1" value="10">
+        <span class="total-hint">（全库共 <span id="unit-random-total">0</span> 题）</span>
         <button class="blue" id="unit-start-random">开始答题</button>
       </div>
     </div>
@@ -229,8 +241,11 @@
       <div class="control-row">
         <label>选择单元：</label>
         <select id="unit-unit-select"></select>
+      </div>
+      <div class="control-row">
         <label>出题数量：</label>
         <input id="unit-unit-count" type="number" min="1" value="5">
+        <span class="total-hint">（本单元共 <span id="unit-unit-total">0</span> 题）</span>
         <button class="blue" id="unit-start-unit">开始答题</button>
       </div>
     </div>
@@ -276,10 +291,12 @@
 
 <script>
 // ===================== 精细化判卷核心算法 =====================
-// 分词：拆分单词和标点，自动忽略空格差异
+// 分词：严格拆分单词与标点，单词仅含字母+中间合法撇号/连字符，所有标点独立标记
 function tokenize(str) {
   const tokens = [];
-  const regex = /([a-zA-Z][a-zA-Z'-]*)|([.,!?;:"'()\[\]])/g;
+  // 单词规则：字母开头、字母结尾，中间可包含撇号或连字符（如 don't / well-known）
+  // 标点规则：匹配所有中英文标点、特殊符号，统一归为标点类型
+  const regex = /([a-zA-Z]+(?:['-][a-zA-Z]+)*)|([\p{P}\p{S}])/gu;
   let match;
   while ((match = regex.exec(str)) !== null) {
     if (match[1]) {
@@ -291,7 +308,7 @@ function tokenize(str) {
   return tokens;
 }
 
-// 提取单词列表及其在原token中的索引
+// 提取纯单词列表及其在原token中的索引，完全排除标点
 function extractWords(tokens) {
   const words = [];
   tokens.forEach((token, idx) => {
@@ -327,7 +344,7 @@ function levenshtein(a, b) {
   return matrix[b.length][a.length];
 }
 
-// 计算最长公共子序列，返回匹配的索引对
+// 计算最长公共子序列，返回匹配的索引对（仅针对纯单词）
 function lcsMatch(correctWords, userWords) {
   const n = correctWords.length;
   const m = userWords.length;
@@ -360,7 +377,7 @@ function lcsMatch(correctWords, userWords) {
   return matches;
 }
 
-// 主错误分析函数：四类错误独立检测，互不干扰
+// 主错误分析函数：四类错误仅针对纯单词，标点完全不参与
 function analyzeErrors(correctSentence, userSentence) {
   const correctTokens = tokenize(correctSentence);
   const userTokens = tokenize(userSentence);
@@ -454,7 +471,7 @@ function analyzeErrors(correctSentence, userSentence) {
     }
   });
   
-  // 生成用户答案标红HTML（带正常空格格式）
+  // 生成用户答案标红HTML（标点正常显示，仅单词标注错误）
   const userParts = [];
   let userWordPtr = 0;
   userTokens.forEach(token => {
@@ -486,10 +503,10 @@ function analyzeErrors(correctSentence, userSentence) {
   });
   let userHTML = userParts.join(' ');
   // 清理标点前后多余空格
-  userHTML = userHTML.replace(/\s+([.,!?;:)\]])/g, '$1');
-  userHTML = userHTML.replace(/([(\[])\s+/g, '$1');
+  userHTML = userHTML.replace(/\s+([.,!?;:)\]”’])/g, '$1');
+  userHTML = userHTML.replace(/([(\[“‘])\s+/g, '$1');
 
-  // 生成正确答案标注HTML（带正常空格格式）
+  // 生成正确答案标注HTML（标点正常显示，仅单词标注错误）
   const correctParts = [];
   let correctWordPtr = 0;
   correctTokens.forEach(token => {
@@ -521,10 +538,10 @@ function analyzeErrors(correctSentence, userSentence) {
   });
   let correctHTML = correctParts.join(' ');
   // 清理标点前后多余空格
-  correctHTML = correctHTML.replace(/\s+([.,!?;:)\]])/g, '$1');
-  correctHTML = correctHTML.replace(/([(\[])\s+/g, '$1');
+  correctHTML = correctHTML.replace(/\s+([.,!?;:)\]”’])/g, '$1');
+  correctHTML = correctHTML.replace(/([(\[“‘])\s+/g, '$1');
   
-  // 错误统计
+  // 错误统计：仅统计单词，标点完全不计入
   const stats = {
     missing: correctWordStatus.filter(s => s === 'missing').length,
     spellError: userWordStatus.filter(s => s === 'spell-error').length,
@@ -658,6 +675,8 @@ function loadWonderSettings(){
   showChineseCheckbox.checked = (savedCn === "true");
   const savedFl = localStorage.getItem(showFirstLetterKey);
   showFirstLetterCheckbox.checked = (savedFl === "true");
+  // 初始化总数显示
+  document.getElementById("wonder-total-num").textContent = wonderDB.length;
 }
 loadWonderSettings();
 
@@ -671,15 +690,31 @@ showFirstLetterCheckbox.addEventListener("change", function(){
   if(currentWonderQs.length > 0) renderWonder();
 });
 
+// 更新范围模式下的题数显示
+function updateWonderRangeTotal() {
+  const start = Number(wonderStartInput.value);
+  const end = Number(wonderEndInput.value);
+  if (start >= 1 && end <= wonderDB.length && start <= end) {
+    document.getElementById("wonder-total-num").textContent = end - start + 1;
+  } else {
+    document.getElementById("wonder-total-num").textContent = "-";
+  }
+}
+
 modeRadios.forEach(radio=>{
   radio.addEventListener("change", function(){
     if(this.value === "range"){
       rangeInputs.classList.remove("hidden");
+      updateWonderRangeTotal();
     }else{
       rangeInputs.classList.add("hidden");
+      document.getElementById("wonder-total-num").textContent = wonderDB.length;
     }
   });
 });
+
+wonderStartInput.addEventListener("input", updateWonderRangeTotal);
+wonderEndInput.addEventListener("input", updateWonderRangeTotal);
 
 function renderWonder(){
   const wrap = document.getElementById("wonder-qs");
@@ -1325,6 +1360,11 @@ function renderJournalList(){
     div.innerHTML = `<input type="checkbox" value="${jId}" id="${inputId}"> <label for="${inputId}">${jId}</label>`;
     listWrap.appendChild(div);
   });
+
+  // 绑定总数更新事件
+  document.querySelectorAll("#journal-list input").forEach(cb=>{
+    cb.addEventListener("change", updateSspCustomTotal);
+  });
 }
 
 // 渲染词语列表
@@ -1339,6 +1379,38 @@ function renderWordList(){
     div.innerHTML = `<input type="checkbox" value="${word}" id="${inputId}"> <label for="${inputId}">${word}</label>`;
     listWrap.appendChild(div);
   });
+
+  // 绑定总数更新事件
+  document.querySelectorAll("#word-list input").forEach(cb=>{
+    cb.addEventListener("change", updateSspWordTotal);
+  });
+}
+
+// 更新自定义组可用题数
+function updateSspCustomTotal() {
+  const source = document.querySelector('input[name="ssp-source"]:checked').value;
+  let total = 0;
+  if (source === "original") {
+    const checkedBoxes = document.querySelectorAll("#journal-list input:checked");
+    const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
+    total = sspOriginalQuestions.filter(q=>selectedJournals.includes(q.journalId)).length;
+  } else if (source === "new") {
+    total = sspNewQuestions.length;
+  } else { // mix
+    const checkedBoxes = document.querySelectorAll("#journal-list input:checked");
+    const selectedJournals = Array.from(checkedBoxes).map(cb=>cb.value);
+    const originalCount = sspOriginalQuestions.filter(q=>selectedJournals.includes(q.journalId)).length;
+    total = originalCount + sspNewQuestions.length;
+  }
+  document.getElementById("ssp-custom-total").textContent = total;
+}
+
+// 更新选词模式可用题数
+function updateSspWordTotal() {
+  const checkedWords = document.querySelectorAll("#word-list input:checked");
+  const selectedWords = Array.from(checkedWords).map(cb=>cb.value);
+  const total = sspQuestions.filter(q=>selectedWords.includes(q.root)).length;
+  document.getElementById("ssp-word-total").textContent = total;
 }
 
 // 出题模式切换
@@ -1347,12 +1419,20 @@ document.querySelectorAll('input[name="ssp-mode"]').forEach(radio=>{
     document.getElementById("custom-ssp-settings").classList.toggle("hidden", this.value !== "custom");
     document.getElementById("word-ssp-settings").classList.toggle("hidden", this.value !== "word");
     updateJournalRangeVisibility();
+    if (this.value === "custom") {
+      updateSspCustomTotal();
+    } else if (this.value === "word") {
+      updateSspWordTotal();
+    }
   });
 });
 
-// 题目来源切换，控制期刊范围显示
+// 题目来源切换，控制期刊范围显示和总数
 document.querySelectorAll('input[name="ssp-source"]').forEach(radio=>{
-  radio.addEventListener("change", updateJournalRangeVisibility);
+  radio.addEventListener("change", function(){
+    updateJournalRangeVisibility();
+    updateSspCustomTotal();
+  });
 });
 
 function updateJournalRangeVisibility(){
@@ -1381,14 +1461,17 @@ function updateJournalRangeVisibility(){
 
 document.getElementById("select-all-journals").onclick = ()=>{
   document.querySelectorAll("#journal-list input").forEach(cb=>cb.checked=true);
+  updateSspCustomTotal();
 };
 
 document.getElementById("select-all-words").onclick = ()=>{
   document.querySelectorAll("#word-list input").forEach(cb=>cb.checked=true);
+  updateSspWordTotal();
 };
 
 document.getElementById("clear-all-words").onclick = ()=>{
   document.querySelectorAll("#word-list input").forEach(cb=>cb.checked=false);
+  updateSspWordTotal();
 };
 
 // 开始答题
@@ -1417,14 +1500,14 @@ document.getElementById("start-ssp").onclick = ()=>{
         sspPool.push({
           journalId: `${jId} 第1组`,
           questions: set0,
-          box: set0.map(q=>q.root)
+          box: [...set0.map(q=>q.root)].sort(()=>Math.random()-0.5)
         });
       }
       if(set1.length > 0){
         sspPool.push({
           journalId: `${jId} 第2组`,
           questions: set1,
-          box: set1.map(q=>q.root)
+          box: [...set1.map(q=>q.root)].sort(()=>Math.random()-0.5)
         });
       }
     });
@@ -1469,7 +1552,7 @@ document.getElementById("start-ssp").onclick = ()=>{
       sspPool.push({
         journalId: `自定义第${i+1}组`,
         questions: groupQs,
-        box: groupQs.map(q=>q.root)
+        box: [...groupQs.map(q=>q.root)].sort(()=>Math.random()-0.5)
       });
     }
   }
@@ -1497,7 +1580,7 @@ document.getElementById("start-ssp").onclick = ()=>{
       sspPool.push({
         journalId: `选词第${i+1}组`,
         questions: groupQs,
-        box: groupQs.map(q=>q.root)
+        box: [...groupQs.map(q=>q.root)].sort(()=>Math.random()-0.5)
       });
     }
   }
@@ -1781,6 +1864,13 @@ let nceCurrentIndex = 0;
 let nceRightCount = 0;
 let nceWrongList = [];
 
+// 计算新概念总句数
+function getNceTotalSentences() {
+  let total = 0;
+  nceDB.forEach(lesson => total += lesson.sentences.length);
+  return total;
+}
+
 // 初始化下拉选择框
 function initNceSelects(){
   const lessonSelect = document.getElementById("nce-lesson-select");
@@ -1798,7 +1888,19 @@ function initNceSelects(){
     opt2.textContent = lesson.title;
     selectLesson.appendChild(opt2);
   });
+
+  // 初始化总数显示
+  document.getElementById("nce-random-total").textContent = getNceTotalSentences();
+  const firstLesson = nceDB[0];
+  document.getElementById("nce-lesson-total").textContent = firstLesson.sentences.length;
 }
+
+// 切换课文时更新本课句数
+document.getElementById("nce-lesson-select").addEventListener("change", function(){
+  const lessonId = Number(this.value);
+  const lesson = nceDB.find(l=>l.id === lessonId);
+  document.getElementById("nce-lesson-total").textContent = lesson.sentences.length;
+});
 
 // 模式切换
 document.querySelectorAll('input[name="nce-mode"]').forEach(radio=>{
@@ -1832,6 +1934,7 @@ document.getElementById("nce-start-random").onclick = ()=>{
 document.getElementById("nce-start-lesson").onclick = ()=>{
   const lessonId = Number(document.getElementById("nce-lesson-select").value);
   const count = Number(document.getElementById("nce-lesson-count").value);
+  const orderMode = document.querySelector('input[name="nce-lesson-order"]:checked').value;
   const lesson = nceDB.find(l=>l.id === lessonId);
   
   if(count > lesson.sentences.length){
@@ -1839,8 +1942,12 @@ document.getElementById("nce-start-lesson").onclick = ()=>{
     return;
   }
 
-  nceQuizList = [...lesson.sentences].sort(()=>Math.random()-0.5).slice(0, count)
-    .map(s=>({...s, lesson: lesson.title}));
+  let sentences = [...lesson.sentences];
+  if (orderMode === 'random') {
+    sentences.sort(()=>Math.random()-0.5);
+  }
+  // 按原文顺序则保持原顺序，取前count句
+  nceQuizList = sentences.slice(0, count).map(s=>({...s, lesson: lesson.title}));
   startNceQuiz();
 };
 
@@ -1931,6 +2038,7 @@ document.getElementById("nce-check-btn").onclick = ()=>{
     <div class="error-detail">
       错误统计：拼写错误 ${result.stats.spellError} 处 | 多余单词 ${result.stats.extra} 处 | 
       缺失单词 ${result.stats.missing} 处 | 顺序错误 ${result.stats.orderError} 处
+      <br>注：标点符号不计入错误统计
     </div>
   `;
 
@@ -2019,7 +2127,20 @@ function initUnitSelects(){
     opt2.textContent = unit;
     selectUnit.appendChild(opt2);
   });
+
+  // 初始化总数显示
+  document.getElementById("unit-random-total").textContent = unitTranslationDB.length;
+  const firstUnit = units[0];
+  const firstUnitQs = unitTranslationDB.filter(item=>item.unit === firstUnit);
+  document.getElementById("unit-unit-total").textContent = firstUnitQs.length;
 }
+
+// 切换单元时更新单元题数
+document.getElementById("unit-unit-select").addEventListener("change", function(){
+  const unitName = this.value;
+  const count = unitTranslationDB.filter(item=>item.unit === unitName).length;
+  document.getElementById("unit-unit-total").textContent = count;
+});
 
 // 模式切换
 document.querySelectorAll('input[name="unit-mode"]').forEach(radio=>{
@@ -2145,6 +2266,7 @@ document.getElementById("unit-check-btn").onclick = ()=>{
     <div class="error-detail">
       错误统计：拼写错误 ${result.stats.spellError} 处 | 多余单词 ${result.stats.extra} 处 | 
       缺失单词 ${result.stats.missing} 处 | 顺序错误 ${result.stats.orderError} 处
+      <br>注：标点符号不计入错误统计
     </div>
   `;
 

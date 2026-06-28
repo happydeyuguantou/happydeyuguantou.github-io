@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wonder & SSP & 新概念 & 单元翻译 刷题工具 by豆包</title>
+  <title>Wonder & SSP & 新概念 & 单元翻译 刷题工具</title>
   <style>
     * {box-sizing: border-box; font-family: system-ui, sans-serif;}
     body {max-width: 1200px; margin: 0 auto; padding: 20px; background: #f7f9fc;}
@@ -53,12 +53,12 @@
     .order-error { color: #b45309; border-bottom: 2px solid #b45309; cursor: help; }
     .missing-hint { color: #dc2626; background: #fee2e2; padding: 0 4px; border-radius: 3px; font-size: 0.9em; margin: 0 2px; cursor: help; }
     .error-detail { margin-top: 8px; font-size: 13px; color: #64748b; font-weight: normal; }
-    .ans-block { margin: 4px 0; line-height: 1.6; }
+    .ans-block { margin: 4px 0; line-height: 1.8; }
     .ans-label { display: inline-block; width: 70px; font-weight: bold; color: #475569; }
   </style>
 </head>
 <body>
-  <h1>Wonder词汇 / SSP选词 / 新概念默写 / 单元翻译</h1>
+  <h1>Wonder词汇 / SSP选词 / 新概念默写 / 单元句子翻译</h1>
   <div class="tab-wrap">
     <button class="tab-btn active" data-tab="tab-wonder">Wonder词汇填空</button>
     <button class="tab-btn" data-tab="tab-ssp">SSP语法选词</button>
@@ -454,63 +454,75 @@ function analyzeErrors(correctSentence, userSentence) {
     }
   });
   
-  // 生成用户答案标红HTML
-  let userHTML = '';
+  // 生成用户答案标红HTML（带正常空格格式）
+  const userParts = [];
   let userWordPtr = 0;
   userTokens.forEach(token => {
     if (token.type === 'punct') {
-      userHTML += token.text;
+      userParts.push(token.text);
     } else {
       const status = userWordStatus[userWordPtr];
       const text = token.text;
+      let part;
       switch (status) {
         case 'matched':
-          userHTML += text;
+          part = text;
           break;
         case 'spell-error':
-          userHTML += `<span class="spell-error" title="拼写错误">${text}</span>`;
+          part = `<span class="spell-error" title="拼写错误">${text}</span>`;
           break;
         case 'order-error':
-          userHTML += `<span class="order-error" title="顺序错误">${text}</span>`;
+          part = `<span class="order-error" title="顺序错误">${text}</span>`;
           break;
         case 'extra':
-          userHTML += `<span class="extra-word" title="多余单词">${text}</span>`;
+          part = `<span class="extra-word" title="多余单词">${text}</span>`;
           break;
         default:
-          userHTML += text;
+          part = text;
       }
+      userParts.push(part);
       userWordPtr++;
     }
   });
-  
-  // 生成正确答案标注HTML
-  let correctHTML = '';
+  let userHTML = userParts.join(' ');
+  // 清理标点前后多余空格
+  userHTML = userHTML.replace(/\s+([.,!?;:)\]])/g, '$1');
+  userHTML = userHTML.replace(/([(\[])\s+/g, '$1');
+
+  // 生成正确答案标注HTML（带正常空格格式）
+  const correctParts = [];
   let correctWordPtr = 0;
   correctTokens.forEach(token => {
     if (token.type === 'punct') {
-      correctHTML += token.text;
+      correctParts.push(token.text);
     } else {
       const status = correctWordStatus[correctWordPtr];
       const text = token.text;
+      let part;
       switch (status) {
         case 'matched':
-          correctHTML += text;
+          part = text;
           break;
         case 'spell-error':
-          correctHTML += `<span class="spell-error" title="对应拼写错误">${text}</span>`;
+          part = `<span class="spell-error" title="对应拼写错误">${text}</span>`;
           break;
         case 'order-error':
-          correctHTML += `<span class="order-error" title="对应顺序错误">${text}</span>`;
+          part = `<span class="order-error" title="对应顺序错误">${text}</span>`;
           break;
         case 'missing':
-          correctHTML += `<span class="missing-hint" title="缺失单词">${text}</span>`;
+          part = `<span class="missing-hint" title="缺失单词">${text}</span>`;
           break;
         default:
-          correctHTML += text;
+          part = text;
       }
+      correctParts.push(part);
       correctWordPtr++;
     }
   });
+  let correctHTML = correctParts.join(' ');
+  // 清理标点前后多余空格
+  correctHTML = correctHTML.replace(/\s+([.,!?;:)\]])/g, '$1');
+  correctHTML = correctHTML.replace(/([(\[])\s+/g, '$1');
   
   // 错误统计
   const stats = {
@@ -605,7 +617,7 @@ const wonderDB = [
   {en:"Girls like Eleanor who were members of the yearbook __________________ and the debate club.", ans:"committee", cn:"委员会"},
   {en:"Don’t give them that __________________ over you.", ans:"power", cn:"掌控力"},
   {en:"Even though I was well beyond the trick-or-treating __________________ myself, I usually threw on some mask or other to __________________ him up and down the blocks, watching him knocking on people’s doors.", ans:"stage;accompany", cn:"阶段;陪同"},
-  {en:"Mom looked at both of us. “Is something going on?” She didn’t __________________ her question to either one of us in particular.", ans:"address", cn:"提出"},
+  {en:"Mom looked at both of us. “Is something going on?” She didn’t __________________ her question to either one of us in particular.", ans:"address", cn:"针对"},
   {en:"In August’s case, the doctors were able to __________________ one of the “single nucleotide deletion mutations” that made war on his face.", ans:"identify", cn:"识别"},
   {en:"He didn’t say anything, but I think that last bit _________________________.", ans:"was getting to him", cn:"戳到他痛处"},
   {en:"Not one person in the __________________ mix of my family gene pool has ever shown any obvious signs of having what August has.", ans:"exotic", cn:"奇特的"},
@@ -768,7 +780,7 @@ const sspOriginalQuestions = [
   {journalId:"3.13增刊+4.10刊", setId:1, en:"He ____ that nothing had happened and went back to work.", ans:"pretended", root:"pretend"},
   {journalId:"3.13增刊+4.10刊", setId:1, en:"Jackson was the kind of person who would ____ without fear.", ans:"jump out of the box", root:"jump out of the box"},
   {journalId:"4.3刊+5.8刊", setId:0, en:"The small bookstore has ____ into a large chain with stores in over twenty cities across the country.", ans:"expanded", root:"expand"},
-  {journalId:"4.3刊+5.8刊", setId:0, en:"The team worked together and finally won a ____ in the final match after a long season.", ans:"victory", root:"victory"},
+  {journalId:"4.3刊+5.8刊", setId:0, en:"The whole village soon learnt that a large sum of money had been lost.", ans:"victory", root:"victory"},
   {journalId:"4.3刊+5.8刊", setId:0, en:"Air is ____, but without it, no one can survive for more than a few minutes.", ans:"invisible", root:"invisible"},
   {journalId:"4.3刊+5.8刊", setId:0, en:"We ____ took the wrong bus and ended up in the next town.", ans:"accidentally", root:"accident"},
   {journalId:"4.3刊+5.8刊", setId:0, en:"Many people ____ that a positive attitude can help overcome the most difficult challenges in life.", ans:"believe", root:"belief"},
@@ -1577,18 +1589,18 @@ document.getElementById("reset-ssp").onclick = ()=>{
 renderJournalList();
 renderWordList();
 
-// ===================== 新概念课文题库 =====================
+// ===================== 新概念课文题库（题干含人名地名英文标注） =====================
 const nceDB = [
   {
     id: 40,
     title: "Lesson 40 Food and talk 进餐与交谈",
     sentences: [
-      {en:"Last week at a dinner party, the hostess asked me to sit next to Mrs. Rumbold.", cn:"在上星期的一次宴会上，女主人安排我坐在兰伯尔德夫人的身旁。"},
-      {en:"Mrs. Rumbold was a large, unsmiling lady in a tight black dress.", cn:"兰伯尔德夫人是一位身材高大、表情严肃的女人，穿一件紧身的黑衣服。"},
+      {en:"Last week at a dinner party, the hostess asked me to sit next to Mrs. Rumbold.", cn:"在上星期的一次宴会上，女主人安排我坐在兰伯尔德夫人（Mrs. Rumbold）的身旁。"},
+      {en:"Mrs. Rumbold was a large, unsmiling lady in a tight black dress.", cn:"兰伯尔德夫人（Mrs. Rumbold）是一位身材高大、表情严肃的女人，穿一件紧身的黑衣服。"},
       {en:"She did not even look up when I took my seat beside her.", cn:"当我在她身旁坐下来的时候，她甚至连头都没有抬一下。"},
       {en:"Her eyes were fixed on her plate and in a short time, she was busy eating.", cn:"她的眼睛盯着自己的盘子，不一会儿就忙着吃起来了。"},
       {en:"I tried to make conversation.", cn:"我试图找个话题和她聊聊。"},
-      {en:"'A new play is coming to \"The Globe\" soon,' I said. 'Will you be seeing it?'", cn:"“一出新剧要来‘环球剧场’上演了，”我说，“您去看吗？”"},
+      {en:"'A new play is coming to \"The Globe\" soon,' I said. 'Will you be seeing it?'", cn:"“一出新剧要来‘环球剧场（The Globe）’上演了，”我说，“您去看吗？”"},
       {en:"'No,' she answered.", cn:"“不，”她回答。"},
       {en:"'Will you be spending your holidays abroad this year?' I asked.", cn:"“您今年去国外度假吗？”我又问。"},
       {en:"'No,' she answered.", cn:"“不，”她回答。"},
@@ -1620,7 +1632,7 @@ const nceDB = [
     id: 42,
     title: "Lesson 42 Not very musical 并非很懂音乐",
     sentences: [
-      {en:"As we had had a long walk through one of the markets of old Delhi, we stopped at a square to have a rest.", cn:"当我们穿过旧德里的市场时走了很长一段路，我们在一个广场上停下来休息。"},
+      {en:"As we had had a long walk through one of the markets of old Delhi, we stopped at a square to have a rest.", cn:"当我们穿过旧德里（old Delhi）的市场时走了很长一段路，我们在一个广场上停下来休息。"},
       {en:"After a time, we noticed a snake charmer with two large baskets at the other side of the square, so we went to have a look at him.", cn:"过了一会儿，我们注意到广场的那一边有一个带着两个大筐的耍蛇人，于是就走过去看看。"},
       {en:"As soon as he saw us, he picked up a long pipe which was covered with coins and opened one of the baskets.", cn:"他一见我们，就拿起了一个长长的上面镶有硬币的管乐器，并掀开了一个筐的盖子。"},
       {en:"When he began to play a tune, we had our first glimpse of the snake.", cn:"当他开始吹奏一支曲子时，我们才第一次看到那条蛇。"},
@@ -1634,13 +1646,13 @@ const nceDB = [
     id: 43,
     title: "Lesson 43 Over the South Pole 飞越南极",
     sentences: [
-      {en:"In 1929, three years after his flight over the North Pole, the American explorer, R.E. Byrd, successfully flew over the South Pole for the first time.", cn:"美国探险家 R.E. 伯德在飞越北极3年之后，于1929年第一次飞越了南极。"},
-      {en:"Though, at first, Byrd and his men were able to take a great many photographs of the mountains that lay below, they soon ran into serious trouble.", cn:"虽然开始时伯德和他的助手们拍下了飞机下面连绵群山的大量照片，但他们很快就陷入了困境。"},
+      {en:"In 1929, three years after his flight over the North Pole, the American explorer, R.E. Byrd, successfully flew over the South Pole for the first time.", cn:"美国探险家 R.E. 伯德（R.E. Byrd）在飞越北极（North Pole）3年之后，于1929年第一次飞越了南极（South Pole）。"},
+      {en:"Though, at first, Byrd and his men were able to take a great many photographs of the mountains that lay below, they soon ran into serious trouble.", cn:"虽然开始时伯德（Byrd）和他的助手们拍下了飞机下面连绵群山的大量照片，但他们很快就陷入了困境。"},
       {en:"At one point, it seemed certain that their plane would crash.", cn:"在有个地方，飞机似乎肯定要坠毁了。"},
       {en:"It could only get over the mountains if it rose to 10,000 feet.", cn:"只有在飞至10,000英尺的高度时，它才能飞过这些山头。"},
-      {en:"Byrd at once ordered his men to throw out two heavy food sacks.", cn:"伯德马上命令他的助手们把两个沉重的食物袋扔掉。"},
+      {en:"Byrd at once ordered his men to throw out two heavy food sacks.", cn:"伯德（Byrd）马上命令他的助手们把两个沉重的食物袋扔掉。"},
       {en:"The plane was then able to rise and it cleared the mountains by 400 feet.", cn:"于是飞机可以上升了，它在离山头400英尺的高度飞越了过去。"},
-      {en:"Byrd now knew that he would be able to reach the South Pole which was 300 miles away, for there were no more mountains in sight.", cn:"伯德这时知道他能够顺利飞抵300英里以外的南极了，因为前面再没有山了。"},
+      {en:"Byrd now knew that he would be able to reach the South Pole which was 300 miles away, for there were no more mountains in sight.", cn:"伯德（Byrd）这时知道他能够顺利飞抵300英里以外的南极（South Pole）了，因为前面再没有山了。"},
       {en:"The aircraft was able to fly over the endless white plains without difficulty.", cn:"飞机可以毫无困难地飞过这片茫茫无际的白色原野！"}
     ]
   },
@@ -1648,14 +1660,14 @@ const nceDB = [
     id: 44,
     title: "Lesson 44 Through the forest 穿过森林",
     sentences: [
-      {en:"Mrs. Anne Sterling did not think of the risk she was taking when she ran through a forest after two men.", cn:"安·斯特林夫人在穿过森林追赶两个男人时，她并没有考虑到所冒的风险。"},
+      {en:"Mrs. Anne Sterling did not think of the risk she was taking when she ran through a forest after two men.", cn:"安·斯特林夫人（Mrs. Anne Sterling）在穿过森林追赶两个男人时，她并没有考虑到所冒的风险。"},
       {en:"They had rushed up to her while she was having a picnic at the edge of a forest with her children and tried to steal her handbag.", cn:"刚才，当她和孩子们正在森林边上野餐的时候，这两个人冲到她跟前，企图抢走她的手提包。"},
       {en:"In the struggle, the strap broke and, with the bag in their possession, both men started running through the trees.", cn:"在争抢中，手提包的带断了，包落入这两个人手里，他们拔腿跑进了树林。"},
-      {en:"Mrs. Sterling got so angry that she ran after them.", cn:"斯特林夫人非常气愤，向着他们追了过去。"},
+      {en:"Mrs. Sterling got so angry that she ran after them.", cn:"斯特林夫人（Mrs. Sterling）非常气愤，向着他们追了过去。"},
       {en:"She was soon out of breath, but she continued to run.", cn:"只追了一会儿便上气不接下气了，但她还是继续追赶。"},
       {en:"When she caught up with them, she saw that they had sat down and were going through the contents of the bag, so she ran straight at them.", cn:"当她赶上他们时，发现他们已经坐了下来，正翻着包里的东西，于是她直冲过去。"},
       {en:"The men got such a fright that they dropped the bag and ran away.", cn:"这两个人吓了一跳，扔下提包逃跑了。"},
-      {en:"'The strap needs mending,' said Mrs. Sterling later, 'but they did not steal anything.'", cn:"“这提包带需要修理，”斯特林夫人事后说道，“不过他们什么也没偷走。”"}
+      {en:"'The strap needs mending,' said Mrs. Sterling later, 'but they did not steal anything.'", cn:"“这提包带需要修理，”斯特林夫人（Mrs. Sterling）事后说道，“不过他们什么也没偷走。”"}
     ]
   },
   {
@@ -1663,12 +1675,12 @@ const nceDB = [
     title: "Lesson 45 A clear conscience 问心无愧",
     sentences: [
       {en:"The whole village soon learnt that a large sum of money had been lost.", cn:"整个村子很快知道，有一大笔钱丢失了。"},
-      {en:"Sam Benton, the local butcher, had lost his wallet while taking his savings to the post office.", cn:"当地的屠户萨姆·本顿在把存款送往邮局的途中把钱包丢了。"},
-      {en:"Sam was sure that the wallet must have been found by one of the villagers, but it was not returned to him.", cn:"萨姆确信那钱包一定是被某个村民捡到了，可是却不见有人来送还给他。"},
-      {en:"Three months passed, and then one morning, Sam found his wallet outside his front door.", cn:"3个月过去了，后来在一天早晨，萨姆在自己的大门外发现了他的钱包。"},
+      {en:"Sam Benton, the local butcher, had lost his wallet while taking his savings to the post office.", cn:"当地的屠户萨姆·本顿（Sam Benton）在把存款送往邮局的途中把钱包丢了。"},
+      {en:"Sam was sure that the wallet must have been found by one of the villagers, but it was not returned to him.", cn:"萨姆（Sam）确信那钱包一定是被某个村民捡到了，可是却不见有人来送还给他。"},
+      {en:"Three months passed, and then one morning, Sam found his wallet outside his front door.", cn:"3个月过去了，后来在一天早晨，萨姆（Sam）在自己的大门外发现了他的钱包。"},
       {en:"It had been wrapped up in newspaper and it contained half the money he had lost, together with a note which said: 'A thief, yes, but only 50 per cent a thief!'", cn:"钱包是用报纸包着的，里面有他丢失的钱的一半，而且还附着一张纸条，上面写着：“一个小偷，是的，但只是一个50%的小偷！”"},
-      {en:"Two months later, some more money was sent to Sam with another note: 'Only 25 per cent a thief now!'", cn:"又过了两个月，又有一些钱送还给了萨姆，又附了一张字条：“这回只是25%的小偷了！”"},
-      {en:"In time, all Sam's money was paid back in this way.", cn:"很快，萨姆全部的钱都用同样的方式还了回来。"},
+      {en:"Two months later, some more money was sent to Sam with another note: 'Only 25 per cent a thief now!'", cn:"又过了两个月，又有一些钱送还给了萨姆（Sam），又附了一张字条：“这回只是25%的小偷了！”"},
+      {en:"In time, all Sam's money was paid back in this way.", cn:"很快，萨姆（Sam）全部的钱都用同样的方式还了回来。"},
       {en:"The last note said: 'I am 100 per cent honest now!'", cn:"最后的那张字条上写道：“我现在是一个100%的诚实人了！”"}
     ]
   },
@@ -1676,13 +1688,13 @@ const nceDB = [
     id: 46,
     title: "Lesson 46 Expensive and uncomfortable 既昂贵又受罪",
     sentences: [
-      {en:"When a plane from London arrived at Sydney airport, workers began to unload a number of wooden boxes which contained clothing.", cn:"当一架来自伦敦的飞机抵达悉尼机场时，工人们开始卸下装有服装的一批木箱。"},
+      {en:"When a plane from London arrived at Sydney airport, workers began to unload a number of wooden boxes which contained clothing.", cn:"当一架来自伦敦（London）的飞机抵达悉尼（Sydney）机场时，工人们开始卸下装有服装的一批木箱。"},
       {en:"No one could account for the fact that one of the boxes was extremely heavy.", cn:"其中有只箱子特别重，可谁也弄不清是怎么回事。"},
       {en:"It suddenly occurred to one of the workers to open up the box.", cn:"突然一个工人想到打开箱子看看。"},
       {en:"He was astonished at what he found.", cn:"看到的情景使他吃惊。"},
       {en:"A man was lying in the box on top of a pile of woolen goods.", cn:"箱内有一个人正躺在一堆毛织品之上。"},
       {en:"He was so surprised at being discovered that he did not even try to run away.", cn:"他由于被人发现而感到非常吃惊，甚至都没有企图逃跑。"},
-      {en:"After he was arrested, the man admitted hiding in the box before the plane left London.", cn:"此人被逮捕后，承认他是在飞机离开伦敦前躲进箱里的。"},
+      {en:"After he was arrested, the man admitted hiding in the box before the plane left London.", cn:"此人被逮捕后，承认他是在飞机离开伦敦（London）前躲进箱里的。"},
       {en:"He had had a long and uncomfortable trip, for he had been confined to the wooden box for over eighteen hours.", cn:"他经历了一次漫长而又难受的旅程，因为他在那木箱里闷了18个多小时。"},
       {en:"The man was ordered to pay $3,500 for the cost of the trip.", cn:"此人被责令交付旅费3,500英镑。"},
       {en:"The normal price of a ticket is $2,000!", cn:"而正常票价是2,000英镑！"}

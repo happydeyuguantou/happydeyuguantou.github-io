@@ -553,7 +553,7 @@ function analyzeErrors(correctSentence, userSentence) {
   return { userHTML, correctHTML, stats };
 }
 
-// ===================== Wonder题库（已完全对齐PDF） =====================
+// ===================== Wonder题库（已对齐学生版挖空） =====================
 const wonderDB = [
   {en:"She left her job on Wall Street about six years ago to ______________ her “dream” and teach kids.", ans:"pursue", cn:"追求"},
   {en:"But the ______________of you, I guess, are new to the school, right?", ans:"rest", cn:"其余人"},
@@ -583,7 +583,7 @@ const wonderDB = [
   {en:"I wasn’t used to this whole _______________ of homework.", ans:"notion", cn:"概念"},
   {en:"Five hundred kids in a school: _______________ every one of them was going to see my face at some time.", ans:"eventually", cn:"最终"},
   {en:"I can only _______________ what they were saying about me. Actually, I prefer not to even try to imagine it.", ans:"imagine", cn:"想象"},
-  {en:"The teachers assigned seats in every class, and I ended up sitting next to Jack in every single class. so I figured either the teachers were told to put me and Jack together, or it was a totally incredible _______________.", ans:"coincidence", cn:"巧合"},
+  {en:"The teachers _______________ seats in every class, and I _______________ next to Jack in every single class. so I figured either the teachers were told to put me and Jack together, or it was a totally incredible _______________.", ans:"assigned;ended up sitting;coincidence", cn:"安排；最终坐在；巧合"},
   {en:"As the guy helped me stand up, he got a look at my face, and without even _______________, he just said: “Whoa!” Then he patted me on the shoulder, like he was dusting me off, and _______________ after his friends.", ans:"meaning to;took off", cn:"有意;跑开"},
   {en:"“I swear, I think he _______________ his pants!”", ans:"wet", cn:"尿湿"},
   {en:"I’d want to. I think you should get a secret squirt gun or something and _______________ it to your eyes somehow.", ans:"attach", cn:"固定"},
@@ -619,7 +619,7 @@ const wonderDB = [
   {en:"Ella said he __________________ her of E.T. She didn’t say this to be mean, of course.", ans:"reminded", cn:"使想起"},
   {en:"I even texted her and she didn’t reply. I __________________ maybe she had ended up staying in the camp longer, now that she was a counselor.", ans:"figured", cn:"猜想"},
   {en:"I can’t say she wasn’t nice, because she was, but she seemed kind of distant, like I was a__________________ friend.", ans:"casual", cn:"普通泛泛之交"},
-  {en:"It’s like they had talked to each other beforehand about redoing their image at the new school, but hadn’t bothered to ______________ me in.", ans:"clue", cn:"告知内情"},
+  {en:"It’s like they had talked to each other beforehand about redoing their image at the new school, but hadn’t bothered to ______________.", ans:"clue me in", cn:"告知内情"},
   {en:"After school I __________________a restroom to avoid bumping into Miranda’s mother outside.", ans:"ducked into", cn:"躲进"},
   {en:"“We stopped for pizza.” Incredible how easily a lie can__________________ through your lips.", ans:"slip", cn:"脱口而出"},
   {en:"“Just forget I asked anything at all,” I answered, and __________________dramatically into Auggie’s room and slammed the door.", ans:"stormed", cn:"冲进去"},
@@ -628,7 +628,7 @@ const wonderDB = [
   {en:"The hallway lights were _______________. The only thing illuminating her was the blue night-light in August’s bedroom.", ans:"out", cn:"熄灭"},
   {en:"Mom took his temperature, brought him some hot tea, and __________________ the “August’s mom’ role again.”", ans:"assumed", cn:"承担"},
   {en:"It was a larger group than I’d been accustomed to hanging out with, and a more __________________ crowd.", ans:"diverse", cn:"多元的"},
-  {en:"But for all they know, there’s more they don’t know. They can try to forecast the ______________, but they can’t guarantee them.", ans:"odds", cn:"概率"},
+  {en:"But for all they know, there’s more they don’t know. They can try to forecast the ______________, but they can’t ______________ them.", ans:"odds;guarantee", cn:"概率；保证"},
   {en:"She tried to __________________ even the slightest trace of August’s face in their faces.", ans:"detect", cn:"察觉"},
   {en:"August had __________________ some very mean things some boys were saying about him.", ans:"overheard", cn:"无意中听到"},
   {en:"Girls like Eleanor who were members of the yearbook __________________ and the debate club.", ans:"committee", cn:"委员会"},
@@ -2348,6 +2348,5 @@ window.addEventListener("DOMContentLoaded", function(){
   initUnitSelects();
 });
 </script>
-<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c353d10e13d549058fd4aa82441c75b6"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

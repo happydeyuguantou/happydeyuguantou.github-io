@@ -290,6 +290,64 @@
   </div>
 
 <script>
+// ===================== 缩写标准化：兼容全写/缩写/撇号空格 =====================
+function normalizeSentence(str) {
+  // 第一步：清理撇号前后的所有空格，修复 don 't / aren 't 这类写法
+  let normalized = str.replace(/\s*'\s*/g, "'");
+
+  // 第二步：按长度从长到短替换缩写为全写，避免短缩写优先匹配
+  const contractions = [
+    { pattern: /\bwouldn't\b/gi, replacement: "would not" },
+    { pattern: /\bshouldn't\b/gi, replacement: "should not" },
+    { pattern: /\bcouldn't\b/gi, replacement: "could not" },
+    { pattern: /\bmustn't\b/gi, replacement: "must not" },
+    { pattern: /\bneedn't\b/gi, replacement: "need not" },
+    { pattern: /\bhaven't\b/gi, replacement: "have not" },
+    { pattern: /\bhasn't\b/gi, replacement: "has not" },
+    { pattern: /\bhadn't\b/gi, replacement: "had not" },
+    { pattern: /\bdidn't\b/gi, replacement: "did not" },
+    { pattern: /\bdoesn't\b/gi, replacement: "does not" },
+    { pattern: /\bdon't\b/gi, replacement: "do not" },
+    { pattern: /\bwasn't\b/gi, replacement: "was not" },
+    { pattern: /\bweren't\b/gi, replacement: "were not" },
+    { pattern: /\bisn't\b/gi, replacement: "is not" },
+    { pattern: /\baren't\b/gi, replacement: "are not" },
+    { pattern: /\bwon't\b/gi, replacement: "will not" },
+    { pattern: /\bcan't\b/gi, replacement: "cannot" },
+    { pattern: /\bthey'll\b/gi, replacement: "they will" },
+    { pattern: /\bthey're\b/gi, replacement: "they are" },
+    { pattern: /\bthey've\b/gi, replacement: "they have" },
+    { pattern: /\bwe'll\b/gi, replacement: "we will" },
+    { pattern: /\bwe're\b/gi, replacement: "we are" },
+    { pattern: /\bwe've\b/gi, replacement: "we have" },
+    { pattern: /\byou'll\b/gi, replacement: "you will" },
+    { pattern: /\byou're\b/gi, replacement: "you are" },
+    { pattern: /\byou've\b/gi, replacement: "you have" },
+    { pattern: /\bhe'll\b/gi, replacement: "he will" },
+    { pattern: /\bshe'll\b/gi, replacement: "she will" },
+    { pattern: /\bshe's\b/gi, replacement: "she is" },
+    { pattern: /\bhe's\b/gi, replacement: "he is" },
+    { pattern: /\bit's\b/gi, replacement: "it is" },
+    { pattern: /\bi'll\b/gi, replacement: "i will" },
+    { pattern: /\bi'm\b/gi, replacement: "i am" },
+    { pattern: /\bi've\b/gi, replacement: "i have" },
+    { pattern: /\bthat's\b/gi, replacement: "that is" },
+    { pattern: /\bthere's\b/gi, replacement: "there is" },
+    { pattern: /\bwhat's\b/gi, replacement: "what is" },
+    { pattern: /\bwho's\b/gi, replacement: "who is" },
+    { pattern: /\bwhere's\b/gi, replacement: "where is" },
+    { pattern: /\bwhen's\b/gi, replacement: "when is" },
+    { pattern: /\bwhy's\b/gi, replacement: "why is" },
+    { pattern: /\bhow's\b/gi, replacement: "how is" }
+  ];
+
+  contractions.forEach(item => {
+    normalized = normalized.replace(item.pattern, item.replacement);
+  });
+
+  return normalized;
+}
+
 // ===================== 精细化判卷核心算法 =====================
 // 分词：严格拆分单词与标点，单词仅含字母+中间合法撇号/连字符，所有标点独立标记
 function tokenize(str) {
@@ -379,8 +437,28 @@ function lcsMatch(correctWords, userWords) {
 
 // 主错误分析函数：四类错误仅针对纯单词，标点完全不参与
 function analyzeErrors(correctSentence, userSentence) {
-  const correctTokens = tokenize(correctSentence);
-  const userTokens = tokenize(userSentence);
+  // 先标准化：统一展开缩写、修复撇号空格
+  const normCorrect = normalizeSentence(correctSentence);
+  const normUser = normalizeSentence(userSentence);
+
+  // 如果标准化后完全一致，直接判对，保留原文显示
+  if (normCorrect.trim().toLowerCase() === normUser.trim().toLowerCase()) {
+    return {
+      userHTML: userSentence,
+      correctHTML: correctSentence,
+      stats: {
+        missing: 0,
+        spellError: 0,
+        extra: 0,
+        orderError: 0,
+        isCorrect: true
+      }
+    };
+  }
+
+  // 存在错误时，基于标准化句子做精细化分析
+  const correctTokens = tokenize(normCorrect);
+  const userTokens = tokenize(normUser);
   const correctWords = extractWords(correctTokens);
   const userWords = extractWords(userTokens);
   
@@ -2038,7 +2116,7 @@ document.getElementById("nce-check-btn").onclick = ()=>{
     <div class="error-detail">
       错误统计：拼写错误 ${result.stats.spellError} 处 | 多余单词 ${result.stats.extra} 处 | 
       缺失单词 ${result.stats.missing} 处 | 顺序错误 ${result.stats.orderError} 处
-      <br>注：标点符号不计入错误统计
+      <br>注：标点符号不计入错误统计，缩写与全写均视为正确
     </div>
   `;
 
@@ -2266,7 +2344,7 @@ document.getElementById("unit-check-btn").onclick = ()=>{
     <div class="error-detail">
       错误统计：拼写错误 ${result.stats.spellError} 处 | 多余单词 ${result.stats.extra} 处 | 
       缺失单词 ${result.stats.missing} 处 | 顺序错误 ${result.stats.orderError} 处
-      <br>注：标点符号不计入错误统计
+      <br>注：标点符号不计入错误统计，缩写与全写均视为正确
     </div>
   `;
 

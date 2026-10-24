@@ -96,8 +96,7 @@ button:disabled {background: #cbd5e1; color: #64748b; cursor: not-allowed;}
 </style>
 </head>
 <body>
-<h1>Wonder词汇 / SSP选词 / 新概念默写 / 单元句子翻译 / 背单词by豆包</h1>
-<p>注意事项：本网站为AI编写，题库可能有缺失，发现题库缺失，可以找我，现在还差unit3单元复习的单词和句子和这期ssp没上去，等答案</p>
+<h1>Wonder词汇 / SSP选词 / 新概念默写 / 单元句子翻译 / 背单词</h1>
 <div class="tab-wrap">
   <button class="tab-btn active" data-tab="tab-wonder">Wonder词汇填空</button>
   <button class="tab-btn" data-tab="tab-ssp">SSP语法选词</button>
@@ -712,18 +711,19 @@ function renderWonder(){
   const showFl = showFirstLetterCheckbox.checked;
   const getFirstLetter = (ans) => ans.split(";").map(part => part.trim().charAt(0)).join(";");
   currentWonderQs.forEach((item, idx) => {
-    let sentence = item.en.replace(/_{2,}/g, "___");
     let hint = showCn ? `（${item.cn}）` : "";
-    let placeholder = showFl ? `首字母: ${getFirstLetter(item.ans)}` : "填写答案";
     const blanks = item.ans.split(";").length;
-    let inputsHtml = "";
+    // 把句子按 ______ 分割，中间插入输入框
+    const parts = item.en.split(/_+/);
+    let sentenceHtml = parts[0];
     for (let b = 0; b < blanks; b++) {
-      inputsHtml += `<input class="blank-input wonder-in" data-blank="${b}" placeholder="${b === 0 ? placeholder : '填写答案'}">`;
+      const ph = b === 0 ? (showFl ? `首字母: ${getFirstLetter(item.ans)}` : "填写答案") : "填写答案";
+      sentenceHtml += `<input class="blank-input wonder-in" data-blank="${b}" placeholder="${ph}" style="width:120px; margin:0 4px;">`;
+      if (parts[b+1]) sentenceHtml += parts[b+1];
     }
     let html = `
       <div class="question-item" data-index="${idx}">
-        <p>${idx+1}. ${sentence} ${hint}</p>
-        ${inputsHtml}
+        <p>${idx+1}. ${sentenceHtml} ${hint}</p>
         <span class="correct-ans hidden"></span>
       </div>
     `;
@@ -1008,14 +1008,16 @@ function renderSspSet(){
   wrap.innerHTML += boxHtml;
   set.questions.forEach((q, idx)=>{
     const blanks = q.ans.split(";").length;
-    let inputsHtml = "";
+    // 把句子按 ______ 分割，中间插入输入框
+    const parts = q.en.split(/_+/);
+    let sentenceHtml = parts[0];
     for (let b = 0; b < blanks; b++) {
-      inputsHtml += `<input class="blank-input ssp-in" data-blank="${b}" placeholder="填写答案">`;
+      sentenceHtml += `<input class="blank-input ssp-in" data-blank="${b}" placeholder="填写答案" style="width:120px; margin:0 4px;">`;
+      if (parts[b+1]) sentenceHtml += parts[b+1];
     }
     const html = `
       <div class="question-item" data-index="${idx}">
-        <p>${idx+1}. ${q.en.replace(/_{2,}/g, "___")}</p>
-        ${inputsHtml}
+        <p>${idx+1}. ${sentenceHtml}</p>
         <span class="correct-ans hidden"></span>
       </div>
     `;
